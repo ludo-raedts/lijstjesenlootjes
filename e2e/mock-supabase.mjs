@@ -8,6 +8,7 @@ const emptyState = () => ({ version: 1, wishlists: [], draws: [], accessTokens: 
 let version = 1;
 let data = emptyState();
 let buckets = new Map();
+let usage = new Map();
 
 function readBody(request) {
   return new Promise((resolve) => {
@@ -44,6 +45,16 @@ const rpc = {
     return current.count <= maximum;
   },
   app_health: () => true,
+  record_usage_event: ({ p_event: event }) => {
+    const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Amsterdam" }).format(new Date());
+    const key = `${day}|${event}`;
+    usage.set(key, (usage.get(key) ?? 0) + 1);
+    return null;
+  },
+  read_usage_daily: () => [...usage.entries()].map(([key, count]) => {
+    const [day, event] = key.split("|");
+    return { day, event, event_count: count };
+  }),
 };
 
 createServer(async (request, response) => {
@@ -51,7 +62,7 @@ createServer(async (request, response) => {
 
   if (url.pathname === "/__health") return send(response, 200, { ok: true });
   if (url.pathname === "/__reset" && request.method === "POST") {
-    version = 1; data = emptyState(); buckets = new Map();
+    version = 1; data = emptyState(); buckets = new Map(); usage = new Map();
     return send(response, 200, { reset: true });
   }
   if (url.pathname === "/__state" && request.method === "GET") {

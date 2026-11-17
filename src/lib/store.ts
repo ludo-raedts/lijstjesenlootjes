@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { purgeDeletedWishlists } from "@/lib/data-lifecycle";
+import type { UsageEvent, UsageRow } from "@/lib/usage";
 import type { Database } from "@/lib/types";
 
 const MAX_COMMIT_ATTEMPTS = 8;
@@ -98,4 +99,27 @@ export async function checkDatabaseHealth() {
     return false;
   }
   return data === true;
+}
+
+/** Best-effort anonymous counter. A failure here must never break the user's action. */
+export async function recordUsage(event: UsageEvent) {
+  try {
+    const { error } = await getClient().rpc("record_usage_event", { p_event: event });
+    if (error) console.error("Supabase record_usage_event failed", error.code);
+  } catch {
+    console.error("Supabase record_usage_event failed");
+  }
+}
+
+export async function readUsageDaily(days: number): Promise<UsageRow[]> {
+  const { data, error } = await getClient().rpc("read_usage_daily", { p_days: days });
+  if (error) {
+    console.error("Supabase read_usage_daily failed", error.code);
+    throw new Error("Usage could not be read.");
+  }
+  return (Array.isArray(data) ? data : []).map((row: { day: string; event: string; event_count: number }) => ({
+    day: row.day,
+    event: row.event,
+    eventCount: Number(row.event_count),
+  }));
 }

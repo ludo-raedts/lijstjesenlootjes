@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { createAssignments } from "@/lib/draw";
 import { errorResponse, noStoreJson } from "@/lib/http";
 import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
-import { transaction } from "@/lib/store";
+import { recordUsage, transaction } from "@/lib/store";
 import { optionalDate, optionalText, text } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
       database.draws.push(draw);
       database.accessTokens.push(admin.record, ...participantAccess.map(({ token }) => token.record));
     });
+    await recordUsage("draw_created");
     return noStoreJson({
       adminUrl: personalLink(request, "drawAdmin", admin.raw),
       participantLinks: participantAccess.map(({ participant, token }) => ({

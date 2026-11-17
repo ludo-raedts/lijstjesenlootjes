@@ -1,0 +1,109 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { formattingLocales } from "@/i18n/config";
+import { getServerI18n } from "@/i18n/server";
+import { hasAdminSession } from "@/lib/admin-auth";
+import { read, readUsageDaily } from "@/lib/store";
+import { buildUsageSeries, summarizeStock, totalUsage, usageEvents } from "@/lib/usage";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerI18n();
+  return {
+    title: t("meta.usage.title"),
+    description: t("meta.usage.description"),
+    robots: { index: false, follow: false },
+  };
+}
+
+export default async function UsagePage() {
+  if (!await hasAdminSession()) redirect("/admin");
+  const { locale, formattingLocale, t } = await getServerI18n();
+  const number = new Intl.NumberFormat(formattingLocales[locale]);
+  const date = (day?: string) =>
+    day
+      ? new Intl.DateTimeFormat(formattingLocale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`))
+      : t("usage.none");
+
+  let usage: ReturnType<typeof buildUsageSeries> | undefined;
+  try {
+    usage = buildUsageSeries(await readUsageDaily(30), 30);
+  } catch {
+    usage = undefined;
+  }
+  const stock = await read((database) => summarizeStock(database));
+  const totals = usage ? totalUsage(usage) : undefined;
+  const recentDays = usage ? usage.slice(-14).reverse() : [];
+
+  return (
+    <div className="shell page-section admin-page">
+      <header className="admin-page-header">
+        <span className="eyebrow">{t("usage.page.eyebrow")}</span>
+        <h1>{t("usage.page.title")}</h1>
+        <p className="lead">{t("usage.page.lead")}</p>
+        <nav className="admin-subnav" aria-label={t("admin.nav.label")}>
+          <Link href="/admin">{t("admin.nav.settings")}</Link>
+          <Link href="/admin/usage" aria-current="page">{t("admin.nav.usage")}</Link>
+        </nav>
+      </header>
+
+      {usage && totals ? (
+        <>
+          <section className="tool-card" aria-labelledby="usage-totals-title">
+            <h2 id="usage-totals-title">{t("usage.totals.title")}</h2>
+            <dl className="usage-grid">
+              {usageEvents.map((event) => (
+                <div key={event}>
+                  <dt>{t(`usage.event.${event}`)}</dt>
+                  <dd data-event={event}>{number.format(totals[event])}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <section className="tool-card" aria-labelledby="usage-daily-title">
+            <h2 id="usage-daily-title">{t("usage.daily.title")}</h2>
+            <div className="usage-table-wrap">
+              <table className="usage-table">
+                <caption>{t("usage.daily.caption")}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">{t("usage.daily.day")}</th>
+                    {usageEvents.map((event) => <th scope="col" key={event}>{t(`usage.event.${event}`)}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentDays.map(({ day, counts }) => (
+                    <tr key={day}>
+                      <th scope="row">{date(day)}</th>
+                      {usageEvents.map((event) => <td key={event}>{number.format(counts[event])}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      ) : (
+        <p className="notice error" role="alert">{t("usage.error")}</p>
+      )}
+
+      <section className="tool-card" aria-labelledby="usage-stock-title">
+        <h2 id="usage-stock-title">{t("usage.stock.title")}</h2>
+        <p className="muted">{t("usage.stock.body")}</p>
+        <dl className="usage-grid">
+          <div><dt>{t("usage.stock.activeWishlists")}</dt><dd data-stock="wishlists">{number.format(stock.activeWishlists)}</dd></div>
+          <div><dt>{t("usage.stock.activeDraws")}</dt><dd data-stock="draws">{number.format(stock.activeDraws)}</dd></div>
+          <div><dt>{t("usage.stock.participants")}</dt><dd>{number.format(stock.participants)}</dd></div>
+          <div><dt>{t("usage.stock.reservedWishes")}</dt><dd>{number.format(stock.reservedWishes)}</dd></div>
+          <div><dt>{t("usage.stock.openPersonalLinks")}</dt><dd>{number.format(stock.openPersonalLinks)}</dd></div>
+          <div><dt>{t("usage.stock.expiring")}</dt><dd>{number.format(stock.expiringWithin30Days)}</dd></div>
+          <div><dt>{t("usage.stock.oldestWishlist")}</dt><dd>{date(stock.oldestWishlistDay)}</dd></div>
+          <div><dt>{t("usage.stock.oldestDraw")}</dt><dd>{date(stock.oldestDrawDay)}</dd></div>
+        </dl>
+      </section>
+    </div>
+  );
+}

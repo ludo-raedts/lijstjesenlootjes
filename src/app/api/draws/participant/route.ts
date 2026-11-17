@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { assertSameOrigin, HttpError, id, requireSession } from "@/lib/security";
 import { errorResponse, noStoreJson } from "@/lib/http";
-import { read, transaction } from "@/lib/store";
+import { read, recordUsage, transaction } from "@/lib/store";
 import { optionalText, optionalUrl, text } from "@/lib/validation";
 import type { DrawWish } from "@/lib/types";
 
@@ -49,8 +49,10 @@ export async function POST(request: NextRequest) {
       const assignment = draw.assignments.find((item) => item.giverId === participant.id);
       const recipient = draw.participants.find((item) => item.id === assignment?.recipientId);
       if (!assignment || !recipient) throw new HttpError(500, "draw_reveal_failed");
+      const firstView = !participant.viewedAt;
       participant.viewedAt = participant.viewedAt ?? new Date().toISOString();
       return {
+        firstView,
         recipientName: recipient.name,
         title: draw.title,
         budget: draw.budget,
@@ -58,7 +60,9 @@ export async function POST(request: NextRequest) {
         recipientWishes: publicWishes(recipient.wishes),
       };
     });
-    return noStoreJson(result);
+    if (result.firstView) await recordUsage("personal_link_opened");
+    const { firstView: _firstView, ...payload } = result;
+    return noStoreJson(payload);
   } catch (error) {
     return errorResponse(error);
   }

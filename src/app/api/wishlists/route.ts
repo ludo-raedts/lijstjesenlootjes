@@ -2,7 +2,7 @@ import { personalLink } from "@/lib/personal-links";
 import { NextRequest } from "next/server";
 import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
 import { errorResponse, noStoreJson } from "@/lib/http";
-import { transaction } from "@/lib/store";
+import { recordUsage, transaction } from "@/lib/store";
 import { optionalDate, optionalText, optionalUrl, text } from "@/lib/validation";
 import type { Wish } from "@/lib/types";
 
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
       database.wishlists.push(wishlist);
       database.accessTokens.push(manage.record, guest.record);
     });
+    await recordUsage("wishlist_created");
     return noStoreJson({
       manageUrl: personalLink(request, "wishlistManage", manage.raw),
       guestUrl: personalLink(request, "wishlistGuest", guest.raw),

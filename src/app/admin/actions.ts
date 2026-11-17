@@ -19,6 +19,7 @@ import {
   type ThemeId,
   type ThemeSettings,
 } from "@/lib/theme";
+import { recordUsage } from "@/lib/store";
 import { saveThemeSettings } from "@/lib/theme-store";
 
 export type AdminActionCode =
@@ -48,6 +49,7 @@ export async function loginAdminAction(
     return { code: "invalid_credentials" };
   }
   await createAdminSession();
+  await recordUsage("admin_login");
   redirect("/admin");
 }
 

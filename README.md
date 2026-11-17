@@ -62,6 +62,10 @@ De server bewaart records in een afgeschermde Supabase/PostgreSQL-tabel. Alleen 
 
 Capabilitytokens bevatten 256 bits willekeur en worden alleen als SHA-256-hash opgeslagen. De ruwe token staat in het URL-fragment en wordt via een same-origin POST verruild voor een HttpOnly/SameSite-sessiecookie. Persoonlijke routes hebben `noindex`, `no-store` en `Referrer-Policy: no-referrer`.
 
+## Gebruiksdashboard
+
+`/admin/usage` (achter dezelfde login als `/admin`) toont anonieme dagtellers (lijstjes en trekkingen gemaakt, reserveringen, geopende persoonlijke lootjes, beheerinlogs, laatste 30 dagen) en wat er nu is opgeslagen (aantallen, oudste datum, binnenkort verlopend). Er worden nooit namen, wensen, links of tokens getoond of bewaard. De tellers staan in `app_private.usage_daily` (migratie `20261117170000_usage_daily.sql`, eerst toepassen), worden na een geslaagde actie best-effort verhoogd en dagen worden in Europe/Amsterdam-tijd geteld. Een mislukte teller laat de actie van de gebruiker nooit falen.
+
 ## End-to-end tests
 
 ```bash

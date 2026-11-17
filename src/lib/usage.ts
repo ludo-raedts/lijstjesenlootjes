@@ -1,0 +1,89 @@
+import { drawExpiresAt, wishlistExpiresAt } from "@/lib/data-lifecycle";
+import type { Database } from "@/lib/types";
+
+export const usageEvents = [
+  "wishlist_created",
+  "draw_created",
+  "reservation_made",
+  "personal_link_opened",
+  "admin_login",
+] as const;
+
+export type UsageEvent = (typeof usageEvents)[number];
+
+export type UsageRow = { day: string; event: string; eventCount: number };
+
+export type UsageDay = { day: string; counts: Record<UsageEvent, number> };
+
+const isUsageEvent = (value: string): value is UsageEvent =>
+  (usageEvents as readonly string[]).includes(value);
+
+const emptyCounts = (): Record<UsageEvent, number> =>
+  Object.fromEntries(usageEvents.map((event) => [event, 0])) as Record<UsageEvent, number>;
+
+/** Calendar day in Europe/Amsterdam as YYYY-MM-DD, matching how the database buckets events. */
+export function amsterdamDay(date: Date) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Amsterdam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+/** One entry per day, oldest first, with zeros for days without events. */
+export function buildUsageSeries(rows: UsageRow[], days: number, now: Date = new Date()): UsageDay[] {
+  const byDay = new Map<string, Record<UsageEvent, number>>();
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    byDay.set(amsterdamDay(new Date(now.getTime() - offset * 86_400_000)), emptyCounts());
+  }
+  for (const row of rows) {
+    const counts = byDay.get(row.day);
+    if (counts && isUsageEvent(row.event)) counts[row.event] += row.eventCount;
+  }
+  return [...byDay.entries()].map(([day, counts]) => ({ day, counts }));
+}
+
+export function totalUsage(series: UsageDay[]): Record<UsageEvent, number> {
+  const totals = emptyCounts();
+  for (const { counts } of series) {
+    for (const event of usageEvents) totals[event] += counts[event];
+  }
+  return totals;
+}
+
+export type StockSummary = {
+  activeWishlists: number;
+  activeDraws: number;
+  participants: number;
+  reservedWishes: number;
+  openPersonalLinks: number;
+  oldestWishlistDay?: string;
+  oldestDrawDay?: string;
+  expiringWithin30Days: number;
+};
+
+/** What is stored right now. Counts only: no titles, names, wishes, or links. */
+export function summarizeStock(database: Database, now: number = Date.now()): StockSummary {
+  const soon = now + 30 * 86_400_000;
+  const oldest = (values: string[]) => values.filter(Boolean).sort()[0]?.slice(0, 10);
+  const expiring = (times: Array<number | undefined>) =>
+    times.filter((time): time is number => time !== undefined && time > now && time <= soon).length;
+
+  return {
+    activeWishlists: database.wishlists.length,
+    activeDraws: database.draws.length,
+    participants: database.draws.reduce((sum, draw) => sum + draw.participants.length, 0),
+    reservedWishes: database.wishlists.reduce(
+      (sum, wishlist) => sum + wishlist.wishes.filter((wish) => wish.reservation).length,
+      0,
+    ),
+    openPersonalLinks: database.accessTokens.filter(
+      (token) => token.role === "draw_participant" && !token.revokedAt && Date.parse(token.expiresAt) > now,
+    ).length,
+    oldestWishlistDay: oldest(database.wishlists.map((wishlist) => wishlist.createdAt)),
+    oldestDrawDay: oldest(database.draws.map((draw) => draw.createdAt)),
+    expiringWithin30Days:
+      expiring(database.wishlists.map(wishlistExpiresAt)) + expiring(database.draws.map(drawExpiresAt)),
+  };
+}

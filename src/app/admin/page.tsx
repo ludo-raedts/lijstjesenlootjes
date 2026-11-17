@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { ThemeAdminForm } from "@/components/ThemeAdminForm";
 import { getServerI18n } from "@/i18n/server";
@@ -36,10 +37,16 @@ export default async function AdminPage() {
       ) : !authenticated ? (
         <AdminLoginForm />
       ) : (
+        <>
+        <nav className="admin-subnav" aria-label={t("admin.nav.label")}>
+          <Link href="/admin" aria-current="page">{t("admin.nav.settings")}</Link>
+          <Link href="/admin/usage">{t("admin.nav.usage")}</Link>
+        </nav>
         <ThemeAdminForm
           settings={await getThemeSettings()}
           appearance={await getActiveAppearance(locale)}
         />
+        </>
       )}
     </div>
   );

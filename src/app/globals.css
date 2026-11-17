@@ -898,3 +898,16 @@ body {
 .seo-content ol { display: grid; gap: 1rem; margin: 1rem 0 0; padding-left: 1.4rem; }
 .seo-content h3 { margin: 0 0 .2rem; font-family: var(--sans); font-size: 1.05rem; letter-spacing: 0; }
 .seo-content li > p { margin: 0; color: var(--muted); }
+
+.admin-subnav { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-top: 1.25rem; }
+.admin-subnav a { padding: .35rem 0; border-bottom: 2px solid transparent; color: var(--ink); font-weight: 700; text-decoration: none; }
+.admin-subnav a[aria-current="page"], .admin-subnav a:hover { border-color: var(--ink); }
+.usage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1rem; margin: 1rem 0 0; }
+.usage-grid > div { padding: 1rem; border: 1px solid var(--line, rgba(0, 0, 0, .15)); border-radius: 8px; background: var(--paper, transparent); }
+.usage-grid dt { color: var(--muted); font-size: .9rem; }
+.usage-grid dd { margin: .25rem 0 0; font-family: var(--serif); font-size: 1.9rem; line-height: 1.1; }
+.usage-table-wrap { overflow-x: auto; }
+.usage-table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.usage-table caption { padding-bottom: .6rem; color: var(--muted); text-align: left; }
+.usage-table th, .usage-table td { padding: .55rem .7rem; border-bottom: 1px solid rgba(0, 0, 0, .12); text-align: right; white-space: nowrap; }
+.usage-table th:first-child { text-align: left; }

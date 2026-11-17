@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { assertSameOrigin, HttpError, requireSession } from "@/lib/security";
 import { errorResponse, noStoreJson } from "@/lib/http";
-import { read, transaction } from "@/lib/store";
+import { read, recordUsage, transaction } from "@/lib/store";
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,9 +47,10 @@ export async function POST(request: NextRequest) {
         if (wish.reservation && wish.reservation.ownerSessionHash !== session.hash) {
           throw new HttpError(409, "wish_already_reserved");
         }
+        const newlyReserved = !wish.reservation;
         wish.reservation = { ownerSessionHash: session.hash, reservedAt: now };
         wishlist.updatedAt = now;
-        return { reserved: true };
+        return { reserved: true, newlyReserved };
       }
       if (body.action === "release") {
         if (!wish.reservation || wish.reservation.ownerSessionHash !== session.hash) {
@@ -57,11 +58,12 @@ export async function POST(request: NextRequest) {
         }
         delete wish.reservation;
         wishlist.updatedAt = now;
-        return { reserved: false };
+        return { reserved: false, newlyReserved: false };
       }
       throw new HttpError(400, "unknown_action");
     });
-    return noStoreJson(result);
+    if (result.reserved === true && result.newlyReserved) await recordUsage("reservation_made");
+    return noStoreJson({ reserved: result.reserved });
   } catch (error) {
     return errorResponse(error);
   }

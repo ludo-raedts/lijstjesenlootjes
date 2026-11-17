@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { E2E_ADMIN_PASSWORD } from "../playwright.config";
-import { i18n, resetBackend } from "./helpers";
+import { createDrawViaApi, createWishlistViaApi, expectNoAxeViolations, i18n, resetBackend } from "./helpers";
 
 test.beforeEach(resetBackend);
 
@@ -75,4 +75,39 @@ test("repeated wrong passwords are rate limited", async ({ page }, testInfo) => 
   // The ninth attempt is refused even with the right password.
   await submit(E2E_ADMIN_PASSWORD);
   await expect(page.getByRole("alert").filter({ hasText: t("admin.login.rateLimited") })).toBeVisible();
+});
+
+test("the usage dashboard needs a login and shows anonymous counts only", async ({ page, browser, baseURL }, testInfo) => {
+  const { t } = i18n(testInfo);
+
+  // Without a session the usage page sends visitors to the login.
+  await page.goto("/admin/usage");
+  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page.getByLabel(t("admin.login.password"))).toBeVisible();
+
+  // Generate some synthetic activity in separate visitor contexts.
+  const visitor = await browser.newContext();
+  const visitorPage = await visitor.newPage();
+  await visitorPage.goto(`${baseURL}/`);
+  const created = await createWishlistViaApi(visitorPage, ["Private wish"]);
+  await createDrawViaApi(visitorPage);
+  await visitor.close();
+  expect(created.guestUrl).toContain("#token=");
+
+  await page.goto("/admin");
+  await page.getByLabel(t("admin.login.password")).fill(E2E_ADMIN_PASSWORD);
+  await page.getByRole("button", { name: t("admin.login.submit") }).click();
+  await page.getByRole("link", { name: t("admin.nav.usage") }).click();
+  await expect(page).toHaveURL(/\/admin\/usage$/);
+
+  await expect(page.locator('[data-event="wishlist_created"]')).toHaveText("1");
+  await expect(page.locator('[data-event="draw_created"]')).toHaveText("1");
+  await expect(page.locator('[data-event="admin_login"]')).toHaveText("1");
+  await expect(page.locator('[data-stock="wishlists"]')).toHaveText("1");
+  await expect(page.locator('[data-stock="draws"]')).toHaveText("1");
+
+  // No user content appears anywhere on the page.
+  const text = await page.locator("main, body").first().innerText();
+  for (const secret of ["Private wish", "Synthetic list", "Alex", "Noor"]) expect(text).not.toContain(secret);
+  await expectNoAxeViolations(page, "usage dashboard");
 });

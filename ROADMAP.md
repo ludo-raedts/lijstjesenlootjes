@@ -85,6 +85,10 @@ Automate these browser flows in both Dutch and English:
 Use isolated synthetic data and delete it during teardown. Do not run destructive tests
 against production records.
 
+## Usage dashboard
+
+Implemented (2026-11-17): `/admin/usage` with anonymous daily counters and a stock summary. Amazon clicks and conversions are not measured here; use Amazon Associates reports.
+
 ## Phase 2 — Product completeness
 
 - Add an optional reminder flow only after an email provider, sender identity, delivery
