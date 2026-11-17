@@ -20,7 +20,7 @@ export function DrawCreate() {
   const [budget, setBudget] = useState("");
   const [date, setDate] = useState("");
   const [others, setOthers] = useState<Person[]>([{ id: "participant-1", name: "" }, { id: "participant-2", name: "" }]);
-  const [excludedPairs, setExcludedPairs] = useState<Set<string>>(new Set());
+  const [excluded, setExcluded] = useState<Set<string>>(new Set());
   const [result, setResult] = useState<DrawResult>();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -31,7 +31,15 @@ export function DrawCreate() {
       ? [{ id: organizerId, name: organizerName.trim() }, ...items]
       : items;
   }, [organizerId, organizerName, organizerParticipates, others]);
-  const pairs = useMemo(() => participants.flatMap((left, leftIndex) => participants.slice(leftIndex + 1).map((right) => ({ left, right, key: [left.id, right.id].sort().join(":") }))), [participants]);
+  const exclusions = useMemo(
+    () => participants.flatMap((giver) => participants.filter((recipient) => recipient.id !== giver.id && excluded.has(`${giver.id}:${recipient.id}`)).map((recipient) => ({ from: giver.id, to: recipient.id }))),
+    [participants, excluded],
+  );
+  const toggleExclusion = (from: string, to: string, checked: boolean) => setExcluded((current) => {
+    const next = new Set(current);
+    if (checked) next.add(`${from}:${to}`); else next.delete(`${from}:${to}`);
+    return next;
+  });
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -40,7 +48,6 @@ export function DrawCreate() {
     if (!requestId.current) requestId.current = crypto.randomUUID();
     setError(""); setBusy(true);
     try {
-      const exclusions = pairs.filter((pair) => excludedPairs.has(pair.key)).flatMap((pair) => [{ from: pair.left.id, to: pair.right.id }, { from: pair.right.id, to: pair.left.id }]);
       setResult(await api<DrawResult>("/api/draws", { method: "POST", body: JSON.stringify({ requestId: requestId.current, organizerName, title, budget, date, participants, exclusions }) }));
     } catch (submitError) { setError((submitError as Error).message); }
     finally { setBusy(false); submitting.current = false; }
@@ -83,9 +90,29 @@ export function DrawCreate() {
       </div>
       <button className="button button-secondary" type="button" onClick={() => setOthers([...others, person()])}>{t("draw.create.addParticipant")}</button>
 
-      <div className="step-heading"><span>3</span><h2>{t("draw.create.step3")}</h2></div>
-      {pairs.length ? <div className="exclusion-grid">{pairs.map((pair) => <label className="exclusion-row" key={pair.key}><input type="checkbox" checked={excludedPairs.has(pair.key)} onChange={(event) => setExcludedPairs((current) => { const next = new Set(current); if (event.target.checked) next.add(pair.key); else next.delete(pair.key); return next; })} /><span>{t("draw.create.exclusion", { left: pair.left.name, right: pair.right.name })}</span></label>)}</div> : <div className="empty-state">{t("draw.create.exclusionEmpty")}</div>}
-      <p className="hint">{t("draw.create.exclusionHint")}</p>
+      <div className="step-heading"><span>3</span><h2>{t("draw.create.step3")} <span className="hint">{t("common.optional")}</span></h2></div>
+      <details className="exclusions">
+        <summary><span>{t("draw.create.exclusionsToggle")}</span>{exclusions.length > 0 && <span className="exclusion-badge">{t("draw.create.exclusionsTotal", { count: exclusions.length })}</span>}</summary>
+        <div className="exclusions-body">
+          <p className="hint">{t("draw.create.exclusionHint")}</p>
+          {participants.length >= 3 ? participants.map((giver) => {
+            const count = exclusions.filter((item) => item.from === giver.id).length;
+            return (
+              <details className="exclusion-person" key={giver.id}>
+                <summary><span>{t("draw.create.exclusionPerson", { name: giver.name })}</span>{count > 0 && <span className="exclusion-badge">{t("draw.create.exclusionCount", { count })}</span>}</summary>
+                <div className="exclusion-grid">
+                  {participants.filter((recipient) => recipient.id !== giver.id).map((recipient) => (
+                    <label className="exclusion-row" key={recipient.id}>
+                      <input type="checkbox" checked={excluded.has(`${giver.id}:${recipient.id}`)} onChange={(event) => toggleExclusion(giver.id, recipient.id, event.target.checked)} />
+                      <span>{recipient.name}</span>
+                    </label>
+                  ))}
+                </div>
+              </details>
+            );
+          }) : <div className="empty-state">{t("draw.create.exclusionEmpty")}</div>}
+        </div>
+      </details>
       {error && <div className="notice error" role="alert">{error}</div>}
       <button className="button" disabled={busy || participants.length < 3} type="submit">{busy ? t("draw.create.drawing") : t("draw.create.submit")}</button>
       <p className="hint">{t("draw.create.frozenHint")}</p>

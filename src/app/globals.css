@@ -326,7 +326,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--green); box-shad
 .exclusion-row input { width: 20px; min-height: 20px; accent-color: var(--terracotta); }
 .divider { height: 1px; margin: 2rem 0; border: 0; background: var(--line); }
 .step-heading { display: flex; align-items: center; gap: .8rem; margin: 2rem 0 1rem; }
-.step-heading span { display: grid; width: 34px; height: 34px; place-items: center; transform: rotate(-4deg); border: 1px solid var(--green); border-radius: 2px 7px 2px 5px; color: var(--green); font-family: var(--serif); font-weight: 700; }
+.step-heading > span { display: grid; width: 34px; height: 34px; place-items: center; transform: rotate(-4deg); border: 1px solid var(--green); border-radius: 2px 7px 2px 5px; color: var(--green); font-family: var(--serif); font-weight: 700; }
 .step-heading h2 { margin: 0; font-family: var(--sans); font-size: 1.15rem; letter-spacing: 0; }
 
 .gift-card { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; }
@@ -871,3 +871,15 @@ body {
   .admin-two-column, .admin-schedule-grid, .admin-theme-grid { grid-template-columns: 1fr; }
   .admin-save { width: 100%; }
 }
+
+/* Optional per-person exclusions (collapsible) */
+.exclusions, .exclusion-person { margin-top: 1rem; border: 1px solid var(--line); border-radius: 2px; background: var(--paper); }
+.exclusions > summary, .exclusion-person > summary { display: flex; min-height: 48px; align-items: center; justify-content: space-between; gap: .75rem; padding: .65rem .9rem; cursor: pointer; font-weight: 700; list-style: none; }
+.exclusions > summary::-webkit-details-marker, .exclusion-person > summary::-webkit-details-marker { display: none; }
+.exclusions > summary::after, .exclusion-person > summary::after { content: "+"; margin-left: auto; font-size: 1.3rem; line-height: 1; }
+.exclusions[open] > summary::after, .exclusion-person[open] > summary::after { content: "−"; }
+.exclusions > summary:focus-visible, .exclusion-person > summary:focus-visible { outline: 3px solid var(--forest); outline-offset: 2px; }
+.exclusions-body { padding: 0 .9rem .9rem; }
+.exclusions-body .exclusion-person { background: var(--white); }
+.exclusion-person .exclusion-grid { margin: 0; padding: 0 .9rem .9rem; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+.exclusion-badge { flex: none; white-space: nowrap; padding: .1rem .55rem; border-radius: 999px; background: var(--forest); color: var(--paper); font-size: .78rem; font-weight: 700; }
