@@ -32,8 +32,8 @@ test("internal routes exist as app folders", () => {
 });
 
 test("the path follows the domain; unknown hosts use Dutch paths", () => {
-  assert.equal(pathForHost("wishlistCreate", "wishanddraw.com"), "/create-wishlist");
-  assert.equal(pathForHost("wishlistCreate", "www.wishanddraw.com:443"), "/create-wishlist");
+  assert.equal(pathForHost("wishlistCreate", "wishanddraw.com"), "/wishlist-maker");
+  assert.equal(pathForHost("wishlistCreate", "www.wishanddraw.com:443"), "/wishlist-maker");
   assert.equal(pathForHost("wishlistCreate", "lijstjesenlootjes.nl"), "/verlanglijstje-maken");
   assert.equal(pathForHost("drawReveal", "lijstje-en-lootjes.vercel.app"), "/lootje");
   assert.equal(pathForHost("drawReveal", null), "/lootje");
@@ -44,25 +44,30 @@ test("hreflang pairs point nl <-> en with the right slug and x-default to the .n
   const alternates = alternatesFor("wishlistCreate");
   assert.deepEqual(alternates, [
     { hreflang: "nl", url: "https://lijstjesenlootjes.nl/verlanglijstje-maken" },
-    { hreflang: "en", url: "https://wishanddraw.com/create-wishlist" },
+    { hreflang: "en", url: "https://wishanddraw.com/wishlist-maker" },
     { hreflang: "x-default", url: "https://lijstjesenlootjes.nl/verlanglijstje-maken" },
   ]);
   assert.equal(alternatesFor("home")[1].url, "https://wishanddraw.com");
   assert.equal(alternatesFor("help")[1].url, "https://wishanddraw.com/help");
-  assert.match(linkHeaderValue("drawCreate"), /<https:\/\/wishanddraw\.com\/draw-names>; rel="alternate"; hreflang="en"/);
+  assert.match(linkHeaderValue("drawCreate"), /<https:\/\/wishanddraw\.com\/secret-santa-generator>; rel="alternate"; hreflang="en"/);
   assert.equal(SITE_DOMAINS[0].locale, "nl");
 });
 
 test("redirects: each domain sends other languages' paths to its canonical path", () => {
   const rules = redirectRules();
   const find = (host: string, source: string) => rules.find((rule) => rule.host === host && rule.source === source);
-  assert.equal(find("wishanddraw.com", "/verlanglijstje-maken")?.destination, "/create-wishlist");
+  assert.equal(find("wishanddraw.com", "/verlanglijstje-maken")?.destination, "/wishlist-maker");
   assert.equal(find("wishanddraw.com", "/lootje")?.destination, "/draw/reveal");
-  assert.equal(find("lijstjesenlootjes.nl", "/create-wishlist")?.destination, "/verlanglijstje-maken");
+  assert.equal(find("lijstjesenlootjes.nl", "/wishlist-maker")?.destination, "/verlanglijstje-maken");
   assert.equal(find("lijstjesenlootjes.nl", "/draw/manage")?.destination, "/trekking-beheren");
   // no redirects for shared paths, none from a canonical path, and no loops
   assert.equal(find("wishanddraw.com", "/help"), undefined);
-  assert.equal(find("wishanddraw.com", "/create-wishlist"), undefined);
+  assert.equal(find("wishanddraw.com", "/wishlist-maker"), undefined);
+  // renamed English paths keep working through legacy redirects on both domains
+  assert.equal(find("wishanddraw.com", "/create-wishlist")?.destination, "/wishlist-maker");
+  assert.equal(find("wishanddraw.com", "/draw-names")?.destination, "/secret-santa-generator");
+  assert.equal(find("wishanddraw.com", "/spin-the-wheel")?.destination, "/name-wheel");
+  assert.equal(find("lijstjesenlootjes.nl", "/draw-names")?.destination, "/lootjes-trekken");
   assert.equal(find("lijstjesenlootjes.nl", "/verlanglijstje-maken"), undefined);
   for (const rule of rules) assert.notEqual(rule.source, rule.destination);
 });

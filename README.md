@@ -52,7 +52,7 @@ De GitHub-repository `ludo-raedts/lijstjesenlootjes` is aan Vercel gekoppeld. Ee
 - `www.lijstjesenlootjes.nl` verwijst permanent door naar de kale domeinnaam (`next.config.ts`).
 - `wishanddraw.com` toont dezelfde app met Engels als standaardtaal; de URL blijft `wishanddraw.com` (geen redirect). `www.wishanddraw.com` verwijst permanent naar de kale naam.
 - De standaardtaal volgt het domein (`src/lib/domains.ts`); een expliciete taalkeuze van de bezoeker (cookie `ll_locale`) wint voor de taal van de tekst. Canonical-URL, sitemap, robots en `hreflang`-Link-headers (`next.config.ts`) zijn per domein.
-- De paden volgen het domein, niet de cookie. Alle paden staan in één getypeerde module, `src/lib/paths.ts`: `lijstjesenlootjes.nl` gebruikt de Nederlandse paden (`/verlanglijstje-maken`, `/lootjes-trekken`, `/rad-draaien`, `/verlanglijstje/beheren`, `/verlanglijstje/bekijken`, `/trekking-beheren`, `/lootje`), `wishanddraw.com` de Engelse (`/create-wishlist`, `/draw-names`, `/spin-the-wheel`, `/wishlist/manage`, `/wishlist/view`, `/draw/manage`, `/draw/reveal`). `/help` en `/privacy` zijn gedeeld. De routemappen in `src/app` blijven Nederlands; `wishanddraw.com` serveert de Engelse paden via host-gebonden rewrites (de URL blijft Engels). Het pad van de andere taal geeft op elk domein een permanente redirect (308) naar het eigen pad, zodat eerder uitgedeelde links blijven werken; het `#token=…`-fragment blijft behouden. Persoonlijke links die de API uitgeeft gebruiken het pad van het domein waarop het verzoek binnenkwam.
+- De paden volgen het domein, niet de cookie. Alle paden staan in één getypeerde module, `src/lib/paths.ts`: `lijstjesenlootjes.nl` gebruikt de Nederlandse paden (`/verlanglijstje-maken`, `/lootjes-trekken`, `/rad-draaien`, `/verlanglijstje/beheren`, `/verlanglijstje/bekijken`, `/trekking-beheren`, `/lootje`), `wishanddraw.com` de Engelse (`/wishlist-maker`, `/secret-santa-generator`, `/name-wheel`, `/wishlist/manage`, `/wishlist/view`, `/draw/manage`, `/draw/reveal`). `/help` en `/privacy` zijn gedeeld. De routemappen in `src/app` blijven Nederlands; `wishanddraw.com` serveert de Engelse paden via host-gebonden rewrites (de URL blijft Engels). Het pad van de andere taal geeft op elk domein een permanente redirect (308) naar het eigen pad, zodat eerder uitgedeelde links blijven werken; hernoemde paden (`legacyPaths` in `PAGES`: `/create-wishlist`, `/draw-names`, `/spin-the-wheel`) redirecten permanent naar het nieuwe pad; het `#token=…`-fragment blijft behouden. Persoonlijke links die de API uitgeeft gebruiken het pad van het domein waarop het verzoek binnenkwam.
 - Sitemap, `hreflang` (nl ↔ en met het juiste pad per domein, `x-default` = `.nl`), robots.txt en de proxy-matcher (`src/proxy.ts`, letterlijke lijst met een test die de overeenkomst met `paths.ts` bewaakt) komen uit of worden bewaakt door dezelfde padentabel. Een nieuw pad toevoegen: eerst in `PAGES`, dan de proxy-matcher bijwerken als het privé is.
 - De DNS-records wijzen naar Vercel. DNS-propagatie en de uitgifte van het TLS-certificaat kunnen direct na registratie of een DNS-wijziging nog enige tijd duren.
 
@@ -61,6 +61,16 @@ De GitHub-repository `ludo-raedts/lijstjesenlootjes` is aan Vercel gekoppeld. Ee
 De server bewaart records in een afgeschermde Supabase/PostgreSQL-tabel. Alleen servercode met de geheime Supabase-sleutel kan de `security definer`-functies voor lezen, schrijven en rate limiting aanroepen; browser- en anon-sleutels hebben geen toegang. Schrijfacties gebruiken optimistic concurrency control, zodat twee gelijktijdige reserveringen niet allebei kunnen slagen. De schemawijzigingen staan in `supabase/migrations/`.
 
 Capabilitytokens bevatten 256 bits willekeur en worden alleen als SHA-256-hash opgeslagen. De ruwe token staat in het URL-fragment en wordt via een same-origin POST verruild voor een HttpOnly/SameSite-sessiecookie. Persoonlijke routes hebben `noindex`, `no-store` en `Referrer-Policy: no-referrer`.
+
+## End-to-end tests
+
+```bash
+npm run test:e2e
+```
+
+De suite (`e2e/`, Playwright met het geïnstalleerde Google Chrome) bouwt de app en draait die tegen een in-memory Supabase-nabootsing (`e2e/mock-supabase.mjs`). Alle omgevingswaarden worden expliciet meegegeven, dus `.env.local` kan de tests nooit naar een echte database laten wijzen; alle geheimen zijn wegwerpwaarden. Chrome koppelt `lijstjesenlootjes.nl` en `wishanddraw.com` aan 127.0.0.1, zodat elke test in beide talen via het echte domein draait (project `nl` en `en`). Een kleine testproxy (`e2e/proxy.mjs`) vervangt wat Vercel normaal doet: de same-origin-controle en het Secure-attribuut van cookies onder `next start`.
+
+Gedekt: homepage, mobiel menu, taalwissel en Engelse paden; verlanglijstje maken, bewerken, delen, reserveren, vrijgeven en verwijderen; trekking met uitsluiting en dubbele namen, persoonlijke links, eigen wensen, link vervangen en verwijderen; admin-login, rate limiting, thema en layout opslaan, uitloggen; health- en cleanup-endpoint; axe (WCAG 2.2 AA) op openbare en persoonlijke pagina's bij 1280, 640 (200% zoom) en 320 px; toetsenbordbediening en gereduceerde beweging.
 
 ## Health en incidenten
 

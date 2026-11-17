@@ -13,6 +13,8 @@ export interface PageDefinition {
   visibility: "public" | "private";
   /** Path per locale/domain. The Dutch path is also the internal route. */
   paths: Record<Locale, string>;
+  /** Former paths per locale that permanently redirect (308) to the canonical path on that locale's domain. */
+  legacyPaths?: Partial<Record<Locale, readonly string[]>>;
 }
 
 export type PageKey =
@@ -29,9 +31,9 @@ export type PageKey =
 
 export const PAGES: readonly PageDefinition[] = [
   { key: "home", visibility: "public", paths: { nl: "/", en: "/" } },
-  { key: "wishlistCreate", visibility: "public", paths: { nl: "/verlanglijstje-maken", en: "/create-wishlist" } },
-  { key: "drawCreate", visibility: "public", paths: { nl: "/lootjes-trekken", en: "/draw-names" } },
-  { key: "wheel", visibility: "public", paths: { nl: "/rad-draaien", en: "/spin-the-wheel" } },
+  { key: "wishlistCreate", visibility: "public", paths: { nl: "/verlanglijstje-maken", en: "/wishlist-maker" }, legacyPaths: { en: ["/create-wishlist"] } },
+  { key: "drawCreate", visibility: "public", paths: { nl: "/lootjes-trekken", en: "/secret-santa-generator" }, legacyPaths: { en: ["/draw-names"] } },
+  { key: "wheel", visibility: "public", paths: { nl: "/rad-draaien", en: "/name-wheel" }, legacyPaths: { en: ["/spin-the-wheel"] } },
   { key: "help", visibility: "public", paths: { nl: "/help", en: "/help" } },
   { key: "privacy", visibility: "public", paths: { nl: "/privacy", en: "/privacy" } },
   { key: "wishlistManage", visibility: "private", paths: { nl: "/verlanglijstje/beheren", en: "/wishlist/manage" } },
@@ -113,14 +115,19 @@ export interface PathRule {
   destination: string;
 }
 
-/** On every domain, other languages' paths permanently redirect (308) to that domain's canonical path. */
+/**
+ * On every domain, other languages' paths and the domain's own legacy paths permanently redirect (308) to that
+ * domain's canonical path.
+ */
 export function redirectRules(): PathRule[] {
   return SITE_DOMAINS.flatMap((domain) =>
     PAGES.flatMap((page) => {
       const canonical = page.paths[domain.locale];
-      return Object.values(page.paths)
-        .filter((path) => path !== canonical)
-        .map((path) => ({ host: domain.host, source: path, destination: canonical }));
+      const sources = [
+        ...Object.values(page.paths),
+        ...Object.values(page.legacyPaths ?? {}).flat(),
+      ].filter((path) => path !== canonical);
+      return [...new Set(sources)].map((path) => ({ host: domain.host, source: path, destination: canonical }));
     }),
   );
 }
