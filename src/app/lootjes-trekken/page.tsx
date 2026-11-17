@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { DrawCreate } from "@/components/DrawCreate";
 import { getServerI18n } from "@/i18n/server";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerI18n();
-  return { title: t("meta.drawCreate.title"), description: t("meta.drawCreate.description") };
+  return publicPageMetadata("drawCreate", "meta.drawCreate.title", "meta.drawCreate.description");
 }
 
 export default async function DrawPage() {

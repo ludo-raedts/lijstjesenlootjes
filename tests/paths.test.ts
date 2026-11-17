@@ -9,7 +9,9 @@ import {
   linkHeaderValue,
   pathForHost,
   pathForLocale,
+  privateDisallowRules,
   privatePathPrefixes,
+  publicPages,
   redirectRules,
   rewriteRules,
 } from "../src/lib/paths";
@@ -104,4 +106,15 @@ test("no hard-coded Dutch paths remain outside the path map", () => {
     const text = readFileSync(file, "utf8");
     for (const path of dutchPaths) assert.ok(!text.includes(`"${path}`) && !text.includes(`}${path}`), `${file} hard-codes ${path}`);
   }
+});
+
+test("robots disallow rules never block a public path", () => {
+  const rules = privateDisallowRules();
+  const blocks = (rule: string, path: string) => (rule.endsWith("$") ? path === rule.slice(0, -1) : path.startsWith(rule));
+  for (const page of publicPages()) {
+    for (const path of Object.values(page.paths)) {
+      assert.ok(!rules.some((rule) => blocks(rule, path)), `${path} must not be disallowed`);
+    }
+  }
+  assert.ok(rules.includes("/lootje$") && rules.includes("/lootje/"));
 });

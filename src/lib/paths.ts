@@ -75,6 +75,14 @@ export function privatePathPrefixes(): string[] {
   return [...new Set(privatePages().flatMap((page) => Object.values(page.paths)))];
 }
 
+/**
+ * robots.txt rules for private paths. A bare "Disallow: /lootje" is a prefix match and would also block the public
+ * "/lootjes-trekken"; so each private path is blocked as an exact path plus its sub-paths.
+ */
+export function privateDisallowRules(): string[] {
+  return privatePathPrefixes().flatMap((path) => [`${path}$`, `${path}/`]);
+}
+
 export interface Alternate {
   hreflang: string;
   url: string;

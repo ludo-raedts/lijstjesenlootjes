@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Wheel } from "@/components/Wheel";
 import { getServerI18n } from "@/i18n/server";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerI18n();
-  return { title: t("meta.wheel.title"), description: t("meta.wheel.description") };
+  return publicPageMetadata("wheel", "meta.wheel.title", "meta.wheel.description");
 }
 
 export default async function WheelPage() {

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { WishlistCreate } from "@/components/WishlistCreate";
 import { getServerI18n } from "@/i18n/server";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerI18n();
-  return { title: t("meta.wishlistCreate.title"), description: t("meta.wishlistCreate.description") };
+  return publicPageMetadata("wishlistCreate", "meta.wishlistCreate.title", "meta.wishlistCreate.description");
 }
 
 export default async function WishlistCreatePage() {

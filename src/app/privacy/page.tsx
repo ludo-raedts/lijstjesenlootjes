@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { getServerI18n } from "@/i18n/server";
+import { publicPageMetadata } from "@/lib/seo";
 import { getAmazonLinkConfig } from "@/lib/affiliate/server";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerI18n();
-  return { title: t("meta.privacy.title"), description: t("meta.privacy.description") };
+  return publicPageMetadata("privacy", "meta.privacy.title", "meta.privacy.description");
 }
 
 export default async function PrivacyPage() {

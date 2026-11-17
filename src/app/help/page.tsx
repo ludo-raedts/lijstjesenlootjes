@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerI18n } from "@/i18n/server";
+import { publicPageMetadata } from "@/lib/seo";
 import { getPagePath } from "@/lib/request-site";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerI18n();
-  return { title: t("nav.help"), description: t("meta.help.description") };
+  return publicPageMetadata("help", "meta.help.title", "meta.help.description");
 }
 
 export default async function HelpPage() {

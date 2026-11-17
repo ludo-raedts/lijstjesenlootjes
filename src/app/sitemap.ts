@@ -3,6 +3,9 @@ import { localeForHost } from "@/lib/domains";
 import { alternatesFor, pathForLocale, publicPages } from "@/lib/paths";
 import { getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
 
+/** Update when public page content changes; a request-time date would make the field meaningless to crawlers. */
+const SITEMAP_LAST_MODIFIED = new Date("2026-11-17");
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = await getRequestSiteUrl();
   const locale = localeForHost(await getRequestHost()) ?? "nl";
@@ -11,9 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const isHome = page.key === "home";
     return {
       url: isHome ? base : `${base}${path}`,
-      lastModified: new Date(),
-      changeFrequency: isHome ? "weekly" : "monthly",
-      priority: isHome ? 1 : 0.8,
+      lastModified: SITEMAP_LAST_MODIFIED,
       alternates: {
         languages: Object.fromEntries(alternatesFor(page.key).map((alternate) => [alternate.hreflang, alternate.url])),
       },
