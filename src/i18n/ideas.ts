@@ -104,9 +104,82 @@ const NL_TITLES: Record<string, string> = {
 
 const TITLES: Partial<Record<Locale, Record<string, string>>> = { nl: NL_TITLES };
 
+/**
+ * A concrete bol product behind an idea. Only the bol product id and a short display name
+ * are stored: no price, image or description, so nothing can go stale except the product
+ * itself. The link is a plain bol URL; the partner link is added when a wish is displayed.
+ * Picked from bol's "Meest gewild" (most wished) results on 2026-11-17. Ideas in "under15"
+ * only have a product when it cost € 15 or less on that date; re-check before changing.
+ * Ideas without an entry simply add the idea title as a wish.
+ */
+export interface IdeaProduct {
+  bolId: string;
+  name: string;
+}
+
+const NL_PRODUCTS: Record<string, IdeaProduct> = {
+  notebook: { bolId: "9300000045174131", name: "Peter Pauper Bookbound notitieboek – Gilded Tree of Life" },
+  "puzzle-500": { bolId: "9300000277775995", name: "Jan van Haasteren – Een hondenleven (500 stukjes)" },
+  "card-game": { bolId: "1004004006487381", name: "Beverbende (999 Games)" },
+  "bath-bomb-set": { bolId: "9300000137888270", name: "Funky Fizzers – 8 badbruisballen" },
+  "fluffy-socks": { bolId: "9300000125974638", name: "Warme huissokken, 5 paar" },
+  "pen-set": { bolId: "9300000246113027", name: "BIC Cristal Pastel balpennen, 10 stuks" },
+  "building-blocks": { bolId: "9300000181455762", name: "Little Dutch bouwblokken – Fairy Garden" },
+  "picture-book": { bolId: "9300000174510838", name: "Het Grote Gevoelenshotel" },
+  "board-game-family": { bolId: "9300000222631585", name: "Pictionary (Mattel)" },
+  "play-dough": { bolId: "9300000166567045", name: "Play-Doh Fun Factory startset" },
+  "science-kit": { bolId: "9300000151777642", name: "Clementoni Super Scheikunde experimenteerdoos" },
+  "magnetic-tiles": { bolId: "9300000183681628", name: "PlayMix magnetische bouwtegels, 62 stuks" },
+  "jigsaw-kids": { bolId: "9300000152168596", name: "Ravensburger Bluey 4-in-1 kinderpuzzels" },
+  "cuddly-toy": { bolId: "9300000229495664", name: "Little Dutch knuffelhond Jackie" },
+  headphones: { bolId: "9300000151669587", name: "JBL Live 770NC noise-cancelling koptelefoon" },
+  "power-bank": { bolId: "9300000438193571", name: "Siltcon powerbank 20.000 mAh" },
+  "phone-stand": { bolId: "9300000026187935", name: "Verstelbare telefoonstandaard voor op bureau" },
+  sketchbook: { bolId: "9300000106767455", name: "Oxford schetsboek A4, 50 vel" },
+  "led-lights": { bolId: "9300000309901668", name: "USB LED-strip 5 meter, warm wit" },
+  "card-game-party": { bolId: "9300000003122902", name: "Throw Throw Burrito" },
+  "bluetooth-speaker": { bolId: "9300000252617209", name: "JBL Go 5 mini speaker" },
+  blanket: { bolId: "9300000161640643", name: "Komfortec fleece plaid 150×200 cm" },
+  "tea-set": { bolId: "9300000102289112", name: "Mingtea theeset met glazen theepot" },
+  "book-light": { bolId: "9300000187288214", name: "Sounix oplaadbaar leeslampje met klem" },
+  bathrobe: { bolId: "9300000227127490", name: "LINNICK teddy fleece badjas" },
+  "jigsaw-adult": { bolId: "9300000277775712", name: "Jan van Haasteren – Leve de Middellandse Zee (1000 stukjes)" },
+  diffuser: { bolId: "9300000183986540", name: "Boncy Bonfire aroma-diffuser met vlameffect" },
+  "throw-pillow": { bolId: "9300000264897582", name: "Dutch Decor Mart sierkussen 45×45 cm" },
+  "adult-colouring-book": { bolId: "9300000220472853", name: "Coco Wyo – Cozy Cuties kleurboek" },
+  "chocolate-box": { bolId: "9300000019648354", name: "Raffaello geschenkdoos 300 g" },
+  "tea-selection": { bolId: "9300000239566022", name: "Pukka Tea Discovery Box" },
+  "coffee-beans": { bolId: "9000000012512898", name: "Lavazza Crema e Aroma koffiebonen" },
+  "cheese-board": { bolId: "9300000226712029", name: "Villux ronde borrelplank met kaasmesjes" },
+  cookbook: { bolId: "9300000258651028", name: "Even simpel – Yotam Ottolenghi" },
+  "baking-tin": { bolId: "9300000230858662", name: "Ronde bakvormen, 6-delige set" },
+  "thermos-flask": { bolId: "9300000243226604", name: "Owala FreeSip 710 ml" },
+  "picnic-blanket": { bolId: "9300000159252202", name: "Benson waterdicht picknickkleed 150×130 cm" },
+  headlamp: { bolId: "9300000250840359", name: "Besjaar oplaadbare LED-hoofdlamp" },
+  "sports-bottle": { bolId: "9300000265715962", name: "Cabau Bloom drinkfles 1 liter" },
+  binoculars: { bolId: "9300000169798461", name: "Freek Vonk × Bresser verrekijker voor kinderen" },
+  "bike-light-set": { bolId: "9300000152579540", name: "Inlustro LED-fietslampenset, oplaadbaar" },
+  "yoga-mat": { bolId: "9300000155058975", name: "Tunturi yogamat 8 mm" },
+  "hiking-socks": { bolId: "9300000194409811", name: "Danish Endurance merino wandelsokken" },
+  frisbee: { bolId: "9200000081916400", name: "Jobber frisbee 25 cm" },
+  "camping-mug": { bolId: "9300000291487457", name: "Cheqo emaille kampeermokken, set van 2" },
+};
+
+const PRODUCTS: Partial<Record<Locale, Record<string, IdeaProduct>>> = { nl: NL_PRODUCTS };
+
+export function bolProductUrl(bolId: string): string {
+  return `https://www.bol.com/nl/nl/p/product/${bolId}/`;
+}
+
+export interface LocalizedIdea {
+  id: string;
+  title: string;
+  product?: { name: string; url: string };
+}
+
 export interface LocalizedIdeaCategory {
   category: IdeaCategory;
-  ideas: { id: string; title: string }[];
+  ideas: LocalizedIdea[];
 }
 
 /** Ideas for a locale, or an empty list when none have been written for it. */
@@ -115,6 +188,10 @@ export function ideasForLocale(locale: Locale): LocalizedIdeaCategory[] {
   if (!titles) return [];
   return IDEA_CATEGORIES.map((category) => ({
     category,
-    ideas: IDEA_IDS[category].flatMap((id) => (titles[id] ? [{ id, title: titles[id] }] : [])),
+    ideas: IDEA_IDS[category].flatMap((id): LocalizedIdea[] => {
+      if (!titles[id]) return [];
+      const product = PRODUCTS[locale]?.[id];
+      return [{ id, title: titles[id], ...(product ? { product: { name: product.name, url: bolProductUrl(product.bolId) } } : {}) }];
+    }),
   })).filter((entry) => entry.ideas.length > 0);
 }

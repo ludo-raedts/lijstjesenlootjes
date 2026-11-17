@@ -27,11 +27,11 @@ export function WishFields({
   };
   // An idea fills the last empty wish row if there is one, otherwise it opens a new row.
   const lastIsBlank = wishes.length > 0 && !wishes[wishes.length - 1].title.trim() && !wishes[wishes.length - 1].url.trim();
-  const addIdea = (title: string) => {
+  const addIdea = (idea: { title: string; url: string }) => {
     if (lastIsBlank) {
-      update(wishes.length - 1, { title });
+      update(wishes.length - 1, idea);
     } else if (wishes.length < MAX_EDITOR_WISHES) {
-      onChange([...wishes, { ...blankWish(), title }]);
+      onChange([...wishes, { ...blankWish(), ...idea }]);
     }
   };
   return (

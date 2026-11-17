@@ -134,6 +134,7 @@ export const enMessages: Record<MessageKey, string> = {
   "ideas.added": "On your list",
   "ideas.announceAdded": "“{title}” was added to your list.",
   "ideas.full": "Your list is full. Remove a wish first to add an idea.",
+  "ideas.partnerNote": "Product suggestions with a link go to bol. These are affiliate links: if you buy something there we receive a commission and you pay no more.",
 
   "wishlist.manage.pageEyebrow": "Personal page",
   "wishlist.manage.pageTitle": "Manage your wishlist.",

@@ -18,7 +18,7 @@ export function WishIdeas({
 }: {
   existingTitles: string[];
   full: boolean;
-  onAdd: (title: string) => void;
+  onAdd: (idea: { title: string; url: string }) => void;
 }) {
   const { locale, t } = useI18n();
   const groups = useMemo(() => ideasForLocale(locale), [locale]);
@@ -51,7 +51,10 @@ export function WishIdeas({
           const added = taken.has(idea.title.trim().toLowerCase());
           return (
             <li key={idea.id}>
-              <span>{idea.title}</span>
+              <span>
+                {idea.title}
+                {idea.product ? <span className="hint idea-product"> {idea.product.name}</span> : null}
+              </span>
               {added ? (
                 <span className="hint">{t("ideas.added")}</span>
               ) : (
@@ -61,7 +64,7 @@ export function WishIdeas({
                   disabled={full}
                   aria-label={t("ideas.addLabel", { title: idea.title })}
                   onClick={() => {
-                    onAdd(idea.title);
+                    onAdd({ title: idea.title, url: idea.product?.url ?? "" });
                     setAnnouncement(t("ideas.announceAdded", { title: idea.title }));
                   }}
                 >
@@ -72,6 +75,7 @@ export function WishIdeas({
           );
         })}
       </ul>
+      <p className="hint">{t("ideas.partnerNote")}</p>
       {full ? <p className="hint">{t("ideas.full")}</p> : null}
       <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
     </details>

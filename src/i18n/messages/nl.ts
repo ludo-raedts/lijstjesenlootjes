@@ -132,6 +132,7 @@ export const nlMessages = {
   "ideas.added": "Staat op je lijstje",
   "ideas.announceAdded": "“{title}” is toegevoegd aan je lijstje.",
   "ideas.full": "Je lijstje zit vol. Haal eerst een wens weg om een idee toe te voegen.",
+  "ideas.partnerNote": "Productsuggesties met een link gaan naar bol. Dat zijn partnerlinks: koop je daar iets, dan ontvangen wij een commissie en betaal jij niet meer.",
 
   "wishlist.manage.pageEyebrow": "Persoonlijke pagina",
   "wishlist.manage.pageTitle": "Beheer je lijstje.",

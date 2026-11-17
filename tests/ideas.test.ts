@@ -20,3 +20,18 @@ test("every Dutch category has ten ideas with unique ids and titles", () => {
 test("a locale without written ideas shows no ideas block", () => {
   assert.deepEqual(ideasForLocale("en"), []);
 });
+
+test("products are well-formed bol links and under-15 picks stay cheap-looking by construction", () => {
+  const groups = ideasForLocale("nl");
+  const withProduct = groups.flatMap((group) => group.ideas.filter((idea) => idea.product));
+  assert.ok(withProduct.length >= 40);
+  const urls = new Set<string>();
+  for (const idea of withProduct) {
+    assert.match(idea.product!.url, /^https:\/\/www\.bol\.com\/nl\/nl\/p\/product\/\d{13,16}\/$/);
+    assert.ok(idea.product!.name.length > 0 && idea.product!.name.length <= 100);
+    urls.add(idea.product!.url);
+  }
+  assert.equal(urls.size, withProduct.length, "no product is used twice");
+  // The English locale never gets bol products.
+  assert.deepEqual(ideasForLocale("en"), []);
+});

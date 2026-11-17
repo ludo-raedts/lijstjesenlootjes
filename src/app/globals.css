@@ -321,6 +321,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--green); box-shad
 .idea-category[aria-pressed="true"] { background: var(--forest); border-color: var(--forest); color: #fff; }
 .idea-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
 .idea-list li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .35rem 0; border-bottom: 1px solid var(--line); }
+.idea-product { display: block; }
 .idea-list li:last-child { border-bottom: 0; }
 .link-result { display: grid; gap: .5rem; margin: .85rem 0 1.35rem; }
 .link-box { display: flex; gap: .75rem; align-items: center; padding: .75rem; border: 1px solid var(--line); border-radius: 2px; background: var(--paper); }
