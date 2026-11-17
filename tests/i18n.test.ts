@@ -20,3 +20,13 @@ test("field validation is localized in the browser", () => {
     "Group name is required.",
   );
 });
+
+test("Dutch and English catalogs have identical keys and placeholders", async () => {
+  const { nlMessages } = await import("../src/i18n/messages/nl");
+  const { enMessages } = await import("../src/i18n/messages/en");
+  assert.deepEqual(Object.keys(enMessages).sort(), Object.keys(nlMessages).sort());
+  const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).sort();
+  for (const key of Object.keys(nlMessages) as Array<keyof typeof nlMessages>) {
+    assert.deepEqual(placeholders(enMessages[key]), placeholders(nlMessages[key]), key);
+  }
+});
