@@ -38,7 +38,12 @@ export default async function HomePage() {
   return (
     <>
       <section className="editorial-hero shell">
-        <img className="hero-tulip" src="/motifs/motif-neutral-tulip.svg" alt="" aria-hidden="true" />
+        <div className="hero-art" aria-hidden="true">
+          <img className="hero-art-tulip" src="/motifs/motif-neutral-tulip.svg" alt="" />
+          <ClipboardArt className="hero-art-list" />
+          <BowlArt className="hero-art-bowl" />
+          <img className="hero-art-blossom" src="/motifs/motif-neutral-blossom.svg" alt="" />
+        </div>
         <div className="hero-copy">
           <span className="eyebrow">{t("home.hero.eyebrow")}</span>
           <h1>{t("home.hero.title")}</h1>

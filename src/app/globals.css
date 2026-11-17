@@ -517,3 +517,38 @@ input:focus, textarea:focus, select:focus { border-color: var(--green); box-shad
 .hero-figure img.figure-corner { width: clamp(70px, 12vw, 150px); height: auto; border-radius: 0; }
 @media (max-width: 560px) { .hero-figure img.figure-corner { width: 64px; } }
 .trust-copy .trust-group { display: block; margin: 0 auto .75rem; }
+
+/* ===== Round 2: hero art, softer image edges, equal product cards ===== */
+.hero-tulip { display: none; }
+.hero-art { position: relative; grid-column: 10 / -1; grid-row: 1; align-self: center; min-height: 300px; }
+.hero-art svg, .hero-art img { position: absolute; height: auto; }
+.hero-art-list { top: 0; right: 14%; width: 46%; transform: rotate(-5deg); }
+.hero-art-bowl { right: 0; bottom: 4%; width: 62%; transform: rotate(3deg); }
+.hero-art-tulip { bottom: 0; left: -2%; width: 26%; transform: rotate(-8deg); }
+.hero-art-blossom { top: 6%; right: 0; width: 15%; }
+.hero-copy { grid-row: 1; }
+.hero-aside { grid-row: 2; }
+@media (max-width: 1100px) { .hero-copy { grid-column: 1 / 9; } .hero-art { grid-column: 9 / -1; } }
+@media (max-width: 860px) {
+  .hero-art { grid-column: 1; grid-row: 2; min-height: 150px; max-width: 360px; margin: 1.5rem 0 0; }
+  .hero-aside { grid-row: 3; }
+  .hero-art-list { width: 34%; right: 40%; }
+  .hero-art-bowl { width: 44%; }
+  .hero-art-tulip { width: 18%; left: 0; }
+}
+
+/* Image: torn on both top and bottom, with a soft paper contact shadow */
+.hero-figure picture { filter: drop-shadow(0 3px 0 rgb(29 42 34 / 14%)) drop-shadow(0 10px 14px rgb(29 42 34 / 10%)); }
+.hero-figure img:not(.figure-corner) {
+  mask: url(/motifs/paper-edge-neutral-01.svg) top / 100% 30px no-repeat, linear-gradient(#000, #000) 0 29px / 100% calc(100% - 58px) no-repeat, url(/motifs/paper-edge-neutral-02.svg) bottom / 100% 30px no-repeat;
+  -webkit-mask: url(/motifs/paper-edge-neutral-01.svg) top / 100% 30px no-repeat, linear-gradient(#000, #000) 0 29px / 100% calc(100% - 58px) no-repeat, url(/motifs/paper-edge-neutral-02.svg) bottom / 100% 30px no-repeat;
+}
+.hero-figure img.figure-corner { z-index: 1; }
+
+/* Equal product cards */
+.product-card { align-items: stretch; }
+.product-card .product-art { align-self: center; }
+.product-body { display: flex; flex-direction: column; align-items: flex-start; }
+.product-body p { flex: 1; }
+.product-body .button { margin-top: .5rem; }
+@media (min-width: 861px) { .product-body h2 { min-height: 2.1em; display: flex; align-items: flex-end; } }
