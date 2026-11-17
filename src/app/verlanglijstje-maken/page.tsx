@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { WishlistCreate } from "@/components/WishlistCreate";
+import { SeoContent } from "@/components/SeoContent";
 import { getServerI18n } from "@/i18n/server";
 import { publicPageMetadata } from "@/lib/seo";
 
@@ -19,6 +20,7 @@ export default async function WishlistCreatePage() {
           <ul><li>{t("wishlist.page.asideManage")}</li><li>{t("wishlist.page.asideGuest")}</li><li>{t("wishlist.page.asideReservation")}</li></ul>
         </aside>
       </div>
+      <SeoContent prefix="wishlist.seo" stepCount={3} tipCount={3} faqCount={4} />
     </>
   );
 }

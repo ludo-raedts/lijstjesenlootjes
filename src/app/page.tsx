@@ -109,7 +109,7 @@ export default async function HomePage() {
             {steps.map((step, index) => (
               <li key={step.title}>
                 <span className="step-badge" aria-hidden="true">{index + 1}</span>
-                <div><strong>{step.title}</strong><p>{step.body}</p></div>
+                <div><h3>{step.title}</h3><p>{step.body}</p></div>
                 <span className="step-icon" aria-hidden="true">{step.icon}</span>
               </li>
             ))}
