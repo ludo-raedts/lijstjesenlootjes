@@ -59,30 +59,31 @@ export function ClipboardArt(props: IconProps) {
   );
 }
 
-/** Bowl with folded lootjes and a folk-art flower. */
+/** Bowl with folded lootjes resting inside, and a folk-art flower on the front. */
 export function BowlArt(props: IconProps) {
   return (
     <Svg viewBox="0 0 160 140" {...props}>
       <g stroke={BRICK} strokeWidth="3" strokeLinecap="round">
-        <path d="M80 22V6M60 28L50 14M100 28L110 14M42 40L28 32M118 40L132 32" />
-      </g>
-      <g stroke={INK} strokeWidth="1.8" strokeLinejoin="round">
-        <path d="M44 56L62 40L80 52L66 66Z" fill={PAPER_WHITE} />
-        <path d="M70 52L92 34L112 50L90 66Z" fill="#FFF6E8" />
-        <path d="M96 56L112 44L128 58L110 68Z" fill={PAPER_WHITE} />
-        <path d="M62 40L66 66M92 34L90 66" stroke={INK} strokeWidth="1" opacity=".5" />
+        <path d="M80 18V4M58 24L48 11M102 24L112 11M40 38L27 30M120 38L133 30" />
       </g>
       <path d="M12 66C12 100 40 126 80 126C120 126 148 100 148 66Z" fill={PAPER_WHITE} stroke={INK} strokeWidth="2.8" strokeLinejoin="round" />
-      <ellipse cx="80" cy="66" rx="68" ry="12" fill="#FFF6E8" stroke={INK} strokeWidth="2.8" />
+      <ellipse cx="80" cy="66" rx="68" ry="12" fill="#EADFCB" stroke={INK} strokeWidth="2.8" />
+      <g stroke={INK} strokeWidth="1.8" strokeLinejoin="round">
+        <path d="M40 66L58 38L80 50L68 74Z" fill={PAPER_WHITE} />
+        <path d="M66 72L88 30L112 50L100 76Z" fill="#FFF6E8" />
+        <path d="M98 74L112 46L134 60L120 72Z" fill={PAPER_WHITE} />
+        <path d="M88 30L90 56M58 38L62 60" strokeWidth="1" opacity=".5" />
+      </g>
+      <path d="M12 66C14 80 44 80 80 80C116 80 146 80 148 66" stroke={INK} strokeWidth="2.8" strokeLinecap="round" fill="none" opacity="0" />
+      <path d="M12 66C16 82 46 90 80 90C114 90 144 82 148 66C146 74 116 78 80 78C44 78 14 74 12 66Z" fill={PAPER_WHITE} />
+      <path d="M12 66C16 82 46 90 80 90C114 90 144 82 148 66" stroke={INK} strokeWidth="2.8" strokeLinecap="round" fill="none" />
       <g>
-        <path d="M80 112C60 112 48 100 44 86C62 88 74 98 80 112Z" fill={FOREST} />
-        <path d="M80 112C100 112 112 100 116 86C98 88 86 98 80 112Z" fill="#2B6A50" />
-        <circle cx="80" cy="90" r="9" fill={BRICK} />
-        <circle cx="68" cy="96" r="7" fill={BRICK_DARK} />
-        <circle cx="92" cy="96" r="7" fill={BRICK_DARK} />
-        <circle cx="80" cy="90" r="3.5" fill={PEACH} />
-        <circle cx="52" cy="82" r="3" fill={COBALT} />
-        <circle cx="108" cy="82" r="3" fill={COBALT} />
+        <path d="M80 118C62 118 50 108 46 96C62 98 74 106 80 118Z" fill={FOREST} />
+        <path d="M80 118C98 118 110 108 114 96C98 98 86 106 80 118Z" fill="#2B6A50" />
+        <circle cx="80" cy="100" r="8" fill={BRICK} />
+        <circle cx="69" cy="105" r="6" fill={BRICK_DARK} />
+        <circle cx="91" cy="105" r="6" fill={BRICK_DARK} />
+        <circle cx="80" cy="100" r="3" fill={PEACH} />
       </g>
     </Svg>
   );
