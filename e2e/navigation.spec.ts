@@ -55,11 +55,15 @@ test("on personal pages the language switch overrides the domain default and per
   await expect(page.locator("html")).toHaveAttribute("lang", other);
 });
 
-test("the English domain serves English paths and redirects Dutch ones", async ({ page }, testInfo) => {
+test("the English domain serves English paths and redirects Dutch and legacy ones", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "en", "English paths exist only on the English domain.");
+  const wishlistPath = pagePath(testInfo, "wishlistCreate");
+  const drawPath = pagePath(testInfo, "drawCreate");
   await page.goto("/verlanglijstje-maken");
-  await expect(page).toHaveURL(/\/wishlist-maker$/);
-  await page.goto("/secret-santa-generator");
+  await expect(page).toHaveURL(new RegExp(`${wishlistPath}$`));
+  await page.goto("/create-wishlist");
+  await expect(page).toHaveURL(new RegExp(`${wishlistPath}$`));
+  await page.goto(drawPath);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.locator("#organizer")).toBeVisible();
 });
