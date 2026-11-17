@@ -312,6 +312,10 @@ input:focus, textarea:focus, select:focus { border-color: var(--green); box-shad
 .wish-ideas { padding: .9rem 1.1rem; border: 1px dashed var(--line); border-radius: 8px; background: #fdfbf8; }
 .wish-ideas summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
 .wish-ideas summary:focus-visible, .idea-category:focus-visible { outline: 3px solid #1c4cb4; outline-offset: 3px; }
+.shop-search { display: grid; gap: .5rem; padding: .75rem .9rem; border: 1px solid var(--line); border-radius: 8px; background: var(--terracotta-soft); }
+.shop-search-hint { margin: 0; }
+.shop-search-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.shop-search-actions .button { background: #fff; }
 .idea-categories { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0 .75rem; }
 .idea-category { min-height: 44px; padding: .45rem .9rem; border: 1px solid #bdb5a9; border-radius: 999px; background: transparent; color: var(--ink); font: inherit; cursor: pointer; }
 .idea-category[aria-pressed="true"] { background: var(--forest); border-color: var(--forest); color: #fff; }

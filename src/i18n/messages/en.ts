@@ -432,7 +432,7 @@ export const enMessages: Record<MessageKey, string> = {
   "privacy.affiliateBody": "We take part in the Amazon Associates programme. Amazon links on this site can contain our Associates tag; if you buy something there afterwards we receive a commission and you pay no more. This happens in two ways. First, we offer “Search on Amazon”: the link contains only the wish title, never names, the list, or a personal link. Second, when a wish contains an amazon.com link, we add our tag when we show it. The link as entered is stored unchanged, and any tag already in it is replaced by ours while it is shown. Links to other shops and shortened Amazon links are not changed. Amazon sets its own cookies once you open its site; we do not add trackers to our pages. Checkout, delivery, and returns happen at Amazon.",
   "affiliate.bol.search": "Search on bol ↗",
   "affiliate.bol.searchLabel": "Search on bol for “{title}” (opens bol, affiliate link)",
-  "affiliate.helperHint": "Pick a product in the shop, then paste its link above.",
+  "affiliate.helperHint": "Need a link? Find the product in the shop and paste its link below.",
   "affiliate.helperEmpty": "Fill in what you would like and you can search for it in a shop.",
   "affiliate.disclosureBol": "Links to bol on this site are affiliate links: if you buy something there afterwards we receive a commission and you pay no more.",
   "affiliate.disclosureBoth": "Links to bol and Amazon on this site are affiliate links: if you buy something afterwards we receive a commission and you pay no more.",

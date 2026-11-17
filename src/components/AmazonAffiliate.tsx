@@ -33,7 +33,7 @@ export function useBolAffiliate() {
 }
 
 /** Deliberate "search in a shop" actions for a wish without its own link. Renders nothing when affiliate links are off. */
-export function ShopSearchLinks({ title }: { title: string }) {
+export function ShopSearchLinks({ title, className }: { title: string; className?: string }) {
   const amazon = useAmazonAffiliate();
   const bol = useBolAffiliate();
   const { t } = useI18n();
@@ -43,12 +43,12 @@ export function ShopSearchLinks({ title }: { title: string }) {
   return (
     <>
       {bolHref ? (
-        <a href={bolHref} target="_blank" rel={SPONSORED_REL} aria-label={t("affiliate.bol.searchLabel", { title })}>
+        <a className={className} href={bolHref} target="_blank" rel={SPONSORED_REL} aria-label={t("affiliate.bol.searchLabel", { title })}>
           {t("affiliate.bol.search")}
         </a>
       ) : null}
       {amazonHref ? (
-        <a href={amazonHref} target="_blank" rel={SPONSORED_REL} aria-label={t("affiliate.amazon.searchLabel", { title })}>
+        <a className={className} href={amazonHref} target="_blank" rel={SPONSORED_REL} aria-label={t("affiliate.amazon.searchLabel", { title })}>
           {t("affiliate.amazon.search")}
         </a>
       ) : null}
@@ -83,16 +83,18 @@ export function AmazonEditorHelper({ title }: { title: string }) {
     (amazon && buildAmazonSearchUrl(title, amazon)) || (bol && buildBolSearchUrl(title, bol)),
   );
   return (
-    <p className="hint amazon-helper">
+    <div className="shop-search">
       {hasSearch ? (
         <>
-          <ShopSearchLinks title={title} />
-          <span> {t("affiliate.helperHint")}</span>
+          <p className="shop-search-hint"><strong>{t("affiliate.helperHint")}</strong></p>
+          <div className="shop-search-actions">
+            <ShopSearchLinks title={title} className="button button-secondary button-small" />
+          </div>
         </>
       ) : (
-        <span>{t("affiliate.helperEmpty")}</span>
+        <p className="hint">{t("affiliate.helperEmpty")}</p>
       )}
-    </p>
+    </div>
   );
 }
 

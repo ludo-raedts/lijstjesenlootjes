@@ -430,7 +430,7 @@ export const nlMessages = {
   "privacy.affiliateBody": "Wij doen mee aan het Amazon Associates-partnerprogramma. Amazon-links op deze site kunnen onze partnercode bevatten; als je daarna iets koopt, ontvangen wij een commissie en betaal jij niet meer. Dat gebeurt op twee manieren. Ten eerste bieden we “Zoek op Amazon” aan: die link bevat alleen de titel van de wens, nooit namen, de lijst of een persoonlijke link. Ten tweede voegen we onze partnercode toe wanneer een wens een amazon.com-link bevat. De ingevoerde link wordt ongewijzigd opgeslagen en een eventuele bestaande partnercode erin wordt bij het tonen vervangen door de onze. Links naar andere winkels en verkorte Amazon-links blijven ongewijzigd. Amazon plaatst zelf cookies zodra je de site opent; wij voegen geen trackers toe aan onze pagina’s. Afrekenen, bezorging en retouren verlopen bij Amazon.",
   "affiliate.bol.search": "Zoek op bol ↗",
   "affiliate.bol.searchLabel": "Zoek op bol naar “{title}” (opent bol, partnerlink)",
-  "affiliate.helperHint": "Kies een product in de winkel en plak de link hierboven.",
+  "affiliate.helperHint": "Link nodig? Zoek het product in de winkel en plak de link hieronder.",
   "affiliate.helperEmpty": "Vul in wat je graag wilt, dan kun je het in een winkel zoeken.",
   "affiliate.disclosureBol": "Links naar bol op deze site zijn partnerlinks: koop je daarna iets bij bol, dan ontvangen wij een commissie en betaal jij niet meer.",
   "affiliate.disclosureBoth": "Links naar bol en Amazon op deze site zijn partnerlinks: koop je daarna iets, dan ontvangen wij een commissie en betaal jij niet meer.",
