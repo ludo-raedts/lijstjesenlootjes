@@ -44,13 +44,13 @@ export function WishFields({
             <div className="field">
               <label htmlFor={`wish-url-${index}`}>{t("wishes.urlLabel")} <span className="hint">{t("common.optional")}</span></label>
               <input id={`wish-url-${index}`} value={wish.url} inputMode="url" onChange={(event) => update(index, { url: event.target.value })} placeholder={t("wishes.urlPlaceholder")} />
-              <AmazonEditorHelper title={wish.title} />
             </div>
             <div className="field">
               <label htmlFor={`wish-price-${index}`}>{t("wishes.priceLabel")} <span className="hint">{t("common.optional")}</span></label>
               <input id={`wish-price-${index}`} value={wish.price} maxLength={40} onChange={(event) => update(index, { price: event.target.value })} placeholder={t("wishes.pricePlaceholder")} />
             </div>
           </div>
+          <AmazonEditorHelper title={wish.title} />
           <div className="field">
             <label htmlFor={`wish-note-${index}`}>{t("wishes.noteLabel")} <span className="hint">{t("common.optional")}</span></label>
             <textarea id={`wish-note-${index}`} value={wish.note} maxLength={500} onChange={(event) => update(index, { note: event.target.value })} placeholder={t("wishes.notePlaceholder")} />
