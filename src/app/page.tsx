@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { getImageProps } from "next/image";
 import Link from "next/link";
 import { BowlArt, ClipboardArt, CobaltDashes, GroupIcon, GiftMark, LinkIcon, PencilIcon } from "@/components/Art";
 import { getServerI18n } from "@/i18n/server";
 import { getPagePath } from "@/lib/request-site";
+import { pageAlternates } from "@/lib/seo";
 import { getActiveAppearance } from "@/lib/theme-store";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return { alternates: await pageAlternates("home") };
+}
 
 export default async function HomePage() {
   const { locale, t } = await getServerI18n();

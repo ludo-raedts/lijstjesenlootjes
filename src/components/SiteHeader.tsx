@@ -3,11 +3,13 @@ import { GiftMark } from "@/components/Art";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getServerI18n } from "@/i18n/server";
 import { getPagePath } from "@/lib/request-site";
+import { getLanguageLinks } from "@/lib/seo";
 
 export async function SiteHeader() {
   const { t } = await getServerI18n();
   const wishlistHref = await getPagePath("wishlistCreate");
   const drawHref = await getPagePath("drawCreate");
+  const languageLinks = await getLanguageLinks();
   return (
     <header className="site-header">
       <div className="shell header-inner">
@@ -19,7 +21,7 @@ export async function SiteHeader() {
           <Link href={wishlistHref}>{t("nav.wishlist")}</Link>
           <Link href={drawHref}>{t("nav.draw")}</Link>
           <Link href="/help">{t("nav.help")}</Link>
-          <LanguageSwitcher />
+          <LanguageSwitcher links={languageLinks} />
         </nav>
         <details className="mobile-nav">
           <summary>
@@ -34,7 +36,7 @@ export async function SiteHeader() {
             <Link href={wishlistHref}>{t("nav.wishlist")}</Link>
             <Link href={drawHref}>{t("nav.draw")}</Link>
             <Link href="/help">{t("nav.help")}</Link>
-            <LanguageSwitcher />
+            <LanguageSwitcher links={languageLinks} />
           </nav>
         </details>
       </div>
