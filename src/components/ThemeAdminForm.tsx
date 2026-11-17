@@ -150,7 +150,14 @@ export function ThemeAdminForm({
             const definition = themeDefinitions[theme];
             return (
               <article className={appearance.theme === theme ? "is-active" : undefined} key={theme}>
-                <img src={definition.desktopImage} alt="" />
+                <img
+                  src={definition.desktopImage}
+                  alt=""
+                  width={1536}
+                  height={1024}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div>
                   <h3>{t(themeLabelKeys[theme])}</h3>
                   <p>{t(layoutLabelKeys[definition.defaultLayout])}</p>

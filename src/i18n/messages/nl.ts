@@ -215,6 +215,11 @@ export const nlMessages = {
   "draw.admin.replace": "Vervang verloren link",
   "draw.admin.emailTitle": "E-mail niet beschikbaar",
   "draw.admin.emailBody": "Persoonlijke links deel je handmatig via een privébericht.",
+  "draw.admin.delete": "Verwijder trekking",
+  "draw.admin.deleteConfirm": "Dit verwijdert de hele trekking, alle persoonlijke lijstjes en alle toegangslinks. Dit kan niet ongedaan worden gemaakt. Doorgaan?",
+  "draw.admin.deleting": "Verwijderen…",
+  "draw.admin.deletedTitle": "De trekking is verwijderd.",
+  "draw.admin.deletedBody": "Alle deelnemers, wensen en toegangslinks van deze trekking zijn definitief verwijderd.",
   "status.participant.viewed": "lootje bekeken",
   "status.participant.available": "link beschikbaar",
 

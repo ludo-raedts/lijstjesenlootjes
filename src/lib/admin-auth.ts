@@ -2,10 +2,10 @@ import "server-only";
 
 import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { isWithinRateLimit } from "@/lib/security";
 
 const ADMIN_COOKIE = "ll_theme_admin_session";
 const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
-const loginAttempts = new Map<string, { attempts: number; resetsAt: number }>();
 
 function getCredentials() {
   return {
@@ -31,15 +31,8 @@ function sign(expiresAt: string) {
     .digest("base64url");
 }
 
-export function allowAdminLogin(identifier: string) {
-  const now = Date.now();
-  const entry = loginAttempts.get(identifier);
-  if (!entry || entry.resetsAt <= now) {
-    loginAttempts.set(identifier, { attempts: 1, resetsAt: now + 15 * 60 * 1000 });
-    return true;
-  }
-  entry.attempts += 1;
-  return entry.attempts <= 8;
+export async function allowAdminLogin(identifier: string) {
+  return isWithinRateLimit(identifier, "theme-admin-login", 8, 15 * 60);
 }
 
 export function verifyAdminPassword(password: string) {

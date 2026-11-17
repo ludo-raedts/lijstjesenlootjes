@@ -217,6 +217,11 @@ export const enMessages: Record<MessageKey, string> = {
   "draw.admin.replace": "Replace lost link",
   "draw.admin.emailTitle": "Email unavailable",
   "draw.admin.emailBody": "Share personal links manually in a private message.",
+  "draw.admin.delete": "Delete draw",
+  "draw.admin.deleteConfirm": "This deletes the entire draw, every personal wishlist, and all access links. This cannot be undone. Continue?",
+  "draw.admin.deleting": "Deleting…",
+  "draw.admin.deletedTitle": "The draw has been deleted.",
+  "draw.admin.deletedBody": "All participants, wishes, and access links for this draw have been permanently deleted.",
   "status.participant.viewed": "draw viewed",
   "status.participant.available": "link available",
 

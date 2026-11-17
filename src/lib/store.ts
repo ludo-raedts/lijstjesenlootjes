@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { purgeDeletedWishlists } from "@/lib/data-lifecycle";
 import type { Database } from "@/lib/types";
 
 const MAX_COMMIT_ATTEMPTS = 8;
@@ -8,8 +9,8 @@ let client: SupabaseClient | undefined;
 function getClient(): SupabaseClient {
   if (client) return client;
 
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) {
     throw new Error("The server is missing the Supabase URL or secret server key.");
   }
@@ -53,6 +54,7 @@ export async function transaction<T>(
   for (let attempt = 0; attempt < MAX_COMMIT_ATTEMPTS; attempt += 1) {
     const { version, database } = await readSnapshot();
     const result = await mutation(database);
+    purgeDeletedWishlists(database);
     const { data: committed, error } = await getClient().rpc("commit_app_state", {
       p_expected_version: version,
       p_next_data: database,

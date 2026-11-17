@@ -33,7 +33,7 @@ export default async function HomePage() {
     { title: t("home.how.step3.title"), body: t("home.how.step3.body"), icon: <GiftMark /> },
   ];
 
-  const common = { alt: t("home.hero.imageAlt"), sizes: "(min-width: 1200px) 1120px, 100vw", quality: 80 };
+  const common = { alt: t("home.hero.imageAlt"), sizes: "(min-width: 1200px) 1120px, 100vw", quality: 75 };
   const { props: { srcSet: desktopSrcSet } } = getImageProps({ ...common, src: appearance.definition.desktopImage, width: 1536, height: 1024 });
   const { props: heroImage } = getImageProps({ ...common, src: appearance.definition.mobileImage, width: 1122, height: 1402, fetchPriority: "high" });
 

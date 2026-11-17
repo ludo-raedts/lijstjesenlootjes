@@ -42,7 +42,7 @@ export async function loginAdminAction(
   if (!isAdminConfigured()) return { code: "not_configured" };
   const headerStore = await headers();
   const identifier = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
-  if (!allowAdminLogin(identifier)) return { code: "rate_limited" };
+  if (!await allowAdminLogin(identifier)) return { code: "rate_limited" };
   const password = formData.get("password");
   if (typeof password !== "string" || !verifyAdminPassword(password)) {
     return { code: "invalid_credentials" };

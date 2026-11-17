@@ -14,6 +14,7 @@ export function WishlistManage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [deleted, setDeleted] = useState(false);
 
   useEffect(() => {
     if (started.current) return;
@@ -41,6 +42,7 @@ export function WishlistManage() {
     finally { setBusy(false); }
   };
 
+  if (deleted) return <div className="tool-card"><div className="notice success" role="status">{t("wishlist.manage.deleted")}</div></div>;
   if (!wishlist) return <div className="tool-card loading">{error ? <div className="notice error" role="alert">{error}</div> : t("wishlist.manage.loading")}</div>;
 
   return (
@@ -55,9 +57,11 @@ export function WishlistManage() {
       <WishFields wishes={wishlist.wishes} onChange={(wishes) => setWishlist({ ...wishlist, wishes: wishes as Array<WishDraft & { id: string }> })} />
       {error && <div className="notice error" role="alert">{error}</div>}
       {message && <div className="notice success" role="status">{message}</div>}
-      <div className="button-row"><button className="button" disabled={busy} type="submit">{busy ? t("wishlist.manage.saving") : t("wishlist.manage.save")}</button><button className="button button-danger" type="button" onClick={async () => {
+      <div className="button-row"><button className="button" disabled={busy} type="submit">{busy ? t("wishlist.manage.saving") : t("wishlist.manage.save")}</button><button className="button button-danger" disabled={busy} type="button" onClick={async () => {
         if (!window.confirm(t("wishlist.manage.deleteConfirm"))) return;
-        try { await api("/api/wishlists/manage", { method: "DELETE", body: "{}" }); setWishlist(undefined); setError(t("wishlist.manage.deleted")); } catch (deleteError) { setError((deleteError as Error).message); }
+        setBusy(true); setError(""); setMessage("");
+        try { await api("/api/wishlists/manage", { method: "DELETE", body: "{}" }); setDeleted(true); } catch (deleteError) { setError((deleteError as Error).message); }
+        finally { setBusy(false); }
       }}>{t("wishlist.manage.delete")}</button></div>
     </form>
   );

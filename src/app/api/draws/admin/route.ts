@@ -57,3 +57,20 @@ export async function POST(request: NextRequest) {
     return errorResponse(error);
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    assertSameOrigin(request);
+    const session = await requireSession(request, "draw_admin");
+    await transaction((database) => {
+      const draw = database.draws.find((item) => item.id === session.scopeId);
+      if (!draw) throw new HttpError(410, "draw_not_found");
+      database.draws = database.draws.filter((item) => item.id !== draw.id);
+      database.accessTokens = database.accessTokens.filter((token) => token.scopeId !== draw.id);
+      database.sessions = database.sessions.filter((item) => item.scopeId !== draw.id);
+    });
+    return noStoreJson({ deleted: true });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}

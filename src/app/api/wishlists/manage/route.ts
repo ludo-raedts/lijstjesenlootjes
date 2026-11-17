@@ -78,11 +78,9 @@ export async function DELETE(request: NextRequest) {
     await transaction((database) => {
       const wishlist = database.wishlists.find((item) => item.id === session.scopeId && !item.deletedAt);
       if (!wishlist) throw new HttpError(410, "wishlist_not_found");
-      const now = new Date().toISOString();
-      wishlist.deletedAt = now;
-      database.accessTokens.forEach((token) => {
-        if (token.scopeId === wishlist.id) token.revokedAt = now;
-      });
+      database.wishlists = database.wishlists.filter((item) => item.id !== wishlist.id);
+      database.accessTokens = database.accessTokens.filter((token) => token.scopeId !== wishlist.id);
+      database.sessions = database.sessions.filter((item) => item.scopeId !== wishlist.id);
     });
     return noStoreJson({ deleted: true });
   } catch (error) {

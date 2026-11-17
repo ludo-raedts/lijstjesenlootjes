@@ -117,7 +117,7 @@ export function assertSameOrigin(request: NextRequest) {
 }
 
 function rateLimitSecret() {
-  const secret = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const secret = process.env.SUPABASE_SECRET_KEY;
   if (!secret) {
     throw new Error("The server is missing the Supabase secret server key.");
   }
@@ -130,10 +130,19 @@ export async function limitIdentifier(
   maximum = 40,
   windowSeconds = 60,
 ) {
-  const bucketKey = createRateLimitBucketKey(identifier, key, rateLimitSecret());
-  if (!await consumeRateLimit(bucketKey, maximum, windowSeconds)) {
+  if (!await isWithinRateLimit(identifier, key, maximum, windowSeconds)) {
     throw new HttpError(429, "rate_limited");
   }
+}
+
+export async function isWithinRateLimit(
+  identifier: string,
+  key: string,
+  maximum = 40,
+  windowSeconds = 60,
+) {
+  const bucketKey = createRateLimitBucketKey(identifier, key, rateLimitSecret());
+  return consumeRateLimit(bucketKey, maximum, windowSeconds);
 }
 
 export async function limit(request: NextRequest, key: string, maximum = 40) {
