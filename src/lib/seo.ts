@@ -40,6 +40,11 @@ export async function getLanguageLinks(): Promise<Record<string, Record<Locale, 
   return links;
 }
 
+/** Share image for a page, served by /og in the visitor's language and the active seasonal theme. */
+export function socialImages(key: PageKey, alt: string): NonNullable<NonNullable<Metadata["openGraph"]>["images"]> {
+  return [{ url: `/og?p=${key}`, width: 1200, height: 630, alt }];
+}
+
 export async function publicPageMetadata(
   key: PageKey,
   titleKey: Parameters<Awaited<ReturnType<typeof getServerI18n>>["t"]>[0],
@@ -61,6 +66,7 @@ export async function publicPageMetadata(
       url: path === "/" ? base : `${base}${path}`,
       title,
       description,
+      images: socialImages(key, title),
     },
   };
 }

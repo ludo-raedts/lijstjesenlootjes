@@ -7,6 +7,7 @@ const hostCondition = (host: string) => ({ type: "host" as const, value: escapeH
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  outputFileTracingIncludes: { "/og": ["./src/assets/fonts/*.woff"] },
   async redirects() {
     return [
       // One canonical host per domain: www -> apex (permanent). The URL stays on the visitor's own domain.
