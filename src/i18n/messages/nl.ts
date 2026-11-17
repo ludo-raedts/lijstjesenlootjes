@@ -186,6 +186,7 @@ export const nlMessages = {
   "draw.create.dateLabel": "Datum",
   "draw.create.step2": "De deelnemers",
   "draw.create.participantsHint": "Minimaal drie deelnemers. Dezelfde naam mag vaker voorkomen; elke rij blijft een eigen persoon.",
+  "draw.create.organizerPlaceholder": "Vul hierboven je naam in",
   "draw.create.participantLabel": "Deelnemer {number}",
   "draw.create.namePlaceholder": "Naam",
   "draw.create.removeParticipant": "Verwijder deelnemer {number}",

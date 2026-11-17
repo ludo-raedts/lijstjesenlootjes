@@ -188,6 +188,7 @@ export const enMessages: Record<MessageKey, string> = {
   "draw.create.dateLabel": "Date",
   "draw.create.step2": "Participants",
   "draw.create.participantsHint": "At least three participants. The same name may appear more than once; every row remains a separate person.",
+  "draw.create.organizerPlaceholder": "Enter your name above",
   "draw.create.participantLabel": "Participant {number}",
   "draw.create.namePlaceholder": "Name",
   "draw.create.removeParticipant": "Remove participant {number}",

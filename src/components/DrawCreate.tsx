@@ -25,6 +25,7 @@ export function DrawCreate() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const offset = organizerParticipates ? 1 : 0;
   const participants = useMemo(() => {
     const items = others.filter((item) => item.name.trim());
     return organizerParticipates && organizerName.trim()
@@ -86,7 +87,8 @@ export function DrawCreate() {
       <div className="step-heading"><span>2</span><h2>{t("draw.create.step2")}</h2></div>
       <p className="muted">{t("draw.create.participantsHint")}</p>
       <div className="participant-list">
-        {others.map((item, index) => <div className="participant-row" key={item.id}><div className="field" style={{ margin: 0, flex: 1 }}><label htmlFor={`participant-${item.id}`}>{t("draw.create.participantLabel", { number: index + 1 })}</label><input id={`participant-${item.id}`} maxLength={80} value={item.name} onChange={(event) => setOthers(others.map((candidate) => candidate.id === item.id ? { ...candidate, name: event.target.value } : candidate))} placeholder={t("draw.create.namePlaceholder")} /></div>{others.length > 2 && <button aria-label={t("draw.create.removeParticipant", { number: index + 1 })} className="button button-danger icon-button" type="button" onClick={() => setOthers(others.filter((candidate) => candidate.id !== item.id))}>×</button>}</div>)}
+        {organizerParticipates && <div className="participant-row"><div className="field" style={{ margin: 0, flex: 1 }}><label htmlFor="participant-organizer">{t("draw.create.participantLabel", { number: 1 })}</label><input id="participant-organizer" readOnly value={organizerName} placeholder={t("draw.create.organizerPlaceholder")} /></div></div>}
+        {others.map((item, index) => <div className="participant-row" key={item.id}><div className="field" style={{ margin: 0, flex: 1 }}><label htmlFor={`participant-${item.id}`}>{t("draw.create.participantLabel", { number: index + 1 + offset })}</label><input id={`participant-${item.id}`} maxLength={80} value={item.name} onChange={(event) => setOthers(others.map((candidate) => candidate.id === item.id ? { ...candidate, name: event.target.value } : candidate))} placeholder={t("draw.create.namePlaceholder")} /></div>{others.length > 2 && <button aria-label={t("draw.create.removeParticipant", { number: index + 1 + offset })} className="button button-danger icon-button" type="button" onClick={() => setOthers(others.filter((candidate) => candidate.id !== item.id))}>×</button>}</div>)}
       </div>
       <button className="button button-secondary" type="button" onClick={() => setOthers([...others, person()])}>{t("draw.create.addParticipant")}</button>
 
