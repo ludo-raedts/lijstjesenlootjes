@@ -884,7 +884,7 @@ body {
 .exclusion-person .exclusion-grid { margin: 0; padding: 0 .9rem .9rem; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
 .exclusion-badge { flex: none; white-space: nowrap; padding: .1rem .55rem; border-radius: 999px; background: var(--forest); color: var(--paper); font-size: .78rem; font-weight: 700; }
 
-/* WhatsApp share button: brand green, white text (contrast ~4.6:1 on #128C7E) */
-.button-whatsapp { display: inline-flex; align-items: center; gap: .5rem; border-color: #0d6f63; background: #128c7e; color: #fff; }
-.button-whatsapp:hover { background: #0d6f63; color: #fff; }
+/* WhatsApp share button: dark WhatsApp green, white text (contrast ~5.2:1, WCAG AA) */
+.button-whatsapp { display: inline-flex; align-items: center; gap: .5rem; border-color: #075e55; background: #0b7a6e; color: #fff; }
+.button-whatsapp:hover { background: #075e55; color: #fff; }
 .button-whatsapp svg { flex: none; }
