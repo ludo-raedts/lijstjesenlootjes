@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { AmazonAffiliateProvider } from "@/components/AmazonAffiliate";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getServerI18n } from "@/i18n/server";
+import { getAmazonLinkConfig } from "@/lib/affiliate/server";
 import { getRequestSiteUrl } from "@/lib/request-site";
 import { isVercelPreview } from "@/lib/site-url";
 import { getActiveAppearance } from "@/lib/theme-store";
@@ -41,6 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const { locale, t } = await getServerI18n();
   const appearance = await getActiveAppearance(locale);
+  const amazonLink = await getAmazonLinkConfig(locale);
   return (
     <html
       lang={locale}
@@ -51,10 +54,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     >
       <body>
         <I18nProvider locale={locale}>
-          <a className="skip-link" href="#inhoud">{t("global.skipLink")}</a>
-          <SiteHeader />
-          <main id="inhoud">{children}</main>
-          <SiteFooter />
+          <AmazonAffiliateProvider config={amazonLink}>
+            <a className="skip-link" href="#inhoud">{t("global.skipLink")}</a>
+            <SiteHeader />
+            <main id="inhoud">{children}</main>
+            <SiteFooter />
+          </AmazonAffiliateProvider>
         </I18nProvider>
       </body>
     </html>

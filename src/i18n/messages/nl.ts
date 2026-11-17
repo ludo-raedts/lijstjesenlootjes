@@ -278,6 +278,11 @@ export const nlMessages = {
   "privacy.todoTitle": "Wat nog moet gebeuren",
   "privacy.todoBody": "Voor livegang zijn onder meer definitieve bewaartermijnen, verwijder- en back-upprocessen, verwerkersafspraken, misbruikbeperking, monitoring en een definitieve privacyverklaring nodig. Die keuzes zijn bewust nog niet als feiten ingevuld.",
   "privacy.warningTitle": "Gebruik nu alleen testdata.",
+  "affiliate.amazon.search": "Zoek op Amazon ↗",
+  "affiliate.amazon.searchLabel": "Zoek “{title}” op Amazon (opent Amazon, partnerlink)",
+  "affiliate.disclosure": "Als Amazon-partner verdienen wij aan kwalificerende aankopen via “Zoek op Amazon”.",
+  "privacy.affiliateTitle": "Amazon-partnerlinks",
+  "privacy.affiliateBody": "Bij wensen zonder eigen link kun je op Amazon zoeken. Die zoeklink bevat onze partnercode; als je daarna iets koopt, ontvangen wij een commissie en betaal jij niet meer. Alleen de titel van de wens staat in de link, geen namen, lijst of persoonlijke link. Je eigen links passen we nooit aan. Afrekenen, bezorging en retouren verlopen bij Amazon.",
   "privacy.warningBody": "De proefomgeving is bedoeld voor review en kan tijdens ontwikkeling worden gewist.",
 
   "wheel.page.eyebrow": "Rad draaien",

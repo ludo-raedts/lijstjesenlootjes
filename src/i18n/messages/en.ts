@@ -280,6 +280,11 @@ export const enMessages: Record<MessageKey, string> = {
   "privacy.todoTitle": "What still needs to happen",
   "privacy.todoBody": "Before launch, the project still needs final retention periods, deletion and backup processes, processor agreements, abuse prevention, monitoring, and a final privacy notice. These choices have deliberately not been presented as settled facts.",
   "privacy.warningTitle": "Only use test data for now.",
+  "affiliate.amazon.search": "Search on Amazon ↗",
+  "affiliate.amazon.searchLabel": "Search Amazon for “{title}” (opens Amazon, affiliate link)",
+  "affiliate.disclosure": "As an Amazon Associate we earn from qualifying purchases made through “Search on Amazon”.",
+  "privacy.affiliateTitle": "Amazon affiliate links",
+  "privacy.affiliateBody": "For wishes without their own link you can search on Amazon. That search link contains our Associates tag; if you buy something afterwards we receive a commission and you pay no more. Only the wish title is in the link, never names, the list, or a personal link. We never change links you entered yourself. Checkout, delivery, and returns happen at Amazon.",
   "privacy.warningBody": "The preview environment is intended for review and may be cleared during development.",
 
   "wheel.page.eyebrow": "Spin the wheel",

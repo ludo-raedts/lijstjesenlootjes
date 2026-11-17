@@ -1,6 +1,7 @@
 "use client";
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { AmazonDisclosure, AmazonSearchLink } from "@/components/AmazonAffiliate";
 import { WishFields, blankWish, type WishDraft } from "@/components/WishFields";
 import { formattingLocales } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -65,7 +66,7 @@ function RecipientWishlist({
                 {wish.note ? <p>{wish.note}</p> : null}
                 <div className="gift-meta">
                   {wish.price ? <span>{wish.price}</span> : null}
-                  {wish.url ? <a href={wish.url} target="_blank" rel="noopener noreferrer nofollow">{t("common.viewLink")}</a> : null}
+                  {wish.url ? <a href={wish.url} target="_blank" rel="noopener noreferrer nofollow">{t("common.viewLink")}</a> : <AmazonSearchLink title={wish.title} />}
                 </div>
               </div>
             </li>
@@ -74,6 +75,7 @@ function RecipientWishlist({
       ) : (
         <p className="empty-wishlist">{t("draw.reveal.emptyWishlist", { name: reveal.recipientName })}</p>
       )}
+      <AmazonDisclosure />
       <p className="hint">{t("draw.reveal.noReservations")}</p>
       <button className="button button-secondary button-small" disabled={refreshing} type="button" onClick={onRefresh}>
         {refreshing ? t("draw.reveal.refreshing") : t("draw.reveal.refresh")}
