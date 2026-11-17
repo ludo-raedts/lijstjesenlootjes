@@ -70,3 +70,37 @@ export async function publicPageMetadata(
     },
   };
 }
+
+type StructuredDataKeys = Parameters<Awaited<ReturnType<typeof getServerI18n>>["t"]>[0];
+
+/** WebSite + Organization for the homepage; the name follows the domain's language. */
+export async function websiteStructuredData(): Promise<Record<string, unknown>[]> {
+  const { locale, t } = await getServerI18n();
+  const base = await getRequestSiteUrl();
+  return [
+    { "@context": "https://schema.org", "@type": "WebSite", name: t("app.name"), url: base, inLanguage: locale },
+    { "@context": "https://schema.org", "@type": "Organization", name: t("app.name"), url: base },
+  ];
+}
+
+/** WebApplication for a tool page. `offers` stays out until the pricing decision is made (see DESIGN.md). */
+export async function webApplicationStructuredData(
+  key: PageKey,
+  nameKey: StructuredDataKeys,
+  descriptionKey: StructuredDataKeys,
+): Promise<Record<string, unknown>> {
+  const { locale, t } = await getServerI18n();
+  const path = await getPagePath(key);
+  const base = await getRequestSiteUrl();
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: t(nameKey),
+    description: t(descriptionKey),
+    url: `${base}${path}`,
+    applicationCategory: "LifestyleApplication",
+    operatingSystem: "Any",
+    browserRequirements: "Requires a modern web browser with JavaScript",
+    inLanguage: locale,
+  };
+}

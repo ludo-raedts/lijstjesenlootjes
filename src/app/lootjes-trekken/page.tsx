@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { DrawCreate } from "@/components/DrawCreate";
 import { SeoContent } from "@/components/SeoContent";
 import { getServerI18n } from "@/i18n/server";
-import { publicPageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { publicPageMetadata, webApplicationStructuredData } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   return publicPageMetadata("drawCreate", "meta.drawCreate.title", "meta.drawCreate.description");
@@ -12,6 +13,7 @@ export default async function DrawPage() {
   const { t } = await getServerI18n();
   return (
     <>
+      <JsonLd data={await webApplicationStructuredData("drawCreate", "meta.drawCreate.title", "meta.drawCreate.description")} />
       <header className="shell tool-hero"><span className="eyebrow">{t("draw.page.eyebrow")}</span><h1>{t("draw.page.title")}</h1><p className="lead">{t("draw.page.lead")}</p></header>
       <div className="shell tool-layout">
         <DrawCreate />

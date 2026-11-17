@@ -4,7 +4,8 @@ import Link from "next/link";
 import { BowlArt, ClipboardArt, CobaltDashes, GroupIcon, GiftMark, LinkIcon, PencilIcon } from "@/components/Art";
 import { getServerI18n } from "@/i18n/server";
 import { getPagePath } from "@/lib/request-site";
-import { pageAlternates } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { pageAlternates, websiteStructuredData } from "@/lib/seo";
 import { getActiveAppearance } from "@/lib/theme-store";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -48,6 +49,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd data={await websiteStructuredData()} />
       <div className="home-stage">
         <section className="editorial-hero shell">
           <div className="hero-art" aria-hidden="true">
