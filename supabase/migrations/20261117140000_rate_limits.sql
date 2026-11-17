@@ -24,7 +24,7 @@ set search_path = ''
 as $$
 declare
   current_count integer;
-  current_time timestamptz := clock_timestamp();
+  now_ts timestamptz := clock_timestamp();
 begin
   if (select auth.role()) <> 'service_role' then
     raise exception 'Only the application server may consume rate limits.'
@@ -45,25 +45,25 @@ begin
     request_count,
     updated_at
   )
-  values (p_bucket_key, current_time, 1, current_time)
+  values (p_bucket_key, now_ts, 1, now_ts)
   on conflict (bucket_key) do update
   set
     request_count = case
-      when limits.window_started_at <= current_time - make_interval(secs => p_window_seconds)
+      when limits.window_started_at <= now_ts - make_interval(secs => p_window_seconds)
         then 1
       else limits.request_count + 1
     end,
     window_started_at = case
-      when limits.window_started_at <= current_time - make_interval(secs => p_window_seconds)
-        then current_time
+      when limits.window_started_at <= now_ts - make_interval(secs => p_window_seconds)
+        then now_ts
       else limits.window_started_at
     end,
-    updated_at = current_time
+    updated_at = now_ts
   returning request_count into current_count;
 
   if random() < 0.01 then
     delete from app_private.rate_limits
-    where updated_at < current_time - interval '7 days';
+    where updated_at < now_ts - interval '7 days';
   end if;
 
   return current_count <= p_maximum;
