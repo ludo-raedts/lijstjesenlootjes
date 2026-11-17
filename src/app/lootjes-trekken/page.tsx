@@ -22,7 +22,7 @@ export default async function DrawPage() {
           <ul><li>{t("draw.page.aside1")}</li><li>{t("draw.page.aside2")}</li><li>{t("draw.page.aside3")}</li><li>{t("draw.page.aside4")}</li></ul>
         </aside>
       </div>
-      <SeoContent prefix="draw.seo" stepCount={4} tipCount={4} faqCount={4} extraSection />
+      <SeoContent prefix="draw.seo" stepCount={4} tipCount={4} faqCount={8} extraSection />
     </>
   );
 }

@@ -45,7 +45,7 @@ export default async function SinterklaasDrawPage() {
         </section>
         <section>
           <h2>{t("sinterklaas.faqTitle")}</h2>
-          {range(4).map((faq) => (
+          {range(6).map((faq) => (
             <details key={faq}><summary>{t(k(`faq${faq}Question`))}</summary><p>{t(k(`faq${faq}Answer`))}</p></details>
           ))}
         </section>

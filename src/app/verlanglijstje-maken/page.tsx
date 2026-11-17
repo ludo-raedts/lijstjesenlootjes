@@ -22,7 +22,7 @@ export default async function WishlistCreatePage() {
           <ul><li>{t("wishlist.page.asideManage")}</li><li>{t("wishlist.page.asideGuest")}</li><li>{t("wishlist.page.asideReservation")}</li></ul>
         </aside>
       </div>
-      <SeoContent prefix="wishlist.seo" stepCount={3} tipCount={3} faqCount={4} />
+      <SeoContent prefix="wishlist.seo" stepCount={3} tipCount={3} faqCount={8} />
     </>
   );
 }
