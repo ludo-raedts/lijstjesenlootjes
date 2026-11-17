@@ -69,6 +69,8 @@ Required implementation after approval of these periods:
 
 ### 3. End-to-end quality gate
 
+**Status (2026-11-17): implemented** in `e2e/` (`npm run test:e2e`, 45 tests across the `nl` and `en` projects, against an in-memory Supabase stand-in so no real data is touched). Not yet automated: running it in CI and in a deploy gate.
+
 Automate these browser flows in both Dutch and English:
 
 - Homepage, mobile menu, locale switch, and domain-default locale.

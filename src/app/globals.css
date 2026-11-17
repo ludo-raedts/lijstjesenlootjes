@@ -241,7 +241,7 @@ p { margin: 0 0 1rem; }
 .footer-brand { margin: 0; font-size: 1.25rem; }
 .footer-grid nav { display: flex; align-items: center; gap: 1.25rem; }
 .footer-grid nav a { color: var(--muted); }
-.footer-edition { margin: 0; color: #766f65; font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; }
+.footer-edition { margin: 0; color: var(--muted); font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; }
 .footer-edition span { margin-right: .35rem; color: var(--terracotta); font-family: var(--serif); font-style: italic; text-transform: lowercase; }
 
 .tool-hero { display: grid; grid-template-columns: 160px minmax(0, 1fr); column-gap: clamp(2rem, 6vw, 6rem); padding: clamp(3.5rem, 7vw, 6rem) 0 clamp(2.8rem, 5vw, 4.5rem); border-bottom: 2px solid var(--ink); }

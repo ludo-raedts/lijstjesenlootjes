@@ -1,0 +1,78 @@
+import { expect, test } from "@playwright/test";
+import { E2E_ADMIN_PASSWORD } from "../playwright.config";
+import { i18n, resetBackend } from "./helpers";
+
+test.beforeEach(resetBackend);
+
+async function login(page: import("@playwright/test").Page, t: ReturnType<typeof i18n>["t"], password = E2E_ADMIN_PASSWORD) {
+  await page.goto("/admin");
+  await page.getByLabel(t("admin.login.password")).fill(password);
+  await page.getByRole("button", { name: t("admin.login.submit") }).click();
+}
+
+test("admin pages are not cacheable or indexable and ask for a login", async ({ page }, testInfo) => {
+  const { t } = i18n(testInfo);
+  const response = await page.goto("/admin");
+  expect(response?.headers()["cache-control"]).toContain("no-store");
+  expect(response?.headers()["x-robots-tag"]).toContain("noindex");
+  await expect(page.getByLabel(t("admin.login.password"))).toBeVisible();
+});
+
+test("a wrong password is refused", async ({ page }, testInfo) => {
+  const { t } = i18n(testInfo);
+  await login(page, t, "not-the-password");
+  await expect(page.getByRole("alert").filter({ hasText: t("admin.login.invalid") })).toBeVisible();
+});
+
+test("log in, save a manual theme and layout, reset to automatic, log out", async ({ page }, testInfo) => {
+  const { t } = i18n(testInfo);
+  await login(page, t);
+  await expect(page.locator("#admin-current-title")).toBeVisible();
+  await expect(page.getByText(t("admin.source.automatic"))).toBeVisible();
+
+  await page.locator("#theme-mode").selectOption("manual");
+  await page.locator("#manual-theme").selectOption("winter");
+  await page.locator("#layout-mode").selectOption("manual");
+  await page.locator("#manual-layout").selectOption("split");
+  await page.getByRole("button", { name: t("admin.save.submit") }).click();
+  await expect(page.getByRole("status").filter({ hasText: t("admin.save.success") })).toBeVisible();
+  await expect(page.locator("#admin-current-title")).toHaveText(t("admin.theme.winter"));
+
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "winter");
+  await expect(page.locator("html")).toHaveAttribute("data-layout", "split");
+  await expect(page.locator("html")).toHaveAttribute("data-theme-source", "manual");
+
+  await page.goto("/admin");
+  await page.locator("#theme-mode").selectOption("automatic");
+  await page.locator("#layout-mode").selectOption("automatic");
+  await page.getByRole("button", { name: t("admin.save.submit") }).click();
+  await expect(page.getByRole("status").filter({ hasText: t("admin.save.success") })).toBeVisible();
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme-source", "automatic");
+
+  await page.goto("/admin");
+  await page.getByRole("button", { name: t("admin.logout") }).click();
+  await expect(page.getByLabel(t("admin.login.password"))).toBeVisible();
+  await page.goto("/admin");
+  await expect(page.getByLabel(t("admin.login.password"))).toBeVisible();
+});
+
+test("repeated wrong passwords are rate limited", async ({ page }, testInfo) => {
+  const { t } = i18n(testInfo);
+  await page.goto("/admin");
+  const submit = async (password: string) => {
+    await page.getByLabel(t("admin.login.password")).fill(password);
+    await Promise.all([
+      page.waitForResponse((response) => response.request().method() === "POST" && new URL(response.url()).pathname === "/admin"),
+      page.getByRole("button", { name: t("admin.login.submit") }).click(),
+    ]);
+  };
+  for (let attempt = 1; attempt <= 8; attempt += 1) {
+    await submit(`wrong-${attempt}`);
+    await expect(page.getByRole("alert").filter({ hasText: t("admin.login.invalid") })).toBeVisible();
+  }
+  // The ninth attempt is refused even with the right password.
+  await submit(E2E_ADMIN_PASSWORD);
+  await expect(page.getByRole("alert").filter({ hasText: t("admin.login.rateLimited") })).toBeVisible();
+});

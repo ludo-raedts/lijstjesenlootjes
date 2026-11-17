@@ -9,3 +9,5 @@ npm-debug.log*
 *.tsbuildinfo
 .vercel/
 .claude/settings.local.json
+test-results/
+playwright-report/
