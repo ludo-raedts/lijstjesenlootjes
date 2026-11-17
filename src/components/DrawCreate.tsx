@@ -3,12 +3,14 @@
 import { type FormEvent, useMemo, useRef, useState } from "react";
 import { api, copyText } from "@/lib/client";
 import { CopyButton } from "@/components/CopyButton";
+import { useI18n } from "@/i18n/I18nProvider";
 
 type Person = { id: string; name: string };
 type DrawResult = { adminUrl: string; participantLinks: Array<{ participantId: string; name: string; url: string }>; emailAvailable: false };
 const person = (): Person => ({ id: crypto.randomUUID(), name: "" });
 
 export function DrawCreate() {
+  const { t } = useI18n();
   const submitting = useRef(false);
   const requestId = useRef("");
   const [organizerId] = useState("organizer");
@@ -47,46 +49,46 @@ export function DrawCreate() {
   if (result) {
     return (
       <section className="tool-card" aria-live="polite">
-        <span className="eyebrow">Trekking voltooid</span><h2>De persoonlijke links staan klaar.</h2>
-        <div className="notice warning"><strong>Bewaar deze pagina totdat je alle links hebt gedeeld.</strong><span>Ruwe persoonlijke links worden niet in de database bewaard en zijn na verversen niet terug te halen. Via beheer kun je een verloren link vervangen.</span></div>
-        <div className="link-result"><label>Jouw beheerlink</label><div className="link-box"><code>{result.adminUrl}</code><CopyButton value={result.adminUrl} label="Kopieer beheerlink" /></div></div>
-        <h3>Deel één link per privébericht</h3>
+        <span className="eyebrow">{t("draw.create.completeEyebrow")}</span><h2>{t("draw.create.completeTitle")}</h2>
+        <div className="notice warning"><strong>{t("draw.create.keepPageTitle")}</strong><span>{t("draw.create.keepPageBody")}</span></div>
+        <div className="link-result"><span className="field-label">{t("draw.create.adminLink")}</span><div className="link-box"><code>{result.adminUrl}</code><CopyButton value={result.adminUrl} label={t("draw.create.copyAdminLink")} /></div></div>
+        <h3>{t("draw.create.shareHeading")}</h3>
         <ul className="result-list">
           {result.participantLinks.map((link) => {
-            const message = `Hoi ${link.name}! We gaan lootjes trekken voor ${title || "onze groep"}. Via deze persoonlijke link zie je voor wie jij een cadeau koopt en kun je je eigen wensenlijstje maken: ${link.url}. Deel de link niet met anderen.`;
-            return <li className="result-row" key={link.participantId}><div className="participant-name"><strong>{link.name}</strong><small>link beschikbaar</small></div><div className="button-row"><CopyButton value={message} label="Kopieer bericht" /><a className="button button-small" href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer">Open WhatsApp</a></div></li>;
+            const message = t("draw.create.participantMessage", { name: link.name, group: title || t("draw.create.defaultGroup"), url: link.url });
+            return <li className="result-row" key={link.participantId}><div className="participant-name"><strong>{link.name}</strong><small>{t("draw.create.linkAvailable")}</small></div><div className="button-row"><CopyButton value={message} label={t("draw.create.copyMessage")} /><a className="button button-small" href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer">{t("draw.create.openWhatsapp")}</a></div></li>;
           })}
         </ul>
-        <div className="notice"><strong>E-mail is niet ingeschakeld.</strong><span>Er is geen provider of afzender getest. De site claimt daarom geen verzending.</span></div>
-        <div className="button-row"><a className="button" href={result.adminUrl}>Open trekkingbeheer</a><button className="button button-secondary" type="button" onClick={() => copyText(result.adminUrl)}>Bewaar beheerlink</button></div>
+        <div className="notice"><strong>{t("draw.create.emailTitle")}</strong><span>{t("draw.create.emailBody")}</span></div>
+        <div className="button-row"><a className="button" href={result.adminUrl}>{t("draw.create.openAdmin")}</a><button className="button button-secondary" type="button" onClick={() => copyText(result.adminUrl)}>{t("draw.create.saveAdmin")}</button></div>
       </section>
     );
   }
 
   return (
     <form className="tool-card" onSubmit={submit}>
-      <div className="step-heading"><span>1</span><h2>De gelegenheid</h2></div>
-      <div className="field"><label htmlFor="organizer">Jouw naam *</label><input id="organizer" required maxLength={80} value={organizerName} onChange={(event) => setOrganizerName(event.target.value)} placeholder="Ludo" /></div>
-      <label className="checkbox-label"><input type="checkbox" checked={organizerParticipates} onChange={(event) => setOrganizerParticipates(event.target.checked)} />Ik doe zelf mee met de trekking</label>
+      <div className="step-heading"><span>1</span><h2>{t("draw.create.step1")}</h2></div>
+      <div className="field"><label htmlFor="organizer">{t("draw.create.organizerLabel")}</label><input id="organizer" required maxLength={80} value={organizerName} onChange={(event) => setOrganizerName(event.target.value)} placeholder={t("draw.create.namePlaceholder")} /></div>
+      <label className="checkbox-label"><input type="checkbox" checked={organizerParticipates} onChange={(event) => setOrganizerParticipates(event.target.checked)} />{t("draw.create.organizerParticipates")}</label>
       <div className="field-row">
-        <div className="field"><label htmlFor="draw-title">Groepsnaam <span className="hint">optioneel</span></label><input id="draw-title" maxLength={100} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Sinterklaas bij de familie" /></div>
-        <div className="field"><label htmlFor="budget">Budget <span className="hint">optioneel</span></label><input id="budget" maxLength={40} value={budget} onChange={(event) => setBudget(event.target.value)} placeholder="€ 25" /></div>
+        <div className="field"><label htmlFor="draw-title">{t("draw.create.groupLabel")} <span className="hint">{t("common.optional")}</span></label><input id="draw-title" maxLength={100} value={title} onChange={(event) => setTitle(event.target.value)} placeholder={t("draw.create.groupPlaceholder")} /></div>
+        <div className="field"><label htmlFor="budget">{t("draw.create.budgetLabel")} <span className="hint">{t("common.optional")}</span></label><input id="budget" maxLength={40} value={budget} onChange={(event) => setBudget(event.target.value)} placeholder={t("draw.create.budgetPlaceholder")} /></div>
       </div>
-      <div className="field"><label htmlFor="draw-date">Datum <span className="hint">optioneel</span></label><input id="draw-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} /></div>
+      <div className="field"><label htmlFor="draw-date">{t("draw.create.dateLabel")} <span className="hint">{t("common.optional")}</span></label><input id="draw-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} /></div>
 
-      <div className="step-heading"><span>2</span><h2>De deelnemers</h2></div>
-      <p className="muted">Minimaal drie deelnemers. Dezelfde naam mag vaker voorkomen; elke rij blijft een eigen persoon.</p>
+      <div className="step-heading"><span>2</span><h2>{t("draw.create.step2")}</h2></div>
+      <p className="muted">{t("draw.create.participantsHint")}</p>
       <div className="participant-list">
-        {others.map((item, index) => <div className="participant-row" key={item.id}><div className="field" style={{ margin: 0, flex: 1 }}><label htmlFor={`participant-${item.id}`}>Deelnemer {index + 1}</label><input id={`participant-${item.id}`} maxLength={80} value={item.name} onChange={(event) => setOthers(others.map((candidate) => candidate.id === item.id ? { ...candidate, name: event.target.value } : candidate))} placeholder="Naam" /></div>{others.length > 2 && <button aria-label={`Verwijder deelnemer ${index + 1}`} className="button button-danger icon-button" type="button" onClick={() => setOthers(others.filter((candidate) => candidate.id !== item.id))}>×</button>}</div>)}
+        {others.map((item, index) => <div className="participant-row" key={item.id}><div className="field" style={{ margin: 0, flex: 1 }}><label htmlFor={`participant-${item.id}`}>{t("draw.create.participantLabel", { number: index + 1 })}</label><input id={`participant-${item.id}`} maxLength={80} value={item.name} onChange={(event) => setOthers(others.map((candidate) => candidate.id === item.id ? { ...candidate, name: event.target.value } : candidate))} placeholder={t("draw.create.namePlaceholder")} /></div>{others.length > 2 && <button aria-label={t("draw.create.removeParticipant", { number: index + 1 })} className="button button-danger icon-button" type="button" onClick={() => setOthers(others.filter((candidate) => candidate.id !== item.id))}>×</button>}</div>)}
       </div>
-      <button className="button button-secondary" type="button" onClick={() => setOthers([...others, person()])}>+ Deelnemer toevoegen</button>
+      <button className="button button-secondary" type="button" onClick={() => setOthers([...others, person()])}>{t("draw.create.addParticipant")}</button>
 
-      <div className="step-heading"><span>3</span><h2>Wie mogen elkaar niet trekken?</h2></div>
-      {pairs.length ? <div className="exclusion-grid">{pairs.map((pair) => <label className="exclusion-row" key={pair.key}><input type="checkbox" checked={excludedPairs.has(pair.key)} onChange={(event) => setExcludedPairs((current) => { const next = new Set(current); if (event.target.checked) next.add(pair.key); else next.delete(pair.key); return next; })} /><span><strong>{pair.left.name}</strong> en <strong>{pair.right.name}</strong> mogen elkaar niet trekken</span></label>)}</div> : <div className="empty-state">Vul eerst minimaal drie namen in.</div>}
-      <p className="hint">Zelf trekken is altijd uitgesloten. Een gekozen paar wordt in beide richtingen uitgesloten.</p>
+      <div className="step-heading"><span>3</span><h2>{t("draw.create.step3")}</h2></div>
+      {pairs.length ? <div className="exclusion-grid">{pairs.map((pair) => <label className="exclusion-row" key={pair.key}><input type="checkbox" checked={excludedPairs.has(pair.key)} onChange={(event) => setExcludedPairs((current) => { const next = new Set(current); if (event.target.checked) next.add(pair.key); else next.delete(pair.key); return next; })} /><span>{t("draw.create.exclusion", { left: pair.left.name, right: pair.right.name })}</span></label>)}</div> : <div className="empty-state">{t("draw.create.exclusionEmpty")}</div>}
+      <p className="hint">{t("draw.create.exclusionHint")}</p>
       {error && <div className="notice error" role="alert">{error}</div>}
-      <button className="button" disabled={busy || participants.length < 3} type="submit">{busy ? "Eerlijk verdelen…" : "Controleer en trek de lootjes"}</button>
-      <p className="hint">De trekking is na deze actie bevroren. Iedere deelnemer kan daarna via de eigen link wensen toevoegen.</p>
+      <button className="button" disabled={busy || participants.length < 3} type="submit">{busy ? t("draw.create.drawing") : t("draw.create.submit")}</button>
+      <p className="hint">{t("draw.create.frozenHint")}</p>
     </form>
   );
 }

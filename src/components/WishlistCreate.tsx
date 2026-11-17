@@ -4,10 +4,12 @@ import { FormEvent, useState } from "react";
 import { api, copyText } from "@/lib/client";
 import { blankWish, WishDraft, WishFields } from "@/components/WishFields";
 import { CopyButton } from "@/components/CopyButton";
+import { useI18n } from "@/i18n/I18nProvider";
 
 type Result = { manageUrl: string; guestUrl: string };
 
 export function WishlistCreate() {
+  const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [occasion, setOccasion] = useState("");
   const [date, setDate] = useState("");
@@ -33,50 +35,50 @@ export function WishlistCreate() {
   };
 
   if (result) {
-    const shareText = `Hoi! Ik heb mijn verlanglijstje gemaakt. Je vindt het hier: ${result.guestUrl}. Je kunt daar ook aangeven wat je wilt geven.`;
+    const shareText = t("wishlist.create.shareText", { url: result.guestUrl });
     return (
       <section className="tool-card" aria-live="polite">
-        <span className="eyebrow">Gelukt</span>
-        <h2>Je lijstje staat klaar.</h2>
-        <p>Je krijgt twee verschillende links. Bewaar je beheerlink goed; daarmee kun je je wensen aanpassen.</p>
-        <div className="notice warning"><strong>De beheerlink is alleen voor jou.</strong><span>Zonder deze link is er in de testversie geen herstel via e-mail.</span></div>
+        <span className="eyebrow">{t("wishlist.create.successEyebrow")}</span>
+        <h2>{t("wishlist.create.successTitle")}</h2>
+        <p>{t("wishlist.create.successIntro")}</p>
+        <div className="notice warning"><strong>{t("wishlist.create.manageWarningTitle")}</strong><span>{t("wishlist.create.manageWarningBody")}</span></div>
         <div className="link-result">
-          <label>Beheerlink</label>
-          <div className="link-box"><code>{result.manageUrl}</code><CopyButton value={result.manageUrl} label="Kopieer beheerlink" /></div>
+          <span className="field-label">{t("wishlist.create.manageLink")}</span>
+          <div className="link-box"><code>{result.manageUrl}</code><CopyButton value={result.manageUrl} label={t("wishlist.create.copyManage")} /></div>
         </div>
         <div className="link-result">
-          <label>Gastenlink</label>
-          <div className="link-box"><code>{result.guestUrl}</code><CopyButton value={result.guestUrl} label="Kopieer gastenlink" /></div>
+          <span className="field-label">{t("wishlist.create.guestLink")}</span>
+          <div className="link-box"><code>{result.guestUrl}</code><CopyButton value={result.guestUrl} label={t("wishlist.create.copyGuest")} /></div>
         </div>
         <div className="button-row">
-          <a className="button" href={result.manageUrl}>Open beheer</a>
+          <a className="button" href={result.manageUrl}>{t("wishlist.create.openManage")}</a>
           <button className="button button-secondary" type="button" onClick={async () => {
-            if (navigator.share) await navigator.share({ title: "Mijn verlanglijstje", text: shareText });
+            if (navigator.share) await navigator.share({ title: t("wishlist.create.shareTitle"), text: shareText });
             else await copyText(shareText);
-          }}>Deel met gasten</button>
+          }}>{t("wishlist.create.share")}</button>
         </div>
-        <p className="hint">Iedereen met de gastenlink kan het lijstje bekijken. De maker kan de gastenlink ook zelf openen en daardoor reserveringen zien.</p>
+        <p className="hint">{t("wishlist.create.guestHint")}</p>
       </section>
     );
   }
 
   return (
     <form className="tool-card" onSubmit={submit}>
-      <div className="step-heading"><span>1</span><h2>Over je lijstje</h2></div>
+      <div className="step-heading"><span>1</span><h2>{t("wishlist.create.step1")}</h2></div>
       <div className="field">
-        <label htmlFor="list-title">Naam van je lijstje *</label>
-        <input id="list-title" value={title} maxLength={120} required onChange={(event) => setTitle(event.target.value)} placeholder="Verlanglijstje van Ludo" />
+        <label htmlFor="list-title">{t("wishlist.create.titleLabel")}</label>
+        <input id="list-title" value={title} maxLength={120} required onChange={(event) => setTitle(event.target.value)} placeholder={t("wishlist.create.titlePlaceholder")} />
       </div>
       <div className="field-row">
-        <div className="field"><label htmlFor="occasion">Gelegenheid <span className="hint">optioneel</span></label><input id="occasion" value={occasion} maxLength={80} onChange={(event) => setOccasion(event.target.value)} placeholder="Verjaardag" /></div>
-        <div className="field"><label htmlFor="date">Datum <span className="hint">optioneel</span></label><input id="date" type="date" value={date} onChange={(event) => setDate(event.target.value)} /></div>
+        <div className="field"><label htmlFor="occasion">{t("wishlist.create.occasionLabel")} <span className="hint">{t("common.optional")}</span></label><input id="occasion" value={occasion} maxLength={80} onChange={(event) => setOccasion(event.target.value)} placeholder={t("wishlist.create.occasionPlaceholder")} /></div>
+        <div className="field"><label htmlFor="date">{t("wishlist.create.dateLabel")} <span className="hint">{t("common.optional")}</span></label><input id="date" type="date" value={date} onChange={(event) => setDate(event.target.value)} /></div>
       </div>
-      <div className="step-heading"><span>2</span><h2>Je wensen</h2></div>
-      <p className="muted">Een eigen omschrijving is genoeg. Een link naar een winkel is optioneel.</p>
+      <div className="step-heading"><span>2</span><h2>{t("wishlist.create.step2")}</h2></div>
+      <p className="muted">{t("wishlist.create.wishesIntro")}</p>
       <WishFields wishes={wishes} onChange={setWishes} />
       {error && <div className="notice error" role="alert">{error}</div>}
-      <button className="button" disabled={busy} type="submit">{busy ? "Lijstje maken…" : "Maak mijn verlanglijstje"}</button>
-      <p className="hint">Gebruik in deze besloten proefversie voorlopig alleen verzonnen gegevens.</p>
+      <button className="button" disabled={busy} type="submit">{busy ? t("wishlist.create.submitting") : t("wishlist.create.submit")}</button>
+      <p className="hint">{t("wishlist.create.testDataHint")}</p>
     </form>
   );
 }

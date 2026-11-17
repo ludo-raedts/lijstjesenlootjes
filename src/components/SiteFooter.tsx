@@ -1,19 +1,21 @@
 import Link from "next/link";
+import { getServerI18n } from "@/i18n/server";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const { t } = await getServerI18n();
   return (
     <footer className="site-footer">
       <div className="shell footer-grid">
         <div>
-          <p className="footer-brand">Lijstjes en lootjes</p>
-          <p className="muted">Een rustige plek om iets samen te regelen.</p>
+          <p className="footer-brand">{t("app.name")}</p>
+          <p className="muted">{t("footer.description")}</p>
         </div>
-        <nav aria-label="Voettekst">
-          <Link href="/rad-draaien">Namenrad</Link>
-          <Link href="/help">Help</Link>
-          <Link href="/privacy">Privacy</Link>
+        <nav aria-label={t("footer.navigationLabel")}>
+          <Link href="/rad-draaien">{t("footer.wheel")}</Link>
+          <Link href="/help">{t("footer.help")}</Link>
+          <Link href="/privacy">{t("footer.privacy")}</Link>
         </nav>
-        <p className="footer-edition"><span>editie</span> besloten proefversie · nog niet publiek</p>
+        <p className="footer-edition">{t("footer.edition")}</p>
       </div>
     </footer>
   );

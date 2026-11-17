@@ -2,7 +2,8 @@
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { WishFields, blankWish, type WishDraft } from "@/components/WishFields";
-import { formattingLocales, getActiveLocale } from "@/i18n/config";
+import { formattingLocales } from "@/i18n/config";
+import { useI18n } from "@/i18n/I18nProvider";
 import { api, ensureSession } from "@/lib/client";
 
 type DrawWish = {
@@ -48,11 +49,12 @@ function RecipientWishlist({
   refreshing: boolean;
   onRefresh: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <section className="draw-wishlist recipient-wishlist" aria-labelledby="recipient-wishlist-title">
       <div className="draw-wishlist-heading">
-        <span className="eyebrow">Cadeautips</span>
-        <h3 id="recipient-wishlist-title">Het lijstje van {reveal.recipientName}</h3>
+        <span className="eyebrow">{t("draw.reveal.tipsEyebrow")}</span>
+        <h3 id="recipient-wishlist-title">{t("draw.reveal.recipientWishlist", { name: reveal.recipientName })}</h3>
       </div>
       {reveal.recipientWishes.length > 0 ? (
         <ul className="gift-list draw-gift-list">
@@ -63,24 +65,25 @@ function RecipientWishlist({
                 {wish.note ? <p>{wish.note}</p> : null}
                 <div className="gift-meta">
                   {wish.price ? <span>{wish.price}</span> : null}
-                  {wish.url ? <a href={wish.url} target="_blank" rel="noopener noreferrer nofollow">Bekijk link ↗</a> : null}
+                  {wish.url ? <a href={wish.url} target="_blank" rel="noopener noreferrer nofollow">{t("common.viewLink")}</a> : null}
                 </div>
               </div>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="empty-wishlist">{reveal.recipientName} heeft nog geen wensen toegevoegd. Kijk later nog eens via dezelfde link.</p>
+        <p className="empty-wishlist">{t("draw.reveal.emptyWishlist", { name: reveal.recipientName })}</p>
       )}
-      <p className="hint">Op dit lijstje wordt niets gereserveerd; alleen jij ziet het via je persoonlijke lootjeslink.</p>
+      <p className="hint">{t("draw.reveal.noReservations")}</p>
       <button className="button button-secondary button-small" disabled={refreshing} type="button" onClick={onRefresh}>
-        {refreshing ? "Lijstje verversen…" : "Ververs dit lijstje"}
+        {refreshing ? t("draw.reveal.refreshing") : t("draw.reveal.refresh")}
       </button>
     </section>
   );
 }
 
 export function DrawReveal() {
+  const { locale, t } = useI18n();
   const started = useRef(false);
   const [draw, setDraw] = useState<NeutralDraw>();
   const [reveal, setReveal] = useState<Reveal>();
@@ -131,7 +134,7 @@ export function DrawReveal() {
         body: JSON.stringify({ wishes }),
       });
       setWishes(result.wishes.map(toDraft));
-      setSaveMessage("Je lijstje is bewaard voor degene die jou heeft getrokken.");
+      setSaveMessage(t("draw.reveal.saved"));
     } catch (saveError) {
       setError((saveError as Error).message);
     } finally {
@@ -142,7 +145,7 @@ export function DrawReveal() {
   if (!draw) {
     return (
       <div className="reveal-card loading">
-        {error ? <div className="notice error" role="alert">{error}</div> : "Persoonlijke link controleren…"}
+        {error ? <div className="notice error" role="alert">{error}</div> : t("draw.reveal.loading")}
       </div>
     );
   }
@@ -150,44 +153,44 @@ export function DrawReveal() {
   return (
     <section className="reveal-card draw-reveal-card">
       <div className="seal" aria-hidden="true">✦</div>
-      <span className="eyebrow">Persoonlijk lootje</span>
-      <h2>Hoi {draw.giverName}</h2>
+      <span className="eyebrow">{t("draw.reveal.eyebrow")}</span>
+      <h2>{t("draw.reveal.hello", { name: draw.giverName })}</h2>
 
       {!reveal ? (
         <div className="reveal-intro">
-          <p>Je lootje voor <strong>{draw.title || "jullie groep"}</strong> staat klaar. De naam verschijnt pas nadat je het bewust opent.</p>
-          {draw.revealedBefore ? <p className="hint">Je hebt dit lootje eerder bekeken.</p> : null}
+          <p>{t("draw.reveal.intro", { group: draw.title || t("draw.reveal.defaultGroup") })}</p>
+          {draw.revealedBefore ? <p className="hint">{t("draw.reveal.viewedBefore")}</p> : null}
           <button className="button" disabled={revealBusy} type="button" onClick={revealDraw}>
-            {revealBusy ? "Lootje openen…" : "Bekijk mijn lootje"}
+            {revealBusy ? t("draw.reveal.opening") : t("draw.reveal.open")}
           </button>
         </div>
       ) : (
         <div className="draw-reveal-content">
           <div className="assignment-panel" aria-live="polite">
-            <p>Jij koopt een cadeau voor</p>
+            <p>{t("draw.reveal.assignment")}</p>
             <p className="recipient-name">{reveal.recipientName}</p>
             {reveal.budget || reveal.date ? (
               <p className="muted">
                 {[
-                  reveal.budget ? `Budget ${reveal.budget}` : undefined,
-                  reveal.date ? new Intl.DateTimeFormat(formattingLocales[getActiveLocale()], { dateStyle: "long" }).format(new Date(`${reveal.date}T12:00:00`)) : undefined,
+                  reveal.budget ? t("draw.reveal.budget", { budget: reveal.budget }) : undefined,
+                  reveal.date ? new Intl.DateTimeFormat(formattingLocales[locale], { dateStyle: "long" }).format(new Date(`${reveal.date}T12:00:00`)) : undefined,
                 ].filter(Boolean).join(" · ")}
               </p>
             ) : null}
-            <p className="hint">Bewaar deze persoonlijke link privé.</p>
+            <p className="hint">{t("draw.reveal.privateHint")}</p>
           </div>
 
           <RecipientWishlist reveal={reveal} refreshing={revealBusy} onRefresh={revealDraw} />
 
           <form className="draw-wishlist own-wishlist" onSubmit={saveWishlist}>
             <div className="draw-wishlist-heading">
-              <span className="eyebrow">Jouw eigen lijstje</span>
-              <h3>Wat zou jij graag krijgen?</h3>
-              <p>Degene die jou heeft getrokken ziet dit bij diens lootje. Er zijn geen reserveringen.</p>
+              <span className="eyebrow">{t("draw.reveal.ownEyebrow")}</span>
+              <h3>{t("draw.reveal.ownTitle")}</h3>
+              <p>{t("draw.reveal.ownBody")}</p>
             </div>
             <WishFields wishes={wishes} onChange={setWishes} />
             <button className="button" disabled={saveBusy} type="submit">
-              {saveBusy ? "Lijstje bewaren…" : "Bewaar mijn lijstje"}
+              {saveBusy ? t("draw.reveal.saving") : t("draw.reveal.save")}
             </button>
             {saveMessage ? <div className="notice success" role="status">{saveMessage}</div> : null}
           </form>

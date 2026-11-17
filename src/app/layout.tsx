@@ -1,38 +1,47 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { I18nProvider } from "@/i18n/I18nProvider";
+import { getServerI18n } from "@/i18n/server";
 import { getSiteUrl, isVercelPreview } from "@/lib/site-url";
 import "./globals.css";
 
 const baseUrl = getSiteUrl();
 
-export const metadata: Metadata = {
-  metadataBase: new URL(baseUrl),
-  title: {
-    default: "Verlanglijstjes maken en online lootjes trekken",
-    template: "%s | Lijstjes en lootjes",
-  },
-  description:
-    "Maak een verlanglijstje of trek online lootjes. Na de trekking maakt iedere deelnemer een eigen lijstje via de persoonlijke link.",
-  applicationName: "Lijstjes en lootjes",
-  robots: isVercelPreview() ? { index: false, follow: false } : undefined,
-  openGraph: {
-    type: "website",
-    locale: "nl_NL",
-    siteName: "Lijstjes en lootjes",
-    title: "Lijstjes en lootjes",
-    description: "Samen wensen, lootjes trekken en gericht geven.",
-  },
-};
+const openGraphLocales = { nl: "nl_NL", en: "en_GB" } as const;
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, t } = await getServerI18n();
+  return {
+    metadataBase: new URL(baseUrl),
+    title: {
+      default: t("meta.home.title"),
+      template: `%s | ${t("app.name")}`,
+    },
+    description: t("meta.home.description"),
+    applicationName: t("app.name"),
+    robots: isVercelPreview() ? { index: false, follow: false } : undefined,
+    openGraph: {
+      type: "website",
+      locale: openGraphLocales[locale],
+      siteName: t("app.name"),
+      title: t("meta.home.openGraphTitle"),
+      description: t("meta.home.description"),
+    },
+  };
+}
+
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const { locale, t } = await getServerI18n();
   return (
-    <html lang="nl" data-scroll-behavior="smooth">
+    <html lang={locale} data-scroll-behavior="smooth">
       <body>
-        <a className="skip-link" href="#inhoud">Ga naar de inhoud</a>
-        <SiteHeader />
-        <main id="inhoud">{children}</main>
-        <SiteFooter />
+        <I18nProvider locale={locale}>
+          <a className="skip-link" href="#inhoud">{t("global.skipLink")}</a>
+          <SiteHeader />
+          <main id="inhoud">{children}</main>
+          <SiteFooter />
+        </I18nProvider>
       </body>
     </html>
   );

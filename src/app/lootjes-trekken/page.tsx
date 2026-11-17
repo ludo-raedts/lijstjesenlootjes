@@ -1,8 +1,24 @@
 import type { Metadata } from "next";
 import { DrawCreate } from "@/components/DrawCreate";
+import { getServerI18n } from "@/i18n/server";
 
-export const metadata: Metadata = { title: "Online lootjes trekken met eigen verlanglijstjes", description: "Trek online lootjes met uitsluitingen. Iedere deelnemer krijgt een persoonlijke link en maakt na het loten een eigen wensenlijstje." };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerI18n();
+  return { title: t("meta.drawCreate.title"), description: t("meta.drawCreate.description") };
+}
 
-export default function DrawPage() {
-  return <><header className="shell tool-hero"><span className="eyebrow">Lootjes trekken</span><h1>Geheim voor de groep, helder geregeld.</h1><p className="lead">Vul de deelnemers in, trek eerlijk de lootjes en deel iedere persoonlijke link. Na het openen maakt iedereen meteen een eigen wensenlijstje.</p></header><div className="shell tool-layout"><DrawCreate /><aside className="side-note"><h2>Eerlijk en persoonlijk</h2><ul><li>Iedereen geeft én ontvangt precies één lootje.</li><li>Iedere deelnemer kan een eigen lijstje maken.</li><li>Op deze lijstjes zijn geen reserveringen nodig.</li><li>De organisator ziet geen overzicht van de koppelingen.</li></ul></aside></div></>;
+export default async function DrawPage() {
+  const { t } = await getServerI18n();
+  return (
+    <>
+      <header className="shell tool-hero"><span className="eyebrow">{t("draw.page.eyebrow")}</span><h1>{t("draw.page.title")}</h1><p className="lead">{t("draw.page.lead")}</p></header>
+      <div className="shell tool-layout">
+        <DrawCreate />
+        <aside className="side-note">
+          <h2>{t("draw.page.asideTitle")}</h2>
+          <ul><li>{t("draw.page.aside1")}</li><li>{t("draw.page.aside2")}</li><li>{t("draw.page.aside3")}</li><li>{t("draw.page.aside4")}</li></ul>
+        </aside>
+      </div>
+    </>
+  );
 }
