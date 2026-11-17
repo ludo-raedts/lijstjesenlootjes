@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { drawExpiresAt, purgeDeletedWishlists, purgeExpired, wishlistExpiresAt } from "../src/lib/data-lifecycle";
+import { accessExpiryIso, drawExpiresAt, extendWishlistAccess, purgeDeletedWishlists, purgeExpired, wishlistExpiresAt } from "../src/lib/data-lifecycle";
 import type { Database } from "../src/lib/types";
 
 test("purging a deleted wishlist also removes its access records", () => {
@@ -86,4 +86,38 @@ test("purgeExpired is idempotent", () => {
   const snapshot = JSON.stringify(database);
   assert.deepEqual(purgeExpired(database, now), { wishlists: 0, draws: 0, accessTokens: 0, sessions: 0 });
   assert.equal(JSON.stringify(database), snapshot);
+});
+
+test("a draw whose event date has passed still lives at least 30 days after creation", () => {
+  const created = "2026-11-17T12:00:00.000Z";
+  assert.equal(drawExpiresAt({ date: "2020-01-01", createdAt: created }), Date.parse(created) + 30 * 86_400_000);
+  assert.equal(drawExpiresAt({ date: "2027-06-01", createdAt: created }), Date.parse("2027-07-16T23:59:59.999Z"));
+});
+
+test("link expiry follows the draw, not a fixed 30 days", () => {
+  const farDraw = drawExpiresAt({ date: "2027-06-01", createdAt: "2026-11-17T12:00:00.000Z" })!;
+  assert.ok(farDraw - Date.parse("2026-11-17T12:00:00.000Z") > 30 * 86_400_000);
+  assert.equal(accessExpiryIso(farDraw), new Date(farDraw).toISOString());
+});
+
+test("updating a wishlist extends its manage and guest links but not others", () => {
+  const wishlist = { id: "w", title: "L", createdAt: "2026-01-01T00:00:00.000Z", updatedAt: "2026-11-01T00:00:00.000Z", wishes: [] };
+  const database: Database = {
+    version: 1,
+    wishlists: [wishlist],
+    draws: [],
+    accessTokens: [
+      { hash: "m", role: "wishlist_manage", scopeId: "w", expiresAt: "2027-01-01T00:00:00.000Z" },
+      { hash: "g", role: "wishlist_guest", scopeId: "w", expiresAt: "2027-01-01T00:00:00.000Z" },
+      { hash: "revoked", role: "wishlist_guest", scopeId: "w", expiresAt: "2027-01-01T00:00:00.000Z", revokedAt: "2026-02-01T00:00:00.000Z" },
+      { hash: "other", role: "wishlist_guest", scopeId: "x", expiresAt: "2027-01-01T00:00:00.000Z" },
+    ],
+    sessions: [],
+  };
+  extendWishlistAccess(database, wishlist);
+  const byHash = Object.fromEntries(database.accessTokens.map((token) => [token.hash, token.expiresAt]));
+  assert.equal(byHash.m, "2027-11-01T00:00:00.000Z");
+  assert.equal(byHash.g, "2027-11-01T00:00:00.000Z");
+  assert.equal(byHash.revoked, "2027-01-01T00:00:00.000Z");
+  assert.equal(byHash.other, "2027-01-01T00:00:00.000Z");
 });

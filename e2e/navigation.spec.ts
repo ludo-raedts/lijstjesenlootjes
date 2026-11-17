@@ -95,3 +95,44 @@ test("writes from a foreign origin are rejected", async ({ request }) => {
   });
   expect(response.status()).toBe(403);
 });
+
+test("malformed, oversized and abusive write requests get clear 4xx answers", async ({ request }) => {
+  const headers = { origin: API, "content-type": "application/json" };
+
+  const malformed = await request.post(`${API}/api/wishlists`, { headers, data: "{not json" });
+  expect(malformed.status()).toBe(400);
+  expect((await malformed.json()).error.code).toBe("invalid_json");
+
+  const oversized = await request.post(`${API}/api/wishlists`, {
+    headers,
+    data: JSON.stringify({ title: "x", wishes: [{ title: "y", note: "z".repeat(300_000) }] }),
+  });
+  expect(oversized.status()).toBe(413);
+
+  const participants = ["a", "b", "c"].map((id) => ({ id, name: id.toUpperCase() }));
+  const flood = await request.post(`${API}/api/draws`, {
+    headers,
+    data: JSON.stringify({
+      requestId: "flood-test",
+      organizerName: "Alex",
+      participants,
+      exclusions: Array.from({ length: 500 }, () => ({ from: "a", to: "b" })),
+    }),
+  });
+  expect(flood.status()).toBe(400);
+  expect((await flood.json()).error.code).toBe("too_many_exclusions");
+});
+
+test("repeated identical exclusions are de-duplicated", async ({ request }) => {
+  const headers = { origin: API, "content-type": "application/json" };
+  const response = await request.post(`${API}/api/draws`, {
+    headers,
+    data: JSON.stringify({
+      requestId: "dedupe-test",
+      organizerName: "Alex",
+      participants: ["a", "b", "c", "d"].map((id) => ({ id, name: id.toUpperCase() })),
+      exclusions: [{ from: "a", to: "b" }, { from: "a", to: "b" }, { from: "a", to: "b" }],
+    }),
+  });
+  expect(response.status()).toBe(201);
+});

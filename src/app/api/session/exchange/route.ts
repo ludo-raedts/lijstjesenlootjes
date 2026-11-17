@@ -1,12 +1,12 @@
 import { NextRequest } from "next/server";
 import { assertSameOrigin, cookieName, exchangeToken, HttpError, limit } from "@/lib/security";
-import { errorResponse, noStoreJson } from "@/lib/http";
+import { errorResponse, noStoreJson, readJson } from "@/lib/http";
 
 export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     await limit(request, "session-exchange", 80);
-    const body = (await request.json()) as { token?: unknown };
+    const body = await readJson(request);
     if (typeof body.token !== "string") throw new HttpError(400, "access_token_missing");
     const { access, session } = await exchangeToken(body.token);
     const response = noStoreJson({ role: access.role });

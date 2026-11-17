@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
+import { extendWishlistAccess } from "@/lib/data-lifecycle";
 import { assertSameOrigin, HttpError, id, requireSession } from "@/lib/security";
-import { errorResponse, noStoreJson } from "@/lib/http";
+import { errorResponse, LIST_BODY_BYTES, noStoreJson, readJson } from "@/lib/http";
 import { read, transaction } from "@/lib/store";
 import { optionalDate, optionalText, optionalUrl, text } from "@/lib/validation";
 import type { Wish } from "@/lib/types";
@@ -32,7 +33,7 @@ export async function PATCH(request: NextRequest) {
   try {
     assertSameOrigin(request);
     const session = await requireSession(request, "wishlist_manage");
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await readJson(request, LIST_BODY_BYTES);
     if (!Array.isArray(body.wishes) || body.wishes.length < 1 || body.wishes.length > 50) {
       throw new HttpError(400, "invalid_wishlist_wish_count", { min: 1, max: 50 });
     }
@@ -64,6 +65,7 @@ export async function PATCH(request: NextRequest) {
       wishlist.date = optionalDate(body.date);
       wishlist.wishes = wishes;
       wishlist.updatedAt = new Date().toISOString();
+      extendWishlistAccess(database, wishlist);
       return publicWishlist(wishlist);
     });
     return noStoreJson({ wishlist: updated });

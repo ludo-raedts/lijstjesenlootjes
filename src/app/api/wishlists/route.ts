@@ -1,7 +1,8 @@
 import { personalLink } from "@/lib/personal-links";
 import { NextRequest } from "next/server";
+import { accessExpiryIso, wishlistExpiresAt } from "@/lib/data-lifecycle";
 import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
-import { errorResponse, noStoreJson } from "@/lib/http";
+import { errorResponse, LIST_BODY_BYTES, noStoreJson, readJson } from "@/lib/http";
 import { recordUsage, transaction } from "@/lib/store";
 import { optionalDate, optionalText, optionalUrl, text } from "@/lib/validation";
 import type { Wish } from "@/lib/types";
@@ -22,14 +23,15 @@ export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     await limit(request, "wishlist-create", 12);
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await readJson(request, LIST_BODY_BYTES);
     if (!Array.isArray(body.wishes) || body.wishes.length < 1 || body.wishes.length > 50) {
       throw new HttpError(400, "invalid_wishlist_wish_count", { min: 1, max: 50 });
     }
     const wishlistId = id();
-    const manage = createAccessToken("wishlist_manage", wishlistId);
-    const guest = createAccessToken("wishlist_guest", wishlistId);
     const createdAt = new Date().toISOString();
+    const accessExpiry = accessExpiryIso(wishlistExpiresAt({ createdAt, updatedAt: createdAt }));
+    const manage = createAccessToken("wishlist_manage", wishlistId, accessExpiry);
+    const guest = createAccessToken("wishlist_guest", wishlistId, accessExpiry);
     const wishlist = {
       id: wishlistId,
       title: text(body.title, "title", 120),

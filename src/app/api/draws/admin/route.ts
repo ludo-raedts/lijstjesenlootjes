@@ -1,7 +1,8 @@
 import { personalLink } from "@/lib/personal-links";
 import { NextRequest } from "next/server";
+import { accessExpiryIso, drawExpiresAt } from "@/lib/data-lifecycle";
 import { assertSameOrigin, createAccessToken, HttpError, requireSession } from "@/lib/security";
-import { errorResponse, noStoreJson } from "@/lib/http";
+import { errorResponse, noStoreJson, readJson } from "@/lib/http";
 import { read, transaction } from "@/lib/store";
 
 export async function GET(request: NextRequest) {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     const session = await requireSession(request, "draw_admin");
-    const body = (await request.json()) as { action?: unknown; participantId?: unknown };
+    const body = await readJson(request);
     if (body.action !== "regenerate" || typeof body.participantId !== "string") {
       throw new HttpError(400, "unknown_admin_action");
     }
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
       const now = new Date().toISOString();
       const oldToken = database.accessTokens.find((token) => token.hash === participant.activeTokenHash);
       if (oldToken) oldToken.revokedAt = now;
-      const next = createAccessToken("draw_participant", draw.id, participant.id);
+      const next = createAccessToken("draw_participant", draw.id, accessExpiryIso(drawExpiresAt(draw)), participant.id);
       participant.activeTokenHash = next.record.hash;
       participant.viewedAt = undefined;
       database.accessTokens.push(next.record);

@@ -43,6 +43,45 @@ export function fisherYates<T>(items: T[], random = (maxExclusive: number) => ra
   return result;
 }
 
+/**
+ * Builds a valid assignment with randomized augmenting paths. It is used when plain random
+ * shuffling does not hit a valid arrangement, which happens for heavily constrained but
+ * solvable draws. The result is always valid, though not uniform over all valid arrangements.
+ */
+export function constructAssignments(
+  participants: DrawParticipantInput[],
+  excluded: Set<string>,
+  random: (maxExclusive: number) => number,
+) {
+  const recipientToGiver = new Map<string, string>();
+  const candidates = new Map(
+    participants.map((giver) => [
+      giver.id,
+      fisherYates(participants, random).filter((recipient) => allowed(giver.id, recipient.id, excluded)),
+    ]),
+  );
+
+  const place = (giver: string, seen: Set<string>): boolean => {
+    for (const recipient of candidates.get(giver) ?? []) {
+      if (seen.has(recipient.id)) continue;
+      seen.add(recipient.id);
+      const current = recipientToGiver.get(recipient.id);
+      if (!current || place(current, seen)) {
+        recipientToGiver.set(recipient.id, giver);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  for (const giver of fisherYates(participants, random)) {
+    if (!place(giver.id, new Set())) return undefined;
+  }
+
+  const recipientOf = new Map([...recipientToGiver.entries()].map(([recipient, giver]) => [giver, recipient]));
+  return participants.map((giver) => ({ giverId: giver.id, recipientId: recipientOf.get(giver.id)! }));
+}
+
 export function createAssignments(
   participants: DrawParticipantInput[],
   exclusions: DrawExclusion[],
@@ -69,5 +108,7 @@ export function createAssignments(
       };
     }
   }
+  const constructed = constructAssignments(participants, excluded, random);
+  if (constructed) return { kind: "success" as const, assignments: constructed };
   return { kind: "technical-limit" as const };
 }

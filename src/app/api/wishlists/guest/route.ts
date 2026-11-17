@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
+import { extendWishlistAccess } from "@/lib/data-lifecycle";
 import { assertSameOrigin, HttpError, requireSession } from "@/lib/security";
-import { errorResponse, noStoreJson } from "@/lib/http";
+import { errorResponse, noStoreJson, readJson } from "@/lib/http";
 import { read, recordUsage, transaction } from "@/lib/store";
 
 export async function GET(request: NextRequest) {
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     const session = await requireSession(request, "wishlist_guest");
-    const body = (await request.json()) as { action?: unknown; wishId?: unknown };
+    const body = await readJson(request);
     if (typeof body.wishId !== "string") throw new HttpError(400, "wish_missing");
     const result = await transaction((database) => {
       const wishlist = database.wishlists.find((item) => item.id === session.scopeId && !item.deletedAt);
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
         const newlyReserved = !wish.reservation;
         wish.reservation = { ownerSessionHash: session.hash, reservedAt: now };
         wishlist.updatedAt = now;
+        extendWishlistAccess(database, wishlist);
         return { reserved: true, newlyReserved };
       }
       if (body.action === "release") {
@@ -58,6 +60,7 @@ export async function POST(request: NextRequest) {
         }
         delete wish.reservation;
         wishlist.updatedAt = now;
+        extendWishlistAccess(database, wishlist);
         return { reserved: false, newlyReserved: false };
       }
       throw new HttpError(400, "unknown_action");

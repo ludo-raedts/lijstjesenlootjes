@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { assertSameOrigin, HttpError, id, requireSession } from "@/lib/security";
-import { errorResponse, noStoreJson } from "@/lib/http";
+import { errorResponse, LIST_BODY_BYTES, noStoreJson, readJson } from "@/lib/http";
 import { read, recordUsage, transaction } from "@/lib/store";
 import { optionalText, optionalUrl, text } from "@/lib/validation";
 import type { DrawWish } from "@/lib/types";
@@ -72,7 +72,7 @@ export async function PATCH(request: NextRequest) {
   try {
     assertSameOrigin(request);
     const session = await requireSession(request, "draw_participant");
-    const body = (await request.json()) as { wishes?: unknown };
+    const body = await readJson(request, LIST_BODY_BYTES);
     if (!Array.isArray(body.wishes) || body.wishes.length < 1 || body.wishes.length > 30) {
       throw new HttpError(400, "invalid_draw_wish_count", { min: 1, max: 30 });
     }

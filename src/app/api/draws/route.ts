@@ -1,7 +1,8 @@
 import { personalLink } from "@/lib/personal-links";
 import { NextRequest } from "next/server";
 import { createAssignments } from "@/lib/draw";
-import { errorResponse, noStoreJson } from "@/lib/http";
+import { DRAW_BODY_BYTES, errorResponse, noStoreJson, readJson } from "@/lib/http";
+import { accessExpiryIso, drawExpiresAt } from "@/lib/data-lifecycle";
 import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
 import { recordUsage, transaction } from "@/lib/store";
 import { optionalDate, optionalText, text } from "@/lib/validation";
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     await limit(request, "draw-create", 10);
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await readJson(request, DRAW_BODY_BYTES);
     const requestId = text(body.requestId, "requestId", 100);
     if (!Array.isArray(body.participants) || body.participants.length < 3 || body.participants.length > 50) {
       throw new HttpError(400, "invalid_participant_count", { min: 3, max: 50 });
@@ -24,6 +25,10 @@ export async function POST(request: NextRequest) {
       throw new HttpError(400, "duplicate_participant_id");
     }
     const participantIds = new Set(participants.map((participant) => participant.id));
+    if (Array.isArray(body.exclusions) && body.exclusions.length > participants.length * (participants.length - 1)) {
+      throw new HttpError(400, "too_many_exclusions");
+    }
+    const seenExclusions = new Set<string>();
     const exclusions = Array.isArray(body.exclusions)
       ? body.exclusions.map((input) => {
           if (!input || typeof input !== "object") throw new HttpError(400, "exclusion_incomplete");
@@ -34,6 +39,11 @@ export async function POST(request: NextRequest) {
             throw new HttpError(400, "exclusion_unknown_participant");
           }
           return { from, to };
+        }).filter(({ from, to }) => {
+          const key = `${from}:${to}`;
+          if (seenExclusions.has(key)) return false;
+          seenExclusions.add(key);
+          return true;
         })
       : [];
     const result = createAssignments(participants, exclusions);
@@ -44,10 +54,13 @@ export async function POST(request: NextRequest) {
       throw new HttpError(503, "draw_generation_timeout");
     }
     const drawId = id();
-    const admin = createAccessToken("draw_admin", drawId);
+    const createdAt = new Date().toISOString();
+    const date = optionalDate(body.date);
+    const accessExpiry = accessExpiryIso(drawExpiresAt({ date, createdAt }));
+    const admin = createAccessToken("draw_admin", drawId, accessExpiry);
     const participantAccess = participants.map((participant) => ({
       participant,
-      token: createAccessToken("draw_participant", drawId, participant.id),
+      token: createAccessToken("draw_participant", drawId, accessExpiry, participant.id),
     }));
     const draw = {
       id: drawId,
@@ -55,8 +68,8 @@ export async function POST(request: NextRequest) {
       title: optionalText(body.title, "groupName", 100),
       organizerName: text(body.organizerName, "organizerName", 80),
       budget: optionalText(body.budget, "budget", 40),
-      date: optionalDate(body.date),
-      createdAt: new Date().toISOString(),
+      date,
+      createdAt,
       status: "complete" as const,
       exclusions,
       assignments: result.assignments,

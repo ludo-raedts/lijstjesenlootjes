@@ -37,6 +37,9 @@ export const apiErrorCodes = [
   "invalid_draw_wish_count",
   "access_token_missing",
   "cron_unauthorized",
+  "invalid_json",
+  "payload_too_large",
+  "too_many_exclusions",
 ] as const;
 
 export type ApiErrorCode = (typeof apiErrorCodes)[number];

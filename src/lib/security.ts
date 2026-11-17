@@ -6,7 +6,6 @@ import { createRateLimitBucketKey } from "@/lib/rate-limit";
 import { consumeRateLimit, read, transaction } from "@/lib/store";
 import { AccessRole, AccessToken, Session } from "@/lib/types";
 
-const ACCESS_DAYS = 30;
 const SESSION_DAYS = 7;
 
 export { HttpError } from "@/lib/api-error";
@@ -30,6 +29,7 @@ export function futureIso(days: number) {
 export function createAccessToken(
   role: AccessRole,
   scopeId: string,
+  expiresAt: string,
   participantId?: string,
 ): { raw: string; record: AccessToken } {
   const raw = newToken();
@@ -40,7 +40,7 @@ export function createAccessToken(
       role,
       scopeId,
       participantId,
-      expiresAt: futureIso(ACCESS_DAYS),
+      expiresAt,
     },
   };
 }
