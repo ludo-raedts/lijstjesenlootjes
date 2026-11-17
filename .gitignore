@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.data/
+coverage/
+.env*
+!.env.example
+npm-debug.log*
+.DS_Store
+*.tsbuildinfo
+.vercel/
+.claude/settings.local.json

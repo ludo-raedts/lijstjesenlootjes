@@ -1,0 +1,4 @@
+.data/
+coverage/
+.env*
+npm-debug.log*
