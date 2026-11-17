@@ -2,16 +2,19 @@ import { getImageProps } from "next/image";
 import Link from "next/link";
 import { BowlArt, ClipboardArt, CobaltDashes, GroupIcon, GiftMark, LinkIcon, PencilIcon } from "@/components/Art";
 import { getServerI18n } from "@/i18n/server";
+import { getPagePath } from "@/lib/request-site";
 import { getActiveAppearance } from "@/lib/theme-store";
 
 export default async function HomePage() {
   const { locale, t } = await getServerI18n();
+  const wishlistHref = await getPagePath("wishlistCreate");
+  const drawHref = await getPagePath("drawCreate");
   const appearance = await getActiveAppearance(locale);
   const tools = [
     {
       title: t("home.wishlist.title"),
       text: t("home.wishlist.body"),
-      href: "/verlanglijstje-maken",
+      href: wishlistHref,
       cta: t("home.wishlist.action"),
       tone: "powder",
       button: "button",
@@ -20,7 +23,7 @@ export default async function HomePage() {
     {
       title: t("home.draw.title"),
       text: t("home.draw.body"),
-      href: "/lootjes-trekken",
+      href: drawHref,
       cta: t("home.draw.action"),
       tone: "peach",
       button: "button button-brick",
@@ -55,8 +58,8 @@ export default async function HomePage() {
           <div className="hero-aside">
             <p className="hero-intro">{t("home.hero.supporting")}</p>
             <div className="hero-actions">
-              <Link className="button" href="/verlanglijstje-maken">{t("home.actions.createWishlist")}</Link>
-              <Link className="button button-brick" href="/lootjes-trekken">{t("home.actions.createDraw")}</Link>
+              <Link className="button" href={wishlistHref}>{t("home.actions.createWishlist")}</Link>
+              <Link className="button button-brick" href={drawHref}>{t("home.actions.createDraw")}</Link>
             </div>
           </div>
         </section>

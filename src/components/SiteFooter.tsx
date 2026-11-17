@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getServerI18n } from "@/i18n/server";
 import { getAmazonLinkConfig } from "@/lib/affiliate/server";
+import { getPagePath } from "@/lib/request-site";
 
 export async function SiteFooter() {
   const { locale, t } = await getServerI18n();
@@ -14,7 +15,7 @@ export async function SiteFooter() {
           <p className="muted">{t("footer.description")}</p>
         </div>
         <nav aria-label={t("footer.navigationLabel")}>
-          <Link href="/rad-draaien">{t("footer.wheel")}</Link>
+          <Link href={await getPagePath("wheel")}>{t("footer.wheel")}</Link>
           <Link href="/help">{t("footer.help")}</Link>
           <Link href="/privacy">{t("footer.privacy")}</Link>
         </nav>

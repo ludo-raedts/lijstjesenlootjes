@@ -1,3 +1,4 @@
+import { personalLink } from "@/lib/personal-links";
 import { NextRequest } from "next/server";
 import { createAssignments } from "@/lib/draw";
 import { errorResponse, noStoreJson } from "@/lib/http";
@@ -71,13 +72,12 @@ export async function POST(request: NextRequest) {
       database.draws.push(draw);
       database.accessTokens.push(admin.record, ...participantAccess.map(({ token }) => token.record));
     });
-    const origin = new URL(request.url).origin;
     return noStoreJson({
-      adminUrl: `${origin}/trekking-beheren#token=${admin.raw}`,
+      adminUrl: personalLink(request, "drawAdmin", admin.raw),
       participantLinks: participantAccess.map(({ participant, token }) => ({
         participantId: participant.id,
         name: participant.name,
-        url: `${origin}/lootje#token=${token.raw}`,
+        url: personalLink(request, "drawReveal", token.raw),
       })),
       emailAvailable: false,
     }, { status: 201 });

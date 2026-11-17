@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { privatePathPrefixes } from "@/lib/paths";
 import { getRequestSiteUrl } from "@/lib/request-site";
 import { isVercelPreview } from "@/lib/site-url";
 
@@ -11,7 +12,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/verlanglijstje/beheren", "/verlanglijstje/bekijken", "/trekking-beheren", "/lootje"],
+      disallow: ["/api/", ...privatePathPrefixes()],
     },
     sitemap: `${await getRequestSiteUrl()}/sitemap.xml`,
   };

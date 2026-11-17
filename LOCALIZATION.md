@@ -190,3 +190,7 @@ New functionality is localization-ready when:
 - UI supports 35% text expansion;
 - user-created content remains untouched;
 - Dutch and English catalog shapes match.
+
+## Localized URL paths (Phase 3, slugs)
+
+Paths per domain live in `src/lib/paths.ts`. Internal route folders stay Dutch; `wishanddraw.com` serves English paths via host-conditioned rewrites and redirects the Dutch ones (308), and vice versa on `lijstjesenlootjes.nl`. The path follows the domain, never the `ll_locale` cookie. Locale-prefixed routing (`/en/...`) is not used.

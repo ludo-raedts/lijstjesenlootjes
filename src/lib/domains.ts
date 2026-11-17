@@ -11,9 +11,6 @@ export const SITE_DOMAINS: readonly SiteDomain[] = [
   { host: "wishanddraw.com", locale: "en" },
 ];
 
-/** Public pages that have an equivalent on every domain (used for hreflang). */
-export const PUBLIC_PATHS = ["/", "/verlanglijstje-maken", "/lootjes-trekken", "/rad-draaien", "/help", "/privacy"] as const;
-
 function stripHost(rawHost: string | null | undefined): string | null {
   const host = rawHost?.split(",")[0]?.trim().toLowerCase().replace(/:\d+$/, "").replace(/\.$/, "");
   return host ? host : null;

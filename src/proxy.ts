@@ -9,6 +9,8 @@ export function proxy(request: NextRequest) {
   return response;
 }
 
+// Next.js needs a statically analyzable matcher, so the private paths are listed literally here.
+// tests/paths.test.ts verifies that this list covers every private path in src/lib/paths.ts (Dutch and English).
 export const config = {
   matcher: [
     "/api/:path*",
@@ -16,6 +18,10 @@ export const config = {
     "/verlanglijstje/bekijken/:path*",
     "/trekking-beheren/:path*",
     "/lootje/:path*",
+    "/wishlist/manage/:path*",
+    "/wishlist/view/:path*",
+    "/draw/manage/:path*",
+    "/draw/reveal/:path*",
     "/admin/:path*",
   ],
 };

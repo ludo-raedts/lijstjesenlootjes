@@ -1,3 +1,4 @@
+import { personalLink } from "@/lib/personal-links";
 import { NextRequest } from "next/server";
 import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
 import { errorResponse, noStoreJson } from "@/lib/http";
@@ -42,10 +43,9 @@ export async function POST(request: NextRequest) {
       database.wishlists.push(wishlist);
       database.accessTokens.push(manage.record, guest.record);
     });
-    const origin = new URL(request.url).origin;
     return noStoreJson({
-      manageUrl: `${origin}/verlanglijstje/beheren#token=${manage.raw}`,
-      guestUrl: `${origin}/verlanglijstje/bekijken#token=${guest.raw}`,
+      manageUrl: personalLink(request, "wishlistManage", manage.raw),
+      guestUrl: personalLink(request, "wishlistGuest", guest.raw),
     }, { status: 201 });
   } catch (error) {
     return errorResponse(error);
