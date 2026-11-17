@@ -2,7 +2,7 @@ import { personalLink } from "@/lib/personal-links";
 import { sendEmail } from "@/lib/email";
 import { renderWishlistEmail } from "@/lib/email-templates";
 import { getServerI18n } from "@/i18n/server";
-import { getRequestSiteUrl } from "@/lib/request-site";
+import { getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
 import { NextRequest } from "next/server";
 import { accessExpiryIso, wishlistExpiresAt } from "@/lib/data-lifecycle";
 import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
@@ -56,9 +56,9 @@ export async function POST(request: NextRequest) {
     const guestUrl = personalLink(request, "wishlistGuest", guest.raw);
     let emailStatus: "not_requested" | "sent" | "failed" = "not_requested";
     if (email) {
-      const { t } = await getServerI18n();
-      const rendered = renderWishlistEmail(t, { title: wishlist.title, manageUrl, guestUrl, site: (await getRequestSiteUrl()).replace(/^https?:\/\//, "") });
-      const result = await sendEmail({ to: email, ...rendered, idempotencyKey: `wishlist-${wishlistId}` });
+      const { t, locale } = await getServerI18n();
+      const rendered = renderWishlistEmail(t, { title: wishlist.title, manageUrl, guestUrl, locale, site: (await getRequestSiteUrl()).replace(/^https?:\/\//, "") });
+      const result = await sendEmail({ to: email, ...rendered, host: await getRequestHost(), idempotencyKey: `wishlist-${wishlistId}` });
       emailStatus = result === "sent" ? "sent" : "failed";
     }
     return noStoreJson({ manageUrl, guestUrl, emailStatus }, { status: 201 });

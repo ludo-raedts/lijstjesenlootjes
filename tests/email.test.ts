@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test, { afterEach } from "node:test";
 import { createTranslator } from "../src/i18n/messages";
-import { emailConfigured, sendEmail } from "../src/lib/email";
+import { emailConfigured, senderForHost, sendEmail } from "../src/lib/email";
 import { escapeHtml, renderDrawEmail, renderWishlistEmail } from "../src/lib/email-templates";
 import { optionalEmail } from "../src/lib/validation";
 
@@ -13,6 +13,7 @@ afterEach(() => {
   delete process.env.EMAIL_PROVIDER_API_KEY;
   delete process.env.EMAIL_FROM;
   delete process.env.EMAIL_REPLY_TO;
+  delete process.env.EMAIL_FROM_WISHANDDRAW_COM;
 });
 
 test("optionalEmail normalizes valid addresses and ignores empty input", () => {
@@ -89,4 +90,14 @@ test("draw email lists every participant link in both languages", () => {
     assert.ok(mail.subject.includes("Familie"));
     for (const needle of ["Sam", "Noor", "#token=1", "#token=2", "#token=a"]) assert.ok(mail.text.includes(needle), `${locale} ${needle}`);
   }
+});
+
+test("each public domain sends from its own sender and falls back to EMAIL_FROM", () => {
+  process.env.EMAIL_FROM = "NL <noreply@lijstjesenlootjes.nl>";
+  assert.equal(senderForHost("lijstjesenlootjes.nl"), "NL <noreply@lijstjesenlootjes.nl>");
+  assert.equal(senderForHost("wishanddraw.com"), "NL <noreply@lijstjesenlootjes.nl>");
+  process.env.EMAIL_FROM_WISHANDDRAW_COM = "EN <noreply@wishanddraw.com>";
+  assert.equal(senderForHost("www.wishanddraw.com:443"), "EN <noreply@wishanddraw.com>");
+  assert.equal(senderForHost("lijstjesenlootjes.nl"), "NL <noreply@lijstjesenlootjes.nl>");
+  assert.equal(senderForHost("localhost:3000"), "NL <noreply@lijstjesenlootjes.nl>");
 });

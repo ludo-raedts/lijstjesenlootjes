@@ -2,7 +2,7 @@ import { personalLink } from "@/lib/personal-links";
 import { sendEmail } from "@/lib/email";
 import { renderDrawEmail } from "@/lib/email-templates";
 import { getServerI18n } from "@/i18n/server";
-import { getRequestSiteUrl } from "@/lib/request-site";
+import { getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
 import { NextRequest } from "next/server";
 import { createAssignments } from "@/lib/draw";
 import { DRAW_BODY_BYTES, errorResponse, noStoreJson, readJson } from "@/lib/http";
@@ -100,14 +100,14 @@ export async function POST(request: NextRequest) {
     }));
     let emailStatus: "not_requested" | "sent" | "failed" = "not_requested";
     if (email) {
-      const { t } = await getServerI18n();
+      const { t, locale } = await getServerI18n();
       const rendered = renderDrawEmail(t, {
         group: draw.title ?? t("draw.create.defaultGroup"),
         adminUrl,
         participants: participantLinks,
-        site: (await getRequestSiteUrl()).replace(/^https?:\/\//, ""),
+        locale, site: (await getRequestSiteUrl()).replace(/^https?:\/\//, ""),
       });
-      const result = await sendEmail({ to: email, ...rendered, idempotencyKey: `draw-${drawId}` });
+      const result = await sendEmail({ to: email, ...rendered, host: await getRequestHost(), idempotencyKey: `draw-${drawId}` });
       emailStatus = result === "sent" ? "sent" : "failed";
     }
     return noStoreJson({ adminUrl, participantLinks, emailStatus }, { status: 201 });
