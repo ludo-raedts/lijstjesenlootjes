@@ -417,3 +417,10 @@ input:focus, textarea:focus, select:focus { border-color: var(--green); box-shad
 /* Hero illustration (art-directed: wide on desktop, portrait on mobile) */
 .hero-figure { margin-block: clamp(1.5rem, 4vw, 3rem) 0; padding: 0; }
 .hero-figure img { display: block; width: 100%; height: auto; border-radius: 12px; }
+
+/* Long capability links must never widen their card */
+.button-small { min-height: 44px; }
+.participant-list, .participant-row, .result-row, .participant-name, .link-box { min-width: 0; max-width: 100%; }
+@media (max-width: 560px) {
+  .link-box code { overflow: visible; overflow-wrap: anywhere; text-overflow: clip; white-space: normal; }
+}

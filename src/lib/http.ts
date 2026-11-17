@@ -15,6 +15,7 @@ export function errorResponse(error: unknown) {
       { status: error.status },
     );
   }
+  console.error("Unhandled API error:", error instanceof Error ? error.message : "non-error thrown");
   return noStoreJson(
     { error: { code: "internal_error" } },
     { status: 500 },
