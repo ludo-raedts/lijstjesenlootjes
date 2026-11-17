@@ -65,7 +65,7 @@ export function WishLink({ url, title }: { url?: string; title: string }) {
   const amazon = useAmazonAffiliate();
   const bol = useBolAffiliate();
   const { t } = useI18n();
-  if (!url) return <ShopSearchLinks title={title} />;
+  if (!url) return <ShopSearchLinks title={title} className="button button-secondary button-small" />;
   const tagged = (amazon ? tagAmazonUrl(url, amazon) : null) ?? (bol ? wrapBolUrl(url, bol) : null);
   if (tagged) {
     return <a href={tagged} target="_blank" rel={SPONSORED_REL}>{t("common.viewLink")}</a>;
