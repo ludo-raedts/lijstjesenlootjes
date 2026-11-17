@@ -31,6 +31,13 @@ De lokale map is gekoppeld aan het Vercel-project `ludo-raedts-projects/lijstjes
 
 Er is geen productiedeployment. De huidige Vercel-preview is afgeschermd met Vercel-authenticatie, wordt automatisch niet geïndexeerd en is end-to-end gecontroleerd op de homepage, navigatie, verlanglijsten, reserveringen, sessies, lootjestrekking en de gekoppelde deelnemerslijstjes.
 
+## Domeinen
+
+- Primair domein: `lijstjesenlootjes.nl` (geregistreerd bij Vimexx, 17 november 2026). Stel `NEXT_PUBLIC_SITE_URL=https://lijstjesenlootjes.nl` in voor Production.
+- `www.lijstjesenlootjes.nl` verwijst permanent door naar de kale domeinnaam (`next.config.ts`).
+- `wishanddraw.com` is gereserveerd voor de toekomstige Engelse versie en verwijst voorlopig tijdelijk (307) door naar het `.nl`-domein.
+- Vercel-domeinkoppeling: `vercel domains add` of via het dashboard; DNS-records komen van Vercel. Zet DNSSEC bij de registrar uit voordat nameservers worden gewijzigd.
+
 ## Opslagarchitectuur
 
 De server bewaart records in een afgeschermde Supabase/PostgreSQL-tabel. Alleen servercode met de geheime Supabase-sleutel kan twee `security definer`-functies aanroepen; browser- en anon-sleutels hebben geen toegang. Schrijfacties gebruiken optimistic concurrency control, zodat twee gelijktijdige reserveringen niet allebei kunnen slagen. Het schema staat in `supabase/migrations/20261116220000_app_state.sql`.
