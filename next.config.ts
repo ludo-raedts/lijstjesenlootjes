@@ -39,8 +39,8 @@ const nextConfig: NextConfig = {
   async headers() {
     // hreflang alternates for every public page, announced on each domain under that domain's own path.
     return SITE_DOMAINS.flatMap((domain) =>
-      PAGES.filter((page) => page.visibility === "public").map((page) => ({
-        source: page.paths[domain.locale],
+      PAGES.filter((page) => page.visibility === "public" && page.paths[domain.locale] !== undefined).map((page) => ({
+        source: page.paths[domain.locale] as string,
         has: [hostCondition(domain.host)],
         headers: [{ key: "Link", value: linkHeaderValue(page.key) }],
       })),

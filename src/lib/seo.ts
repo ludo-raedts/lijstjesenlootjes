@@ -3,8 +3,8 @@ import "server-only";
 import type { Metadata } from "next";
 import { getServerI18n } from "@/i18n/server";
 import { getPagePath, getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
-import { findSiteDomain } from "@/lib/domains";
-import { alternatesFor, pathForLocale, publicPages, type PageKey } from "@/lib/paths";
+import { SITE_DOMAINS, findSiteDomain } from "@/lib/domains";
+import { alternatesFor, hasPath, pathForLocale, publicPages, type PageKey } from "@/lib/paths";
 import type { Locale } from "@/i18n/config";
 
 const openGraphLocales = { nl: "nl_NL", en: "en_GB" } as const;
@@ -31,9 +31,13 @@ export async function getLanguageLinks(): Promise<Record<string, Record<Locale, 
   if (!findSiteDomain(await getRequestHost())) return null;
   const locale = (await getServerI18n()).locale;
   const links: Record<string, Record<Locale, string>> = {};
-  for (const page of publicPages()) {
+  for (const page of publicPages().filter((candidate) => hasPath(candidate.key, locale))) {
     const urls = Object.fromEntries(
-      alternatesFor(page.key).filter((alternate) => alternate.hreflang !== "x-default").map((alternate) => [alternate.hreflang, alternate.url]),
+      SITE_DOMAINS.map((domain) => {
+        // A page the other domain lacks links to that domain's fallback page, never to a missing URL.
+        const path = pathForLocale(page.key, domain.locale);
+        return [domain.locale, path === "/" ? `https://${domain.host}` : `https://${domain.host}${path}`];
+      }),
     ) as Record<Locale, string>;
     links[pathForLocale(page.key, locale)] = urls;
   }

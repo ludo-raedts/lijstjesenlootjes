@@ -19,7 +19,7 @@ import { personalLink } from "../src/lib/personal-links";
 
 test("every page has a distinct path per language and unique paths overall", () => {
   for (const locale of ["nl", "en"] as const) {
-    const paths = PAGES.map((page) => page.paths[locale]);
+    const paths = PAGES.map((page) => page.paths[locale]).filter((path) => path !== undefined);
     assert.equal(new Set(paths).size, paths.length, `duplicate ${locale} paths`);
   }
 });
@@ -117,9 +117,22 @@ test("robots disallow rules never block a public path", () => {
   const rules = privateDisallowRules();
   const blocks = (rule: string, path: string) => (rule.endsWith("$") ? path === rule.slice(0, -1) : path.startsWith(rule));
   for (const page of publicPages()) {
-    for (const path of Object.values(page.paths)) {
+    for (const path of Object.values(page.paths).filter((value): value is string => value !== undefined)) {
       assert.ok(!rules.some((rule) => blocks(rule, path)), `${path} must not be disallowed`);
     }
   }
   assert.ok(rules.includes("/lootje$") && rules.includes("/lootje/"));
+});
+
+test("a page that exists in one language only falls back on the other domain", () => {
+  const page = PAGES.find((candidate) => candidate.key === "sinterklaasDraw");
+  assert.ok(page && page.paths.en === undefined && page.fallback === "drawCreate");
+  assert.equal(pathForLocale("sinterklaasDraw", "nl"), "/sinterklaas-lootjes-trekken");
+  assert.equal(pathForLocale("sinterklaasDraw", "en"), "/secret-santa-generator");
+  assert.equal(
+    redirectRules().find((rule) => rule.host === "wishanddraw.com" && rule.source === "/sinterklaas-lootjes-trekken")?.destination,
+    "/secret-santa-generator",
+  );
+  assert.deepEqual(alternatesFor("sinterklaasDraw").map((alternate) => alternate.hreflang), ["nl", "x-default"]);
+  assert.ok(!rewriteRules().some((rule) => rule.source === "/sinterklaas-lootjes-trekken"));
 });

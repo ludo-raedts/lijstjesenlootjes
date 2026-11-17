@@ -11,8 +11,13 @@ export interface PageDefinition {
   key: PageKey;
   /** Public pages are indexable and listed in the sitemap; private pages hold capability tokens. */
   visibility: "public" | "private";
-  /** Path per locale/domain. The Dutch path is also the internal route. */
-  paths: Record<Locale, string>;
+  /**
+   * Path per locale/domain. The Dutch path is also the internal route and always exists. A page without a path
+   * for a locale does not exist on that locale's domain (no sitemap entry, no hreflang alternate).
+   */
+  paths: { nl: string; en?: string };
+  /** Required when a locale has no path: where links to this page and its Dutch path lead on that domain. */
+  fallback?: PageKey;
   /** Former paths per locale that permanently redirect (308) to the canonical path on that locale's domain. */
   legacyPaths?: Partial<Record<Locale, readonly string[]>>;
 }
@@ -22,6 +27,7 @@ export type PageKey =
   | "wishlistCreate"
   | "drawCreate"
   | "wheel"
+  | "sinterklaasDraw"
   | "help"
   | "privacy"
   | "wishlistManage"
@@ -34,6 +40,7 @@ export const PAGES: readonly PageDefinition[] = [
   { key: "wishlistCreate", visibility: "public", paths: { nl: "/verlanglijstje-maken", en: "/wishlist-maker" }, legacyPaths: { en: ["/create-wishlist"] } },
   { key: "drawCreate", visibility: "public", paths: { nl: "/lootjes-trekken", en: "/secret-santa-generator" }, legacyPaths: { en: ["/draw-names"] } },
   { key: "wheel", visibility: "public", paths: { nl: "/rad-draaien", en: "/name-wheel" }, legacyPaths: { en: ["/spin-the-wheel"] } },
+  { key: "sinterklaasDraw", visibility: "public", paths: { nl: "/sinterklaas-lootjes-trekken" }, fallback: "drawCreate" },
   { key: "help", visibility: "public", paths: { nl: "/help", en: "/help" } },
   { key: "privacy", visibility: "public", paths: { nl: "/privacy", en: "/privacy" } },
   { key: "wishlistManage", visibility: "private", paths: { nl: "/verlanglijstje/beheren", en: "/wishlist/manage" } },
@@ -52,11 +59,21 @@ export function getPage(key: PageKey): PageDefinition {
 
 /** The internal (Dutch) route folder for a page. */
 export function internalPath(key: PageKey): string {
-  return getPage(key).paths[DEFAULT_LOCALE];
+  return getPage(key).paths.nl;
 }
 
+/** Whether the page exists on the locale's domain. */
+export function hasPath(key: PageKey, locale: Locale): boolean {
+  return getPage(key).paths[locale] !== undefined;
+}
+
+/** The page's path on the locale's domain; for a page that domain lacks, the path of its fallback page. */
 export function pathForLocale(key: PageKey, locale: Locale): string {
-  return getPage(key).paths[locale];
+  const page = getPage(key);
+  const path = page.paths[locale];
+  if (path !== undefined) return path;
+  if (!page.fallback) throw new Error(`Page ${key} has no ${locale} path and no fallback`);
+  return pathForLocale(page.fallback, locale);
 }
 
 /** The canonical path on the domain the visitor is on; unknown hosts (previews, local) use the Dutch paths. */
@@ -74,7 +91,7 @@ export function privatePages(): PageDefinition[] {
 
 /** Private path prefixes in every language, for robots.txt and the proxy. */
 export function privatePathPrefixes(): string[] {
-  return [...new Set(privatePages().flatMap((page) => Object.values(page.paths)))];
+  return [...new Set(privatePages().flatMap((page) => Object.values(page.paths).filter((path): path is string => path !== undefined)))];
 }
 
 /**
@@ -94,12 +111,13 @@ export interface Alternate {
 export function alternatesFor(key: PageKey): Alternate[] {
   const page = getPage(key);
   const urlFor = (domain: SiteDomain) => {
-    const path = page.paths[domain.locale];
+    const path = page.paths[domain.locale] as string;
     return path === "/" ? `https://${domain.host}` : `https://${domain.host}${path}`;
   };
+  const domains = SITE_DOMAINS.filter((domain) => page.paths[domain.locale] !== undefined);
   return [
-    ...SITE_DOMAINS.map((domain) => ({ hreflang: domain.locale, url: urlFor(domain) })),
-    { hreflang: "x-default", url: urlFor(SITE_DOMAINS[0]) },
+    ...domains.map((domain) => ({ hreflang: domain.locale, url: urlFor(domain) })),
+    { hreflang: "x-default", url: urlFor(domains[0]) },
   ];
 }
 
@@ -117,16 +135,16 @@ export interface PathRule {
 
 /**
  * On every domain, other languages' paths and the domain's own legacy paths permanently redirect (308) to that
- * domain's canonical path.
+ * domain's canonical path. A page the domain lacks redirects to its fallback page.
  */
 export function redirectRules(): PathRule[] {
   return SITE_DOMAINS.flatMap((domain) =>
     PAGES.flatMap((page) => {
-      const canonical = page.paths[domain.locale];
+      const canonical = pathForLocale(page.key, domain.locale);
       const sources = [
         ...Object.values(page.paths),
         ...Object.values(page.legacyPaths ?? {}).flat(),
-      ].filter((path) => path !== canonical);
+      ].filter((path): path is string => path !== undefined && path !== canonical);
       return [...new Set(sources)].map((path) => ({ host: domain.host, source: path, destination: canonical }));
     }),
   );
@@ -135,9 +153,9 @@ export function redirectRules(): PathRule[] {
 /** Domains whose canonical paths differ from the internal route folders serve them through rewrites. */
 export function rewriteRules(): PathRule[] {
   return SITE_DOMAINS.flatMap((domain) =>
-    PAGES.filter((page) => page.paths[domain.locale] !== internalPath(page.key)).map((page) => ({
+    PAGES.filter((page) => page.paths[domain.locale] !== undefined && page.paths[domain.locale] !== internalPath(page.key)).map((page) => ({
       host: domain.host,
-      source: page.paths[domain.locale],
+      source: page.paths[domain.locale] as string,
       destination: internalPath(page.key),
     })),
   );
