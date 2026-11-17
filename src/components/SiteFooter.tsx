@@ -5,6 +5,7 @@ export async function SiteFooter() {
   const { t } = await getServerI18n();
   return (
     <footer className="site-footer">
+      <img className="footer-flowers" src="/motifs/motif-neutral-flower-corner.svg" alt="" aria-hidden="true" />
       <div className="shell footer-grid">
         <div>
           <p className="footer-brand">{t("app.name")}</p>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 220 240" fill="none">
+  <defs>
+    <g id="tulip">
+      <path d="M50 146C49 120 51 96 50 74" stroke="#174A36" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M50 124C30 122 16 108 12 88C32 90 46 104 50 124Z" fill="#174A36"/>
+      <path d="M50 118C70 116 84 102 88 82C68 84 54 98 50 118Z" fill="#2B6A50"/>
+      <path d="M50 78C30 74 22 48 32 30C40 42 47 56 50 78Z" fill="#A53A2E"/>
+      <path d="M50 78C70 74 78 48 68 30C60 42 53 56 50 78Z" fill="#7C2B24"/>
+      <path d="M50 80C38 72 36 44 50 16C64 44 62 72 50 80Z" fill="#C24B3B"/>
+      <path d="M50 70C44 60 44 46 50 34" stroke="#F2C8B7" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+    </g>
+    <g id="blossom">
+      <g fill="#1C4CB4">
+        <circle cx="20" cy="9" r="6.5"/><circle cx="30.5" cy="16.6" r="6.5"/><circle cx="26.5" cy="29" r="6.5"/><circle cx="13.5" cy="29" r="6.5"/><circle cx="9.5" cy="16.6" r="6.5"/>
+      </g>
+      <circle cx="20" cy="20" r="5" fill="#F2C8B7"/><circle cx="20" cy="20" r="1.8" fill="#A53A2E"/>
+    </g>
+  </defs>
+  <path d="M8 232C40 196 62 170 96 146" stroke="#174A36" stroke-width="3" stroke-linecap="round"/>
+  <path d="M40 200C28 194 22 182 24 170C36 174 42 186 40 200Z" fill="#2B6A50"/>
+  <path d="M66 176C58 166 58 154 64 144C72 152 74 164 66 176Z" fill="#174A36"/>
+  <path d="M26 214C14 214 6 206 4 196C16 196 24 202 26 214Z" fill="#174A36"/>
+  <use href="#tulip" transform="translate(80 8) rotate(14 50 146) scale(1.05)"/>
+  <use href="#tulip" transform="translate(6 88) rotate(-22 50 146) scale(.62)"/>
+  <use href="#blossom" transform="translate(150 118) scale(1.1)"/>
+  <use href="#blossom" transform="translate(30 20) scale(.8)"/>
+  <circle cx="112" cy="206" r="4" fill="#A53A2E"/>
+  <circle cx="132" cy="190" r="3" fill="#1C4CB4"/>
+  <circle cx="92" cy="218" r="3" fill="#1C4CB4"/>
+</svg>

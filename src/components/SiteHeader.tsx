@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GiftMark } from "@/components/Art";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getServerI18n } from "@/i18n/server";
 
@@ -8,13 +9,13 @@ export async function SiteHeader() {
     <header className="site-header">
       <div className="shell header-inner">
         <Link className="wordmark" href="/" aria-label={t("nav.homeLabel")}>
-          <span className="wordmark-mark" aria-hidden="true">✓</span>
-          <span>{t("app.name")}</span>
+          <GiftMark className="wordmark-mark" />
+          <span className="wordmark-text">{t("app.name")}</span>
         </Link>
         <nav className="main-nav" aria-label={t("nav.label")}>
-          <Link href="/verlanglijstje-maken"><span>01</span>{t("nav.wishlist")}</Link>
-          <Link href="/lootjes-trekken"><span>02</span>{t("nav.draw")}</Link>
-          <Link href="/help"><span>03</span>{t("nav.help")}</Link>
+          <Link href="/verlanglijstje-maken">{t("nav.wishlist")}</Link>
+          <Link href="/lootjes-trekken">{t("nav.draw")}</Link>
+          <Link href="/help">{t("nav.help")}</Link>
           <LanguageSwitcher />
         </nav>
       </div>
