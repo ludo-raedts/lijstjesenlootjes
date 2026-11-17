@@ -1,3 +1,4 @@
+import { getImageProps } from "next/image";
 import Link from "next/link";
 import { getServerI18n } from "@/i18n/server";
 
@@ -29,6 +30,10 @@ export default async function HomePage() {
     { title: t("home.how.step3.title"), body: t("home.how.step3.body") },
   ];
 
+  const common = { alt: t("home.hero.imageAlt"), sizes: "(min-width: 1200px) 1120px, 100vw", quality: 80 };
+  const { props: { srcSet: desktopSrcSet } } = getImageProps({ ...common, src: "/images/hero-neutral-desktop.png", width: 1536, height: 1024 });
+  const { props: heroImage } = getImageProps({ ...common, src: "/images/hero-neutral-mobile.png", width: 1122, height: 1402, fetchPriority: "high" });
+
   return (
     <>
       <section className="editorial-hero shell">
@@ -45,6 +50,13 @@ export default async function HomePage() {
         </div>
         <span className="hero-pencil" aria-hidden="true" />
       </section>
+
+      <figure className="shell hero-figure">
+        <picture>
+          <source media="(min-width: 861px)" srcSet={desktopSrcSet} />
+          <img {...heroImage} alt={common.alt} />
+        </picture>
+      </figure>
 
       <section className="shell tool-index" aria-labelledby="home-products-title">
         <header className="index-header">

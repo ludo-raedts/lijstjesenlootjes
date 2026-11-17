@@ -413,3 +413,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--green); box-shad
 .footer-grid nav a, .text-link { display: inline-flex; }
 .main-nav a { grid-auto-flow: column; }
 .main-nav a { gap: .4rem; }
+
+/* Hero illustration (art-directed: wide on desktop, portrait on mobile) */
+.hero-figure { margin-block: clamp(1.5rem, 4vw, 3rem) 0; padding: 0; }
+.hero-figure img { display: block; width: 100%; height: auto; border-radius: 12px; }
