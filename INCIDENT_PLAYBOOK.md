@@ -8,8 +8,16 @@ Short, practical steps for the first hour. Keep this free of real names, links, 
   `503 {"status":"degraded"}` otherwise. It never returns data or error details.
 - Point an uptime monitor at `https://lijstjesenlootjes.nl/api/health` and
   `https://wishanddraw.com/api/health` (check every minute, alert after 2 failures).
-- In Vercel, configure alerts under Observability → Alerts for: elevated 5xx rate, failed
-  deployments, and function errors. Send them to a monitored address.
+- Vercel alert rules (Observability → Alerts, or `vercel alerts rules ls`):
+  - `ar_default` (built-in): usage and error anomalies at severity high or above, sent to
+    team owners.
+  - `Elevated 5xx responses` (`ar_01a1e9f9-4740-754a-80a4-ba334f372946`, custom, this project
+    only): fires at high severity when at least 5% of requests in a 5-minute window return
+    5xx, with at least 3 failing requests. Team owners are notified. Inspect it with
+    `vercel alerts rules inspect <ruleId>`. It was accepted by Vercel but has not been
+    proven by a real incident yet; verify it the first time something breaks.
+  - Failed deployments are not an alert rule. Enable them under Vercel → Settings →
+    Notifications (deployment failed) so a broken build is reported by email.
 - Structured log events to search for in Runtime Logs: `health_check_failed`,
   `retention_cleanup_completed`, `Supabase read_app_state failed`,
   `Supabase commit_app_state failed`, `Supabase consume_app_rate_limit failed`,
