@@ -12,6 +12,7 @@ export const apiErrorCodes = [
   "invalid_url",
   "unsupported_url_protocol",
   "invalid_date",
+  "invalid_email",
   "invalid_wishlist_wish_count",
   "wish_incomplete",
   "duplicate_wish",

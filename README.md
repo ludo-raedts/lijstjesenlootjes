@@ -91,7 +91,7 @@ Gedekt: homepage, mobiel menu, taalwissel en Engelse paden; verlanglijstje maken
 ## Bewuste beperkingen
 
 - Handmatig verwijderen wist een verlanglijstje of trekking met alle bijbehorende tokens en sessies direct. Een dagelijkse Vercel Cron-job (`/api/cron/cleanup`, `vercel.json`, beveiligd met `CRON_SECRET`) verwijdert verlopen scopes: trekkingen 45 dagen na de datum of 90 dagen na aanmaak zonder datum, verlanglijstjes 12 maanden na de laatste wijziging of reservering, plus verlopen of verweesde tokens en sessies (`src/lib/data-lifecycle.ts`). Het back-upbeleid is nog niet definitief vastgesteld; de Supabase-tabellen gebruiken RLS zonder publieke policies.
-- Geen e-mailprovider; de UI claimt nergens dat e-mail is verzonden.
+- E-mail is optioneel en eenmalig (Resend, `src/lib/email.ts`): het adres gaat mee met het aanmaakverzoek, wordt niet opgeslagen of gelogd, en de UI meldt alleen "verstuurd" als de provider het accepteerde. Zonder `EMAIL_PROVIDER_API_KEY` en `EMAIL_FROM` wordt niets verzonden. Nog niet gedekt: DNS (SPF, DKIM, DMARC) voor de verzenddomeinen, een bounce- en complaintwebhook en een e-mailteller in het dashboard.
 - De productiedeployment is publiek bereikbaar, maar blijft voorlopig een besloten proefversie; er zijn nog geen analytics of externe scripts.
 - Geen herstelroute wanneer een beheerlink verloren is.
 - De oorspronkelijke persoonlijke lootjeslink is na uitgifte niet terug te halen; beheer kan een nieuwe link maken en de oude intrekken.

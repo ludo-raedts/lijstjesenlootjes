@@ -1,11 +1,15 @@
 import { personalLink } from "@/lib/personal-links";
+import { sendEmail } from "@/lib/email";
+import { renderDrawEmail } from "@/lib/email-templates";
+import { getServerI18n } from "@/i18n/server";
+import { getRequestSiteUrl } from "@/lib/request-site";
 import { NextRequest } from "next/server";
 import { createAssignments } from "@/lib/draw";
 import { DRAW_BODY_BYTES, errorResponse, noStoreJson, readJson } from "@/lib/http";
 import { accessExpiryIso, drawExpiresAt } from "@/lib/data-lifecycle";
 import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
 import { recordUsage, transaction } from "@/lib/store";
-import { optionalDate, optionalText, text } from "@/lib/validation";
+import { optionalDate, optionalEmail, optionalText, text } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +17,8 @@ export async function POST(request: NextRequest) {
     await limit(request, "draw-create", 10);
     const body = await readJson(request, DRAW_BODY_BYTES);
     const requestId = text(body.requestId, "requestId", 100);
+    const email = optionalEmail(body.email);
+    if (email) await limit(request, "email-send", 5);
     if (!Array.isArray(body.participants) || body.participants.length < 3 || body.participants.length > 50) {
       throw new HttpError(400, "invalid_participant_count", { min: 3, max: 50 });
     }
@@ -86,15 +92,25 @@ export async function POST(request: NextRequest) {
       database.accessTokens.push(admin.record, ...participantAccess.map(({ token }) => token.record));
     });
     await recordUsage("draw_created");
-    return noStoreJson({
-      adminUrl: personalLink(request, "drawAdmin", admin.raw),
-      participantLinks: participantAccess.map(({ participant, token }) => ({
-        participantId: participant.id,
-        name: participant.name,
-        url: personalLink(request, "drawReveal", token.raw),
-      })),
-      emailAvailable: false,
-    }, { status: 201 });
+    const adminUrl = personalLink(request, "drawAdmin", admin.raw);
+    const participantLinks = participantAccess.map(({ participant, token }) => ({
+      participantId: participant.id,
+      name: participant.name,
+      url: personalLink(request, "drawReveal", token.raw),
+    }));
+    let emailStatus: "not_requested" | "sent" | "failed" = "not_requested";
+    if (email) {
+      const { t } = await getServerI18n();
+      const rendered = renderDrawEmail(t, {
+        group: draw.title ?? t("draw.create.defaultGroup"),
+        adminUrl,
+        participants: participantLinks,
+        site: (await getRequestSiteUrl()).replace(/^https?:\/\//, ""),
+      });
+      const result = await sendEmail({ to: email, ...rendered, idempotencyKey: `draw-${drawId}` });
+      emailStatus = result === "sent" ? "sent" : "failed";
+    }
+    return noStoreJson({ adminUrl, participantLinks, emailStatus }, { status: 201 });
   } catch (error) {
     return errorResponse(error);
   }

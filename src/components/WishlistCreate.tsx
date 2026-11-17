@@ -6,13 +6,15 @@ import { blankWish, WishDraft, WishFields } from "@/components/WishFields";
 import { CopyButton } from "@/components/CopyButton";
 import { useI18n } from "@/i18n/I18nProvider";
 
-type Result = { manageUrl: string; guestUrl: string };
+type Result = { manageUrl: string; guestUrl: string; emailStatus: "not_requested" | "sent" | "failed" };
 
 export function WishlistCreate() {
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [occasion, setOccasion] = useState("");
   const [date, setDate] = useState("");
+  const [email, setEmail] = useState("");
+  const [sentTo, setSentTo] = useState("");
   const [wishes, setWishes] = useState<WishDraft[]>([blankWish()]);
   const [result, setResult] = useState<Result>();
   const [error, setError] = useState("");
@@ -23,10 +25,12 @@ export function WishlistCreate() {
     setError("");
     setBusy(true);
     try {
-      setResult(await api<Result>("/api/wishlists", {
+      const created = await api<Result>("/api/wishlists", {
         method: "POST",
-        body: JSON.stringify({ title, occasion, date, wishes }),
-      }));
+        body: JSON.stringify({ title, occasion, date, wishes, email }),
+      });
+      setSentTo(email.trim());
+      setResult(created);
     } catch (submissionError) {
       setError((submissionError as Error).message);
     } finally {
@@ -41,6 +45,8 @@ export function WishlistCreate() {
         <span className="eyebrow">{t("wishlist.create.successEyebrow")}</span>
         <h2>{t("wishlist.create.successTitle")}</h2>
         <p>{t("wishlist.create.successIntro")}</p>
+        {result.emailStatus === "sent" && <div className="notice"><strong>{t("email.result.sentTitle")}</strong><span>{t("email.result.sentBody", { email: sentTo })}</span></div>}
+        {result.emailStatus === "failed" && <div className="notice error" role="alert"><strong>{t("email.result.failedTitle")}</strong><span>{t("email.result.failedBody")}</span></div>}
         <div className="notice warning"><strong>{t("wishlist.create.manageWarningTitle")}</strong><span>{t("wishlist.create.manageWarningBody")}</span></div>
         <div className="link-result">
           <span className="field-label">{t("wishlist.create.manageLink")}</span>
@@ -76,6 +82,7 @@ export function WishlistCreate() {
       <div className="step-heading"><span>2</span><h2>{t("wishlist.create.step2")}</h2></div>
       <p className="muted">{t("wishlist.create.wishesIntro")}</p>
       <WishFields wishes={wishes} onChange={setWishes} />
+      <div className="field"><label htmlFor="email">{t("email.field.label")} <span className="hint">{t("common.optional")}</span></label><input id="email" type="email" autoComplete="email" maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t("email.field.placeholder")} aria-describedby="email-hint" /><p className="hint" id="email-hint">{t("email.field.wishlistHint")}</p></div>
       {error && <div className="notice error" role="alert">{error}</div>}
       <button className="button" disabled={busy} type="submit">{busy ? t("wishlist.create.submitting") : t("wishlist.create.submit")}</button>
       <p className="hint">{t("wishlist.create.testDataHint")}</p>

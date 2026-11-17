@@ -50,3 +50,15 @@ export function optionalDate(value: unknown) {
   }
   return value;
 }
+
+const EMAIL_PATTERN = /^[^\s@<>(),;:"\\[\]]+@[^\s@<>(),;:"\\[\]]+\.[^\s@<>(),;:"\\[\]]{2,}$/;
+
+/** Optional single address for one-off transactional mail. Never stored; control characters are rejected outright. */
+export function optionalEmail(value: unknown) {
+  if (value === undefined || value === null || value === "") return undefined;
+  if (typeof value !== "string") throw new HttpError(400, "invalid_email");
+  const result = value.trim().toLowerCase();
+  if (!result) return undefined;
+  if (result.length > 254 || !EMAIL_PATTERN.test(result)) throw new HttpError(400, "invalid_email");
+  return result;
+}

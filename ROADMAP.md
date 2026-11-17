@@ -91,7 +91,8 @@ Implemented (2026-11-17): `/admin/usage` with anonymous daily counters and a sto
 
 ## Phase 2 — Product completeness
 
-- Add an optional reminder flow only after an email provider, sender identity, delivery
+- One-off mail of the links at creation is implemented (Resend, address never stored).
+  Add an optional reminder flow only after an email provider, sender identity, delivery
   monitoring, unsubscribe handling, and localized templates are ready.
 - Let organizers set or extend an expiry date within policy limits.
 - Add a clear “link expired” recovery path without exposing assignments.
