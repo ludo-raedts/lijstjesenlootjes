@@ -60,6 +60,10 @@ De server bewaart records in een afgeschermde Supabase/PostgreSQL-tabel. Alleen 
 
 Capabilitytokens bevatten 256 bits willekeur en worden alleen als SHA-256-hash opgeslagen. De ruwe token staat in het URL-fragment en wordt via een same-origin POST verruild voor een HttpOnly/SameSite-sessiecookie. Persoonlijke routes hebben `noindex`, `no-store` en `Referrer-Policy: no-referrer`.
 
+## Health en incidenten
+
+`GET /api/health` geeft `200` (`ok`) of `503` (`degraded`) en toont nooit data of foutdetails; het controleert alleen de databaseverbinding via de RPC `app_health` (migratie `20261117160000_app_health.sql`, eerst toepassen). Zie [INCIDENT_PLAYBOOK.md](INCIDENT_PLAYBOOK.md) voor detectie, containment en het roteren van sleutels.
+
 ## Bewuste beperkingen
 
 - Handmatig verwijderen wist een verlanglijstje of trekking met alle bijbehorende tokens en sessies direct. Een dagelijkse Vercel Cron-job (`/api/cron/cleanup`, `vercel.json`, beveiligd met `CRON_SECRET`) verwijdert verlopen scopes: trekkingen 45 dagen na de datum of 90 dagen na aanmaak zonder datum, verlanglijstjes 12 maanden na de laatste wijziging of reservering, plus verlopen of verweesde tokens en sessies (`src/lib/data-lifecycle.ts`). Het back-upbeleid is nog niet definitief vastgesteld; de Supabase-tabellen gebruiken RLS zonder publieke policies.

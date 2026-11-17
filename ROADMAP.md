@@ -57,6 +57,8 @@ Required implementation after approval of these periods:
 
 ### 2. Monitoring and incident readiness
 
+**Status (2026-11-17): partly implemented.** `GET /api/health` (database probe via the `app_health` RPC, migration `20261117160000_app_health.sql`) and `INCIDENT_PLAYBOOK.md` exist. Still manual: apply the migration, point an uptime monitor at `/api/health`, and configure Vercel alerts for 5xx and failed deploys.
+
 - Add a minimal health endpoint that checks application-to-database connectivity without
   returning database contents.
 - Create alerts for elevated 5xx responses, failed Supabase RPC calls, and failed deploys.

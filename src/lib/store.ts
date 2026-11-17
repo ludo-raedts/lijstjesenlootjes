@@ -90,3 +90,12 @@ export async function consumeRateLimit(
   }
   return data;
 }
+
+export async function checkDatabaseHealth() {
+  const { data, error } = await getClient().rpc("app_health");
+  if (error) {
+    console.error("Supabase app_health failed", error.code);
+    return false;
+  }
+  return data === true;
+}
