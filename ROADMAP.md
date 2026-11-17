@@ -142,8 +142,11 @@ type CatalogItem = {
 - Store user-entered title, note, price, and URL exactly as entered.
 - Store provider metadata separately so it can be refreshed or removed without changing
   the user's own description.
-- Never rewrite an existing manually entered URL in place. Affiliate items are added via a
-  deliberate provider flow with a visible disclosure.
+- Never rewrite a manually entered URL in storage. Decision 2026-11-17: for the Amazon
+  programme only, full links on the programme's own marketplace receive the Associates tag
+  at display time (replacing any existing tag), with a visible disclosure and a privacy
+  statement. Other hosts and short links stay untouched. The tag is public (it is in every
+  outbound link) and is passed to the browser for this purpose.
 - Treat merchant price and availability as temporary display data, not as the wishlist's
   source of truth.
 - Add a provider kill switch that removes merchant content and disables outbound tracking

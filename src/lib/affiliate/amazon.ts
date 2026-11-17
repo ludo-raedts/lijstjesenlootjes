@@ -67,6 +67,28 @@ export function resolveAmazonLink(
 }
 
 /**
+ * Display-time tagging of a link the user entered. The stored URL is never changed.
+ * Only full URLs on the programme's own marketplace are tagged: other hosts, short links
+ * (amzn.to, a.co) and other Amazon marketplaces are returned as null (leave untouched),
+ * because a tag only earns commission on the marketplace it was registered for. Any tag
+ * already present is replaced with ours.
+ */
+export function tagAmazonUrl(rawUrl: string, config: AmazonLinkConfig): string | null {
+  let url: URL;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+  const bareHost = config.marketplaceHost.replace(/^www\./, "");
+  if (url.hostname !== config.marketplaceHost && url.hostname !== bareHost) return null;
+  url.protocol = "https:";
+  url.searchParams.set("tag", config.tag);
+  return url.toString();
+}
+
+/**
  * Builds a deliberate Amazon search link carrying the Associates tag. User-entered wish
  * URLs are never rewritten; this link is only offered as a separate action.
  */

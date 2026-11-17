@@ -1,5 +1,6 @@
 "use client";
 
+import { AmazonEditorHelper } from "@/components/AmazonAffiliate";
 import { useI18n } from "@/i18n/I18nProvider";
 
 export type WishDraft = {
@@ -43,6 +44,7 @@ export function WishFields({
             <div className="field">
               <label htmlFor={`wish-url-${index}`}>{t("wishes.urlLabel")} <span className="hint">{t("common.optional")}</span></label>
               <input id={`wish-url-${index}`} value={wish.url} inputMode="url" onChange={(event) => update(index, { url: event.target.value })} placeholder={t("wishes.urlPlaceholder")} />
+              <AmazonEditorHelper title={wish.title} />
             </div>
             <div className="field">
               <label htmlFor={`wish-price-${index}`}>{t("wishes.priceLabel")} <span className="hint">{t("common.optional")}</span></label>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AmazonDisclosure, AmazonSearchLink } from "@/components/AmazonAffiliate";
+import { AmazonDisclosure, WishLink } from "@/components/AmazonAffiliate";
 import { formattingLocales } from "@/i18n/config";
 import { api, ensureSession } from "@/lib/client";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -31,7 +31,7 @@ export function WishlistGuest() {
       <ul className="gift-list">
         {wishlist.wishes.map((wish) => (
           <li className="gift-card" key={wish.id}>
-            <div><span className={`availability ${wish.reserved ? "reserved" : ""}`}>{wish.reserved ? (wish.ownReservation ? t("wishlist.guest.reservedByYou") : t("wishlist.guest.reserved")) : t("wishlist.guest.available")}</span><h3>{wish.title}</h3>{wish.note && <p>{wish.note}</p>}<div className="gift-meta">{wish.price && <span>{wish.price}</span>}{wish.url ? <a href={wish.url} target="_blank" rel="noopener noreferrer nofollow">{t("common.viewLink")}</a> : <AmazonSearchLink title={wish.title} />}</div></div>
+            <div><span className={`availability ${wish.reserved ? "reserved" : ""}`}>{wish.reserved ? (wish.ownReservation ? t("wishlist.guest.reservedByYou") : t("wishlist.guest.reserved")) : t("wishlist.guest.available")}</span><h3>{wish.title}</h3>{wish.note && <p>{wish.note}</p>}<div className="gift-meta">{wish.price && <span>{wish.price}</span>}<WishLink url={wish.url} title={wish.title} /></div></div>
             {(!wish.reserved || wish.ownReservation) && <button className={wish.ownReservation ? "button button-secondary" : "button"} disabled={busyId === wish.id} type="button" onClick={async () => {
               setBusyId(wish.id); setError("");
               try { await api("/api/wishlists/guest", { method: "POST", body: JSON.stringify({ action: wish.ownReservation ? "release" : "reserve", wishId: wish.id }) }); await load(); }

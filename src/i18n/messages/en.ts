@@ -289,9 +289,11 @@ export const enMessages: Record<MessageKey, string> = {
   "privacy.warningTitle": "Only use test data for now.",
   "affiliate.amazon.search": "Search on Amazon ↗",
   "affiliate.amazon.searchLabel": "Search Amazon for “{title}” (opens Amazon, affiliate link)",
-  "affiliate.disclosure": "As an Amazon Associate we earn from qualifying purchases made through “Search on Amazon”.",
+  "affiliate.amazon.helperHint": "Pick a product on Amazon, then paste its link above.",
+  "affiliate.amazon.helperEmpty": "Fill in what you would like and you can search for it on Amazon.",
+  "affiliate.disclosure": "As an Amazon Associate we earn from qualifying purchases made through Amazon links on this site.",
   "privacy.affiliateTitle": "Amazon affiliate links",
-  "privacy.affiliateBody": "For wishes without their own link you can search on Amazon. That search link contains our Associates tag; if you buy something afterwards we receive a commission and you pay no more. Only the wish title is in the link, never names, the list, or a personal link. We never change links you entered yourself. Checkout, delivery, and returns happen at Amazon.",
+  "privacy.affiliateBody": "We take part in the Amazon Associates programme. Amazon links on this site can contain our Associates tag; if you buy something there afterwards we receive a commission and you pay no more. This happens in two ways. First, we offer “Search on Amazon”: the link contains only the wish title, never names, the list, or a personal link. Second, when a wish contains an amazon.com link, we add our tag when we show it. The link as entered is stored unchanged, and any tag already in it is replaced by ours while it is shown. Links to other shops and shortened Amazon links are not changed. Amazon sets its own cookies once you open its site; we do not add trackers to our pages. Checkout, delivery, and returns happen at Amazon.",
   "privacy.warningBody": "The preview environment is intended for review and may be cleared during development.",
 
   "wheel.page.eyebrow": "Spin the wheel",

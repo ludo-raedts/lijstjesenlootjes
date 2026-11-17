@@ -287,9 +287,11 @@ export const nlMessages = {
   "privacy.warningTitle": "Gebruik nu alleen testdata.",
   "affiliate.amazon.search": "Zoek op Amazon ↗",
   "affiliate.amazon.searchLabel": "Zoek “{title}” op Amazon (opent Amazon, partnerlink)",
-  "affiliate.disclosure": "Als Amazon-partner verdienen wij aan kwalificerende aankopen via “Zoek op Amazon”.",
+  "affiliate.amazon.helperHint": "Kies een product op Amazon en plak de link hierboven.",
+  "affiliate.amazon.helperEmpty": "Vul in wat je graag wilt, dan kun je het op Amazon zoeken.",
+  "affiliate.disclosure": "Als Amazon-partner verdienen wij aan kwalificerende aankopen via Amazon-links op deze site.",
   "privacy.affiliateTitle": "Amazon-partnerlinks",
-  "privacy.affiliateBody": "Bij wensen zonder eigen link kun je op Amazon zoeken. Die zoeklink bevat onze partnercode; als je daarna iets koopt, ontvangen wij een commissie en betaal jij niet meer. Alleen de titel van de wens staat in de link, geen namen, lijst of persoonlijke link. Je eigen links passen we nooit aan. Afrekenen, bezorging en retouren verlopen bij Amazon.",
+  "privacy.affiliateBody": "Wij doen mee aan het Amazon Associates-partnerprogramma. Amazon-links op deze site kunnen onze partnercode bevatten; als je daarna iets koopt, ontvangen wij een commissie en betaal jij niet meer. Dat gebeurt op twee manieren. Ten eerste bieden we “Zoek op Amazon” aan: die link bevat alleen de titel van de wens, nooit namen, de lijst of een persoonlijke link. Ten tweede voegen we onze partnercode toe wanneer een wens een amazon.com-link bevat. De ingevoerde link wordt ongewijzigd opgeslagen en een eventuele bestaande partnercode erin wordt bij het tonen vervangen door de onze. Links naar andere winkels en verkorte Amazon-links blijven ongewijzigd. Amazon plaatst zelf cookies zodra je de site opent; wij voegen geen trackers toe aan onze pagina’s. Afrekenen, bezorging en retouren verlopen bij Amazon.",
   "privacy.warningBody": "De proefomgeving is bedoeld voor review en kan tijdens ontwikkeling worden gewist.",
 
   "wheel.page.eyebrow": "Rad draaien",

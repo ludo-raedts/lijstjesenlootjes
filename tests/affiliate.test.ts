@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildAmazonSearchUrl, resolveAmazonLink } from "../src/lib/affiliate/amazon";
+import { buildAmazonSearchUrl, resolveAmazonLink, tagAmazonUrl } from "../src/lib/affiliate/amazon";
 
 test("wishanddraw.com resolves to the amazon.com programme for English only", () => {
   assert.deepEqual(resolveAmazonLink("wishanddraw.com", "en"), { marketplaceHost: "www.amazon.com", tag: "wishanddraw-20" });
@@ -37,4 +37,31 @@ test("search links reject empty queries and cap long ones", () => {
   assert.equal(buildAmazonSearchUrl("   ", config), null);
   const long = new URL(buildAmazonSearchUrl("a".repeat(500), config)!);
   assert.equal(long.searchParams.get("k")!.length, 120);
+});
+
+const amazon = { marketplaceHost: "www.amazon.com", tag: "wishanddraw-20" };
+
+test("amazon.com product links receive our tag and keep their other parameters", () => {
+  const tagged = new URL(tagAmazonUrl("https://www.amazon.com/dp/B0ABC12345?th=1", amazon)!);
+  assert.equal(tagged.pathname, "/dp/B0ABC12345");
+  assert.equal(tagged.searchParams.get("th"), "1");
+  assert.equal(tagged.searchParams.get("tag"), "wishanddraw-20");
+  assert.equal(new URL(tagAmazonUrl("http://amazon.com/dp/B0ABC12345", amazon)!).protocol, "https:");
+});
+
+test("a tag someone else put in a link is replaced, not duplicated", () => {
+  const url = new URL(tagAmazonUrl("https://www.amazon.com/dp/B0ABC12345?tag=someone-20&tag=x-20", amazon)!);
+  assert.deepEqual(url.searchParams.getAll("tag"), ["wishanddraw-20"]);
+});
+
+test("other hosts, short links, other marketplaces and bad input are left alone", () => {
+  for (const link of [
+    "https://www.amazon.nl/dp/B0ABC12345",
+    "https://amzn.to/3abc",
+    "https://a.co/d/abc",
+    "https://amazon.com.evil.test/dp/B0",
+    "https://evil.test/?u=amazon.com",
+    "javascript:alert(1)",
+    "not a url",
+  ]) assert.equal(tagAmazonUrl(link, amazon), null, link);
 });

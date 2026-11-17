@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import { AmazonDisclosure, AmazonSearchLink } from "@/components/AmazonAffiliate";
+import { AmazonDisclosure, WishLink } from "@/components/AmazonAffiliate";
 import { WishFields, blankWish, type WishDraft } from "@/components/WishFields";
 import { formattingLocales } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -66,7 +66,7 @@ function RecipientWishlist({
                 {wish.note ? <p>{wish.note}</p> : null}
                 <div className="gift-meta">
                   {wish.price ? <span>{wish.price}</span> : null}
-                  {wish.url ? <a href={wish.url} target="_blank" rel="noopener noreferrer nofollow">{t("common.viewLink")}</a> : <AmazonSearchLink title={wish.title} />}
+                  <WishLink url={wish.url} title={wish.title} />
                 </div>
               </div>
             </li>
