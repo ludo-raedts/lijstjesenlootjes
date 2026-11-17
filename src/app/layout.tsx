@@ -4,6 +4,12 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getServerI18n } from "@/i18n/server";
 import { getSiteUrl, isVercelPreview } from "@/lib/site-url";
+import "@fontsource-variable/fraunces/wght.css";
+import "@fontsource-variable/fraunces/wght-italic.css";
+import "@fontsource/atkinson-hyperlegible/latin-400.css";
+import "@fontsource/atkinson-hyperlegible/latin-ext-400.css";
+import "@fontsource/atkinson-hyperlegible/latin-700.css";
+import "@fontsource/atkinson-hyperlegible/latin-ext-700.css";
 import "./globals.css";
 
 const baseUrl = getSiteUrl();

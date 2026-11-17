@@ -13,8 +13,8 @@
   --line: #cec4b5;
   --white: #fffdf9;
   --shadow: 0 18px 50px rgb(45 39 31 / 8%);
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --sans: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  --serif: "Fraunces Variable", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: "Atkinson Hyperlegible", "Avenir Next", Avenir, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -412,3 +412,4 @@ input:focus, textarea:focus, select:focus { border-color: var(--green); box-shad
 .main-nav a, .footer-grid nav a, .text-link, .wordmark { min-height: 44px; align-items: center; }
 .footer-grid nav a, .text-link { display: inline-flex; }
 .main-nav a { grid-auto-flow: column; }
+.main-nav a { gap: .4rem; }

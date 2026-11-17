@@ -48,7 +48,7 @@ export function Wheel() {
       context.textAlign = "right";
       context.textBaseline = "middle";
       context.fillStyle = "#fffdf9";
-      context.font = `700 ${visibleOptions.length > 10 ? 15 : 18}px Avenir Next, sans-serif`;
+      context.font = `700 ${visibleOptions.length > 10 ? 15 : 18}px "Atkinson Hyperlegible", Avenir Next, sans-serif`;
       const label = option.length > 24 ? `${option.slice(0, 22)}…` : option;
       context.fillText(label, radius - 24, 0, radius * .7);
       context.restore();
