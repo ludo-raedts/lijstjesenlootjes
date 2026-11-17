@@ -33,7 +33,8 @@ export type PageKey =
   | "wishlistManage"
   | "wishlistGuest"
   | "drawAdmin"
-  | "drawReveal";
+  | "drawReveal"
+  | "recover";
 
 export const PAGES: readonly PageDefinition[] = [
   { key: "home", visibility: "public", paths: { nl: "/", en: "/" } },
@@ -47,6 +48,8 @@ export const PAGES: readonly PageDefinition[] = [
   { key: "wishlistGuest", visibility: "private", paths: { nl: "/verlanglijstje/bekijken", en: "/wishlist/view" } },
   { key: "drawAdmin", visibility: "private", paths: { nl: "/trekking-beheren", en: "/draw/manage" } },
   { key: "drawReveal", visibility: "private", paths: { nl: "/lootje", en: "/draw/reveal" } },
+  // Not secret, but not for search engines or the sitemap either: a form for people who lost their management link.
+  { key: "recover", visibility: "private", paths: { nl: "/beheerlink-kwijt", en: "/recover-link" } },
 ];
 
 const DEFAULT_LOCALE: Locale = "nl";

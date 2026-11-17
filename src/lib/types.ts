@@ -20,6 +20,12 @@ export type Wish = {
 
 export type DrawWish = Omit<Wish, "reservation">;
 
+/** Delivery state of the one-off link email. The address itself is never stored. */
+export type EmailStatus = {
+  state: "queued" | "sent" | "failed";
+  at: string;
+};
+
 export type Wishlist = {
   id: string;
   title: string;
@@ -29,6 +35,9 @@ export type Wishlist = {
   updatedAt?: string;
   deletedAt?: string;
   wishes: Wish[];
+  /** Keyed hash of the organizer's address, stored only when they opted in to link recovery. */
+  recoveryHash?: string;
+  emailStatus?: EmailStatus;
 };
 
 export type Participant = {
@@ -37,6 +46,8 @@ export type Participant = {
   viewedAt?: string;
   activeTokenHash: string;
   wishes?: DrawWish[];
+  /** A standalone wishlist this participant chose to show to their giver, read live. */
+  linkedWishlistId?: string;
 };
 
 export type Draw = {
@@ -51,6 +62,8 @@ export type Draw = {
   participants: Participant[];
   exclusions: Array<{ from: string; to: string }>;
   assignments: Array<{ giverId: string; recipientId: string }>;
+  recoveryHash?: string;
+  emailStatus?: EmailStatus;
 };
 
 export type AccessToken = {

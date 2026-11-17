@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { AmazonDisclosure, WishLink } from "@/components/AmazonAffiliate";
 import { formattingLocales } from "@/i18n/config";
-import { api, ensureSession } from "@/lib/client";
+import { api, ensureSession, linkProblemCode } from "@/lib/client";
+import type { ApiErrorCode } from "@/lib/api-error";
+import { LinkProblem } from "@/components/LinkProblem";
 import { useI18n } from "@/i18n/I18nProvider";
 
 type GuestWishlist = { title: string; occasion?: string; date?: string; wishes: Array<{ id: string; title: string; url?: string; price?: string; note?: string; reserved: boolean; ownReservation: boolean }> };
@@ -13,15 +15,16 @@ export function WishlistGuest() {
   const started = useRef(false);
   const [wishlist, setWishlist] = useState<GuestWishlist>();
   const [error, setError] = useState("");
+  const [errorCode, setErrorCode] = useState<ApiErrorCode>();
   const [busyId, setBusyId] = useState("");
 
   const load = async () => {
     const result = await api<{ wishlist: GuestWishlist }>("/api/wishlists/guest");
     setWishlist(result.wishlist);
   };
-  useEffect(() => { if (started.current) return; started.current = true; (async () => { try { await ensureSession(); await load(); } catch (loadError) { setError((loadError as Error).message); } })(); }, []);
+  useEffect(() => { if (started.current) return; started.current = true; (async () => { try { await ensureSession(); await load(); } catch (loadError) { setError((loadError as Error).message); setErrorCode(linkProblemCode(loadError)); } })(); }, []);
 
-  if (!wishlist) return <div className="tool-card loading">{error ? <div className="notice error" role="alert">{error}</div> : t("wishlist.guest.loading")}</div>;
+  if (!wishlist) return <div className="tool-card loading">{errorCode ? <LinkProblem role="guest" code={errorCode} message={error} /> : error ? <div className="notice error" role="alert">{error}</div> : t("wishlist.guest.loading")}</div>;
   return (
     <section className="tool-card">
       <span className="eyebrow">{t("wishlist.guest.eyebrow")}</span><h2>{wishlist.title}</h2>

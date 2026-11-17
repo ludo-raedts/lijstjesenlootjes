@@ -1,15 +1,31 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
-import { api, ensureSession } from "@/lib/client";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { api, ensureSession, linkProblemCode } from "@/lib/client";
+import type { ApiErrorCode } from "@/lib/api-error";
+import { LinkProblem } from "@/components/LinkProblem";
+import { MailPanel, type MailStatus } from "@/components/MailPanel";
 import { WishDraft, WishFields } from "@/components/WishFields";
+import { formattingLocales } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
 
-type Wishlist = { id: string; title: string; occasion?: string; date?: string; wishes: Array<WishDraft & { id: string }> };
+type Wishlist = {
+  id: string;
+  title: string;
+  occasion?: string;
+  date?: string;
+  expiresAt?: string;
+  emailStatus?: MailStatus;
+  recoverable?: boolean;
+  wishes: Array<WishDraft & { id: string }>;
+};
+type ManageResponse = { wishlist: Wishlist; emailAvailable?: boolean };
 
 export function WishlistManage() {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const started = useRef(false);
+  const [errorCode, setErrorCode] = useState<ApiErrorCode>();
+  const [emailAvailable, setEmailAvailable] = useState(false);
   const [wishlist, setWishlist] = useState<Wishlist>();
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -22,12 +38,21 @@ export function WishlistManage() {
     (async () => {
       try {
         await ensureSession();
-        const result = await api<{ wishlist: Wishlist }>("/api/wishlists/manage");
+        const result = await api<ManageResponse>("/api/wishlists/manage");
+        setEmailAvailable(Boolean(result.emailAvailable));
         setWishlist({ ...result.wishlist, wishes: result.wishlist.wishes.map((wish) => ({ ...wish, url: wish.url ?? "", price: wish.price ?? "", note: wish.note ?? "" })) });
       } catch (loadError) {
         setError((loadError as Error).message);
+        setErrorCode(linkProblemCode(loadError));
       }
     })();
+  }, []);
+
+  // Refreshes only the mail and expiry details, so unsaved edits in the form are never overwritten.
+  const refreshMeta = useCallback(async () => {
+    const result = await api<ManageResponse>("/api/wishlists/manage");
+    setEmailAvailable(Boolean(result.emailAvailable));
+    setWishlist((current) => current && { ...current, emailStatus: result.wishlist.emailStatus, recoverable: result.wishlist.recoverable, expiresAt: result.wishlist.expiresAt });
   }, []);
 
   const save = async (event: FormEvent) => {
@@ -43,9 +68,16 @@ export function WishlistManage() {
   };
 
   if (deleted) return <div className="tool-card"><div className="notice success" role="status">{t("wishlist.manage.deleted")}</div></div>;
-  if (!wishlist) return <div className="tool-card loading">{error ? <div className="notice error" role="alert">{error}</div> : t("wishlist.manage.loading")}</div>;
+  if (!wishlist) {
+    return (
+      <div className="tool-card loading">
+        {errorCode ? <LinkProblem role="organizer" code={errorCode} message={error} /> : error ? <div className="notice error" role="alert">{error}</div> : t("wishlist.manage.loading")}
+      </div>
+    );
+  }
 
   return (
+    <div className="manage-stack">
     <form className="tool-card" onSubmit={save}>
       <span className="eyebrow">{t("wishlist.manage.eyebrow")}</span><h2>{t("wishlist.manage.title")}</h2>
       <div className="notice"><strong>{t("wishlist.manage.reservationTitle")}</strong><span>{t("wishlist.manage.reservationBody")}</span></div>
@@ -64,5 +96,10 @@ export function WishlistManage() {
         finally { setBusy(false); }
       }}>{t("wishlist.manage.delete")}</button></div>
     </form>
+    <section className="tool-card">
+      {wishlist.expiresAt ? <p className="muted">{t("expiry.until", { date: new Intl.DateTimeFormat(formattingLocales[locale], { dateStyle: "long" }).format(new Date(wishlist.expiresAt)) })}</p> : null}
+      <MailPanel endpoint="/api/wishlists/manage" status={wishlist.emailStatus} recoverable={Boolean(wishlist.recoverable)} emailAvailable={emailAvailable} onRefresh={refreshMeta} />
+    </section>
+    </div>
   );
 }

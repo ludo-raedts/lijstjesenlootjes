@@ -9,6 +9,8 @@ let version = 1;
 let data = emptyState();
 let buckets = new Map();
 let usage = new Map();
+// Stand-in for the email provider: records what would have been sent, once per idempotency key.
+let mails = [];
 
 function readBody(request) {
   return new Promise((resolve) => {
@@ -62,11 +64,23 @@ createServer(async (request, response) => {
 
   if (url.pathname === "/__health") return send(response, 200, { ok: true });
   if (url.pathname === "/__reset" && request.method === "POST") {
-    version = 1; data = emptyState(); buckets = new Map(); usage = new Map();
+    version = 1; data = emptyState(); buckets = new Map(); usage = new Map(); mails = [];
     return send(response, 200, { reset: true });
   }
   if (url.pathname === "/__state" && request.method === "GET") {
     return send(response, 200, { version, data });
+  }
+
+  if (url.pathname === "/emails" && request.method === "POST") {
+    const body = await readBody(request);
+    const key = request.headers["idempotency-key"];
+    if (!key || !mails.some((mail) => mail.key === key)) {
+      mails.push({ key, from: body.from, to: body.to, subject: body.subject, text: body.text });
+    }
+    return send(response, 200, { id: "mock-email" });
+  }
+  if (url.pathname === "/__mails" && request.method === "GET") {
+    return send(response, 200, { mails });
   }
 
   const match = url.pathname.match(/^\/rest\/v1\/rpc\/([a-z_]+)$/);

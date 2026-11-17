@@ -5,7 +5,9 @@ import { AmazonDisclosure, WishLink } from "@/components/AmazonAffiliate";
 import { WishFields, blankWish, type WishDraft } from "@/components/WishFields";
 import { formattingLocales } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
-import { api, ensureSession } from "@/lib/client";
+import { api, ensureSession, linkProblemCode } from "@/lib/client";
+import type { ApiErrorCode } from "@/lib/api-error";
+import { LinkProblem } from "@/components/LinkProblem";
 
 type DrawWish = {
   id: string;
@@ -22,6 +24,7 @@ type NeutralDraw = {
   date?: string;
   revealedBefore: boolean;
   ownWishes: DrawWish[];
+  linkedWishlist?: { title: string; wishCount: number };
 };
 
 type Reveal = {
@@ -91,6 +94,9 @@ export function DrawReveal() {
   const [reveal, setReveal] = useState<Reveal>();
   const [wishes, setWishes] = useState<WishDraft[]>([blankWish()]);
   const [error, setError] = useState("");
+  const [errorCode, setErrorCode] = useState<ApiErrorCode>();
+  const [linkInput, setLinkInput] = useState("");
+  const [linkBusy, setLinkBusy] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [revealBusy, setRevealBusy] = useState(false);
   const [saveBusy, setSaveBusy] = useState(false);
@@ -107,6 +113,7 @@ export function DrawReveal() {
         setWishes(result.draw.ownWishes.length > 0 ? result.draw.ownWishes.map(toDraft) : [blankWish()]);
       } catch (loadError) {
         setError((loadError as Error).message);
+        setErrorCode(linkProblemCode(loadError));
       }
     }
 
@@ -144,10 +151,27 @@ export function DrawReveal() {
     }
   }
 
+  async function changeLink(action: "link_wishlist" | "unlink_wishlist") {
+    setLinkBusy(true);
+    setError("");
+    try {
+      const result = await api<{ linkedWishlist?: { title: string; wishCount: number } }>("/api/draws/participant", {
+        method: "PUT",
+        body: JSON.stringify({ action, link: linkInput }),
+      });
+      setDraw((current) => current && { ...current, linkedWishlist: result.linkedWishlist });
+      setLinkInput("");
+    } catch (linkError) {
+      setError((linkError as Error).message);
+    } finally {
+      setLinkBusy(false);
+    }
+  }
+
   if (!draw) {
     return (
       <div className="reveal-card loading">
-        {error ? <div className="notice error" role="alert">{error}</div> : t("draw.reveal.loading")}
+        {errorCode ? <LinkProblem role="participant" code={errorCode} message={error} /> : error ? <div className="notice error" role="alert">{error}</div> : t("draw.reveal.loading")}
       </div>
     );
   }
@@ -196,6 +220,31 @@ export function DrawReveal() {
             </button>
             {saveMessage ? <div className="notice success" role="status">{saveMessage}</div> : null}
           </form>
+
+          <section className="draw-wishlist link-wishlist" aria-labelledby="link-wishlist-title">
+            <div className="draw-wishlist-heading">
+              <h3 id="link-wishlist-title">{t("draw.reveal.linkTitle")}</h3>
+              <p>{t("draw.reveal.linkBody")}</p>
+            </div>
+            {draw.linkedWishlist ? (
+              <div className="linked-wishlist">
+                <p role="status"><strong>{t("draw.reveal.linked", { title: draw.linkedWishlist.title })}</strong></p>
+                <button className="button button-secondary button-small" disabled={linkBusy} type="button" onClick={() => void changeLink("unlink_wishlist")}>
+                  {t("draw.reveal.unlink")}
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={(event) => { event.preventDefault(); void changeLink("link_wishlist"); }}>
+                <div className="field">
+                  <label htmlFor="link-wishlist-input">{t("draw.reveal.linkLabel")}</label>
+                  <input id="link-wishlist-input" required value={linkInput} onChange={(event) => setLinkInput(event.target.value)} autoComplete="off" spellCheck={false} />
+                </div>
+                <button className="button button-secondary" disabled={linkBusy || !linkInput.trim()} type="submit">
+                  {linkBusy ? t("draw.reveal.linking") : t("draw.reveal.linkSubmit")}
+                </button>
+              </form>
+            )}
+          </section>
         </div>
       )}
 

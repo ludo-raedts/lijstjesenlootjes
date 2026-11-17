@@ -1,6 +1,7 @@
 "use client";
 
 import { AmazonEditorHelper } from "@/components/AmazonAffiliate";
+import { WishIdeas, MAX_EDITOR_WISHES } from "@/components/WishIdeas";
 import { useI18n } from "@/i18n/I18nProvider";
 
 export type WishDraft = {
@@ -24,8 +25,18 @@ export function WishFields({
   const update = (index: number, patch: Partial<WishDraft>) => {
     onChange(wishes.map((wish, current) => current === index ? { ...wish, ...patch } : wish));
   };
+  // An idea fills the last empty wish row if there is one, otherwise it opens a new row.
+  const lastIsBlank = wishes.length > 0 && !wishes[wishes.length - 1].title.trim() && !wishes[wishes.length - 1].url.trim();
+  const addIdea = (title: string) => {
+    if (lastIsBlank) {
+      update(wishes.length - 1, { title });
+    } else if (wishes.length < MAX_EDITOR_WISHES) {
+      onChange([...wishes, { ...blankWish(), title }]);
+    }
+  };
   return (
     <div className="wish-editor">
+      <WishIdeas existingTitles={wishes.map((wish) => wish.title)} full={wishes.length >= MAX_EDITOR_WISHES && !lastIsBlank} onAdd={addIdea} />
       {wishes.map((wish, index) => (
         <fieldset className="wish-row" key={wish.id ?? index}>
           <div className="wish-row-head">

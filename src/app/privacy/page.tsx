@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getServerI18n } from "@/i18n/server";
 import { publicPageMetadata } from "@/lib/seo";
-import { getAmazonLinkConfig } from "@/lib/affiliate/server";
+import { getAmazonLinkConfig, getBolLinkConfig } from "@/lib/affiliate/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   return publicPageMetadata("privacy", "meta.privacy.title", "meta.privacy.description");
@@ -10,6 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PrivacyPage() {
   const { locale, t } = await getServerI18n();
   const amazonLink = await getAmazonLinkConfig(locale);
+  const bolLink = await getBolLinkConfig(locale);
   return (
     <div className="shell narrow page-section prose-page">
       <span className="eyebrow">{t("privacy.eyebrow")}</span>
@@ -29,9 +30,12 @@ export default async function PrivacyPage() {
           <p>{t("privacy.affiliateBody")}</p>
         </>
       ) : null}
-      <h2>{t("privacy.todoTitle")}</h2>
-      <p>{t("privacy.todoBody")}</p>
-      <div className="notice warning"><strong>{t("privacy.warningTitle")}</strong><span>{t("privacy.warningBody")}</span></div>
+      {bolLink ? (
+        <>
+          <h2>{t("privacy.affiliateBolTitle")}</h2>
+          <p>{t("privacy.affiliateBolBody")}</p>
+        </>
+      ) : null}
     </div>
   );
 }

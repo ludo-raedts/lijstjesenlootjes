@@ -64,6 +64,22 @@ export function accessExpiryIso(expiresAt: number | undefined, fallbackDays = 30
   return new Date(expiresAt ?? now + fallbackDays * DAY_MS).toISOString();
 }
 
+/**
+ * After an organizer changes a draw's date, every live link of that draw follows the new expiry.
+ * Revoked links stay revoked.
+ */
+export function syncDrawAccess(database: Database, draw: Database["draws"][number]) {
+  const expiresAt = drawExpiresAt(draw);
+  if (expiresAt === undefined) return undefined;
+  const iso = new Date(expiresAt).toISOString();
+  for (const token of database.accessTokens) {
+    if (token.scopeId !== draw.id || token.revokedAt) continue;
+    if (token.role !== "draw_admin" && token.role !== "draw_participant") continue;
+    token.expiresAt = iso;
+  }
+  return iso;
+}
+
 /** A wishlist's lifetime slides with every update, so its links slide with it. */
 export function extendWishlistAccess(database: Database, wishlist: Database["wishlists"][number]) {
   const expiresAt = wishlistExpiresAt(wishlist);

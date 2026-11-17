@@ -1,5 +1,7 @@
 import { personalLink } from "@/lib/personal-links";
-import { sendEmail } from "@/lib/email";
+import { deliverEmailAfterResponse, queuedStatus } from "@/lib/email-delivery";
+import { emailConfigured } from "@/lib/email";
+import { recoveryHash, recoverySecret } from "@/lib/recovery";
 import { renderWishlistEmail } from "@/lib/email-templates";
 import { getServerI18n } from "@/i18n/server";
 import { getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
@@ -9,7 +11,7 @@ import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib
 import { errorResponse, LIST_BODY_BYTES, noStoreJson, readJson } from "@/lib/http";
 import { recordUsage, transaction } from "@/lib/store";
 import { optionalDate, optionalEmail, optionalText, optionalUrl, text } from "@/lib/validation";
-import type { Wish } from "@/lib/types";
+import type { Wish, Wishlist } from "@/lib/types";
 
 function parseWish(input: unknown): Wish {
   if (!input || typeof input !== "object") throw new HttpError(400, "wish_incomplete");
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
     const accessExpiry = accessExpiryIso(wishlistExpiresAt({ createdAt, updatedAt: createdAt }));
     const manage = createAccessToken("wishlist_manage", wishlistId, accessExpiry);
     const guest = createAccessToken("wishlist_guest", wishlistId, accessExpiry);
-    const wishlist = {
+    const wishlist: Wishlist = {
       id: wishlistId,
       title: text(body.title, "title", 120),
       occasion: optionalText(body.occasion, "occasion", 80),
@@ -46,6 +48,8 @@ export async function POST(request: NextRequest) {
       createdAt,
       updatedAt: createdAt,
       wishes: body.wishes.map(parseWish),
+      recoveryHash: email && body.recoverable === true ? recoveryHash(email, recoverySecret()) : undefined,
+      emailStatus: email && emailConfigured() ? queuedStatus() : undefined,
     };
     await transaction((database) => {
       database.wishlists.push(wishlist);
@@ -54,12 +58,15 @@ export async function POST(request: NextRequest) {
     await recordUsage("wishlist_created");
     const manageUrl = personalLink(request, "wishlistManage", manage.raw);
     const guestUrl = personalLink(request, "wishlistGuest", guest.raw);
-    let emailStatus: "not_requested" | "sent" | "failed" = "not_requested";
+    let emailStatus: "not_requested" | "queued" | "failed" = "not_requested";
     if (email) {
       const { t, locale } = await getServerI18n();
       const rendered = renderWishlistEmail(t, { title: wishlist.title, manageUrl, guestUrl, locale, site: (await getRequestSiteUrl()).replace(/^https?:\/\//, "") });
-      const result = await sendEmail({ to: email, ...rendered, host: await getRequestHost(), idempotencyKey: `wishlist-${wishlistId}` });
-      emailStatus = result === "sent" ? "sent" : "failed";
+      const queued = deliverEmailAfterResponse(
+        { to: email, ...rendered, host: await getRequestHost(), idempotencyKey: `wishlist-${wishlistId}` },
+        { kind: "wishlist", id: wishlistId },
+      );
+      emailStatus = queued ? "queued" : "failed";
     }
     return noStoreJson({ manageUrl, guestUrl, emailStatus }, { status: 201 });
   } catch (error) {

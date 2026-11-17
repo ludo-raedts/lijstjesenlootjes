@@ -21,6 +21,13 @@ export type EmailMessage = {
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const TIMEOUT_MS = 8000;
+/** Pauses before each attempt: first try at once, then two retries for transient failures. */
+export const RETRY_DELAYS_MS = [0, 1500, 4000] as const;
+
+/** Test and staging hook: point the provider call at a stand-in. Never set in production. */
+function endpoint() {
+  return process.env.EMAIL_API_URL?.trim() || RESEND_ENDPOINT;
+}
 
 /**
  * Sender for a public domain. `EMAIL_FROM_<HOST>` (for example `EMAIL_FROM_WISHANDDRAW_COM`) wins when set;
@@ -36,13 +43,15 @@ export function emailConfigured() {
   return Boolean(process.env.EMAIL_PROVIDER_API_KEY?.trim() && process.env.EMAIL_FROM?.trim());
 }
 
-export async function sendEmail(message: EmailMessage): Promise<EmailResult> {
+type Attempt = { result: EmailResult; retryable: boolean };
+
+async function attempt(message: EmailMessage): Promise<Attempt> {
   const apiKey = process.env.EMAIL_PROVIDER_API_KEY?.trim();
   const from = senderForHost(message.host);
-  if (!apiKey || !from) return "skipped";
+  if (!apiKey || !from) return { result: "skipped", retryable: false };
   const replyTo = process.env.EMAIL_REPLY_TO?.trim();
   try {
-    const response = await fetch(RESEND_ENDPOINT, {
+    const response = await fetch(endpoint(), {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -61,11 +70,34 @@ export async function sendEmail(message: EmailMessage): Promise<EmailResult> {
     });
     if (!response.ok) {
       console.error("Email send failed", response.status);
-      return "failed";
+      // Rate limits and provider errors are worth another try; a rejected request (4xx) is not.
+      return { result: "failed", retryable: response.status === 429 || response.status >= 500 };
     }
-    return "sent";
+    return { result: "sent", retryable: false };
   } catch {
     console.error("Email send failed");
-    return "failed";
+    return { result: "failed", retryable: true };
   }
+}
+
+export async function sendEmail(message: EmailMessage): Promise<EmailResult> {
+  return (await attempt(message)).result;
+}
+
+/**
+ * Sends with a few retries for transient failures. The idempotency key makes a retried send deliver at most one
+ * mail. Meant to run after the response, so the visitor never waits on the provider.
+ */
+export async function sendEmailWithRetry(
+  message: EmailMessage,
+  delays: readonly number[] = RETRY_DELAYS_MS,
+): Promise<EmailResult> {
+  let last: EmailResult = "failed";
+  for (const delay of delays) {
+    if (delay > 0) await new Promise((resolve) => setTimeout(resolve, delay));
+    const outcome = await attempt(message);
+    last = outcome.result;
+    if (outcome.result !== "failed" || !outcome.retryable) return outcome.result;
+  }
+  return last;
 }

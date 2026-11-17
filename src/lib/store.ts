@@ -1,10 +1,11 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { commitBackoffMs } from "@/lib/backoff";
 import { purgeDeletedWishlists } from "@/lib/data-lifecycle";
 import type { UsageEvent, UsageRow } from "@/lib/usage";
 import type { Database } from "@/lib/types";
 
-const MAX_COMMIT_ATTEMPTS = 8;
+const MAX_COMMIT_ATTEMPTS = 12;
 let client: SupabaseClient | undefined;
 
 function getClient(): SupabaseClient {
@@ -66,6 +67,9 @@ export async function transaction<T>(
       throw new Error("The database change could not be stored.");
     }
     if (committed === true) return result;
+    // Someone else committed first. Count the collision (no data) and retry after a random pause.
+    console.warn("Supabase state commit conflict", attempt + 1);
+    await new Promise((resolve) => setTimeout(resolve, commitBackoffMs(attempt)));
   }
 
   throw new Error("The database was too busy to commit the change.");

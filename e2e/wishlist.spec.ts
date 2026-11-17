@@ -57,6 +57,13 @@ test("create, edit, share, reserve, release and delete a wishlist", async ({ pag
     await expect(amazon).toHaveCount(0);
   }
   await expect(guestPageA.locator(".gift-card", { hasText: "Garden book" }).locator("a[href*='amazon.']")).toHaveCount(0);
+  const bolSearch = guestPageA.locator(".gift-card", { hasText: "Garden book" }).locator("a[href*='partner.bol.com']");
+  if (locale === "nl") {
+    await expect(bolSearch).toHaveAttribute("rel", /sponsored/);
+    await expect(bolSearch).toHaveAttribute("href", /s=1560649/);
+  } else {
+    await expect(bolSearch).toHaveCount(0);
+  }
 
   await firstCard.getByRole("button", { name: t("wishlist.guest.reserve") }).click();
   await expect(firstCard.getByText(t("wishlist.guest.reservedByYou"))).toBeVisible();

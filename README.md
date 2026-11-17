@@ -2,10 +2,10 @@
 
 De vaste projectcontext staat in [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md). De gekozen visuele richting, inclusieve representatieregels en het uitvoeringsplan staan in het [designhandboek](DESIGN.md). De grens tussen Engelse interne code en vertaalde interfaces staat in [LOCALIZATION.md](LOCALIZATION.md). De releasevolgorde en volgende productfasen, inclusief bol/Amazon-affiliates, staan in [ROADMAP.md](ROADMAP.md).
 
-Een reviewbare Next.js/TypeScript-uitwerking van de productbriefing van 16 november 2026. De drie routes zijn zelfstandig bruikbaar:
+Een Next.js/TypeScript-uitwerking van de productbriefing van 16 november 2026. De drie routes zijn zelfstandig bruikbaar:
 
 - `/verlanglijstje-maken`: lijst maken, beheer- en gastenlink, wensen aanpassen, atomisch reserveren en eigen reservering herstellen.
-- `/lootjes-trekken`: deelnemers, wederzijdse uitsluitingen, cryptografische trekking, persoonlijke links en een eigen wensenlijstje per deelnemer zonder reserveringen.
+- `/lootjes-trekken`: deelnemers, wederzijdse uitsluitingen, cryptografische trekking, persoonlijke links en een eigen wensenlijstje per deelnemer zonder reserveringen. Een deelnemer kan ook een bestaand los verlanglijstje koppelen; de gever ziet dan de actuele wensen daarvan (nooit de reserveringen).
 - `/rad-draaien`: secundaire, volledig browserlokale tool met onbevooroordeelde cryptografische keuze, reduced-motionondersteuning en delen/kopiëren.
 
 ## Lokaal starten
@@ -23,7 +23,14 @@ Kwaliteitscontroles:
 npm test
 npm run typecheck
 npm run build
+npm run test:e2e
 ```
+
+## Continuous integration
+
+`.github/workflows/ci.yml` draait bij elke pull request en elke push naar `main`: typecheck en unit tests (job `checks`) en de volledige Playwright-suite in `nl` en `en` (job `e2e`, tegen de in-memory Supabase- en e-mailnabootsing, met wegwerpgeheimen; er zijn geen repository-secrets nodig). Bij een mislukte e2e-run worden de traces 7 dagen bewaard als artifact.
+
+Vercel deployt een push naar `main` zelf, los van deze workflow. Om CI een echte releasepoort te maken moet er één keer, in GitHub, een branch-protectionregel voor `main` worden gezet die de checks `Typecheck, unit tests and build` en `End-to-end (Playwright, nl + en)` verplicht stelt en werken via pull requests afdwingt (Settings → Branches). Dat is een repository-instelling en staat dus niet in de code.
 
 ## Seasonal themes and administration
 
@@ -52,7 +59,7 @@ De GitHub-repository `ludo-raedts/lijstjesenlootjes` is aan Vercel gekoppeld. Ee
 - `www.lijstjesenlootjes.nl` verwijst permanent door naar de kale domeinnaam (`next.config.ts`).
 - `wishanddraw.com` toont dezelfde app met Engels als standaardtaal; de URL blijft `wishanddraw.com` (geen redirect). `www.wishanddraw.com` verwijst permanent naar de kale naam.
 - De standaardtaal volgt het domein (`src/lib/domains.ts`); een expliciete taalkeuze van de bezoeker (cookie `ll_locale`) wint voor de taal van de tekst. Canonical-URL, sitemap, robots en `hreflang`-Link-headers (`next.config.ts`) zijn per domein.
-- De paden volgen het domein, niet de cookie. Alle paden staan in één getypeerde module, `src/lib/paths.ts`: `lijstjesenlootjes.nl` gebruikt de Nederlandse paden (`/verlanglijstje-maken`, `/lootjes-trekken`, `/rad-draaien`, `/verlanglijstje/beheren`, `/verlanglijstje/bekijken`, `/trekking-beheren`, `/lootje`), `wishanddraw.com` de Engelse (`/wishlist-maker`, `/secret-santa-generator`, `/name-wheel`, `/wishlist/manage`, `/wishlist/view`, `/draw/manage`, `/draw/reveal`). `/help` en `/privacy` zijn gedeeld. De routemappen in `src/app` blijven Nederlands; `wishanddraw.com` serveert de Engelse paden via host-gebonden rewrites (de URL blijft Engels). Het pad van de andere taal geeft op elk domein een permanente redirect (308) naar het eigen pad, zodat eerder uitgedeelde links blijven werken; hernoemde paden (`legacyPaths` in `PAGES`: `/create-wishlist`, `/draw-names`, `/spin-the-wheel`) redirecten permanent naar het nieuwe pad; het `#token=…`-fragment blijft behouden. Persoonlijke links die de API uitgeeft gebruiken het pad van het domein waarop het verzoek binnenkwam.
+- De paden volgen het domein, niet de cookie. Alle paden staan in één getypeerde module, `src/lib/paths.ts`: `lijstjesenlootjes.nl` gebruikt de Nederlandse paden (`/verlanglijstje-maken`, `/lootjes-trekken`, `/rad-draaien`, `/verlanglijstje/beheren`, `/verlanglijstje/bekijken`, `/trekking-beheren`, `/lootje`, `/beheerlink-kwijt`), `wishanddraw.com` de Engelse (`/wishlist-maker`, `/secret-santa-generator`, `/name-wheel`, `/wishlist/manage`, `/wishlist/view`, `/draw/manage`, `/draw/reveal`, `/recover-link`). `/help` en `/privacy` zijn gedeeld. De routemappen in `src/app` blijven Nederlands; `wishanddraw.com` serveert de Engelse paden via host-gebonden rewrites (de URL blijft Engels). Het pad van de andere taal geeft op elk domein een permanente redirect (308) naar het eigen pad, zodat eerder uitgedeelde links blijven werken; hernoemde paden (`legacyPaths` in `PAGES`: `/create-wishlist`, `/draw-names`, `/spin-the-wheel`) redirecten permanent naar het nieuwe pad; het `#token=…`-fragment blijft behouden. Persoonlijke links die de API uitgeeft gebruiken het pad van het domein waarop het verzoek binnenkwam.
 - Sitemap, `hreflang` (nl ↔ en met het juiste pad per domein, `x-default` = `.nl`), robots.txt en de proxy-matcher (`src/proxy.ts`, letterlijke lijst met een test die de overeenkomst met `paths.ts` bewaakt) komen uit of worden bewaakt door dezelfde padentabel. Een nieuw pad toevoegen: eerst in `PAGES`, dan de proxy-matcher bijwerken als het privé is.
 - De DNS-records wijzen naar Vercel. DNS-propagatie en de uitgifte van het TLS-certificaat kunnen direct na registratie of een DNS-wijziging nog enige tijd duren.
 
@@ -65,6 +72,8 @@ Capabilitytokens bevatten 256 bits willekeur en worden alleen als SHA-256-hash o
 ## Linkgeldigheid en invoerlimieten
 
 Persoonlijke en gedeelde links zijn geldig zolang het lijstje of de trekking bestaat (`src/lib/data-lifecycle.ts`): een trekking verloopt 45 dagen na de datum, minimaal 30 dagen na het maken, en de links lopen daarin mee. De links van een lijstje schuiven mee met elke wijziging of reservering. Schrijf-API's lezen JSON met een groottelimiet (`readJson` in `src/lib/http.ts`; kapotte JSON geeft 400, te groot 413) en het aantal uitsluitingen is begrensd op n×(n−1), met ontdubbeling. Lukt willekeurig schudden niet voor een oplosbare trekking, dan bouwt `constructAssignments` alsnog een geldige verdeling.
+
+De organisator kan in het beheer de datum van een trekking aanpassen (`PATCH /api/draws/admin`); alle nog geldige links van die trekking krijgen dan de nieuwe vervaldatum (`syncDrawAccess`). Het beheer toont tot wanneer de links werken. Een dode link (verlopen, vervangen of onbekend) krijgt per oorzaak een eigen foutcode (`access_link_expired`, `access_link_replaced`, `access_link_invalid`) en toont een uitleg met de juiste vervolgstap: organisatoren worden naar de herstelpagina gestuurd, deelnemers en gasten naar degene die de link deelde.
 
 ## Beveiligingsheaders
 
@@ -80,9 +89,9 @@ Persoonlijke en gedeelde links zijn geldig zolang het lijstje of de trekking bes
 npm run test:e2e
 ```
 
-De suite (`e2e/`, Playwright met het geïnstalleerde Google Chrome) bouwt de app en draait die tegen een in-memory Supabase-nabootsing (`e2e/mock-supabase.mjs`). Alle omgevingswaarden worden expliciet meegegeven, dus `.env.local` kan de tests nooit naar een echte database laten wijzen; alle geheimen zijn wegwerpwaarden. Chrome koppelt `lijstjesenlootjes.nl` en `wishanddraw.com` aan 127.0.0.1, zodat elke test in beide talen via het echte domein draait (project `nl` en `en`). Een kleine testproxy (`e2e/proxy.mjs`) vervangt wat Vercel normaal doet: de same-origin-controle en het Secure-attribuut van cookies onder `next start`.
+De suite (`e2e/`, Playwright met het geïnstalleerde Google Chrome) bouwt de app en draait die tegen een in-memory Supabase-nabootsing (`e2e/mock-supabase.mjs`). Alle omgevingswaarden worden expliciet meegegeven, dus `.env.local` kan de tests nooit naar een echte database laten wijzen; alle geheimen zijn wegwerpwaarden. Chrome koppelt `lijstjesenlootjes.nl` en `wishanddraw.com` aan 127.0.0.1, zodat elke test in beide talen via het echte domein draait (project `nl` en `en`). De e-mailprovider wordt vervangen door dezelfde nabootsing (`EMAIL_API_URL`), die elke mail vastlegt zodat tests de inhoud kunnen lezen; er gaat nooit iets naar Resend. Een kleine testproxy (`e2e/proxy.mjs`) vervangt wat Vercel normaal doet: de same-origin-controle en het Secure-attribuut van cookies onder `next start`.
 
-Gedekt: homepage, mobiel menu, taalwissel en Engelse paden; verlanglijstje maken, bewerken, delen, reserveren, vrijgeven en verwijderen; trekking met uitsluiting en dubbele namen, persoonlijke links, eigen wensen, link vervangen en verwijderen; admin-login, rate limiting, thema en layout opslaan, uitloggen; health- en cleanup-endpoint; axe (WCAG 2.2 AA) op openbare en persoonlijke pagina's bij 1280, 640 (200% zoom) en 320 px; toetsenbordbediening en gereduceerde beweging.
+Gedekt: homepage, mobiel menu, taalwissel en Engelse paden; verlanglijstje maken, bewerken, delen, reserveren, vrijgeven en verwijderen; trekking met uitsluiting en dubbele namen, persoonlijke links, eigen wensen, link vervangen en verwijderen; e-mail op de achtergrond met status, herstel van beheerlinks (ook voor onbekende adressen en zonder opt-in), datum verschuiven met alle links, voortgang en herinneringen, een los lijstje koppelen aan een trekking en de uitleg bij dode links; admin-login, rate limiting, thema en layout opslaan, uitloggen; health- en cleanup-endpoint; axe (WCAG 2.2 AA) op openbare en persoonlijke pagina's bij 1280, 640 (200% zoom) en 320 px; toetsenbordbediening en gereduceerde beweging.
 
 ## Health en incidenten
 
@@ -91,10 +100,11 @@ Gedekt: homepage, mobiel menu, taalwissel en Engelse paden; verlanglijstje maken
 ## Bewuste beperkingen
 
 - Handmatig verwijderen wist een verlanglijstje of trekking met alle bijbehorende tokens en sessies direct. Een dagelijkse Vercel Cron-job (`/api/cron/cleanup`, `vercel.json`, beveiligd met `CRON_SECRET`) verwijdert verlopen scopes: trekkingen 45 dagen na de datum of 90 dagen na aanmaak zonder datum, verlanglijstjes 12 maanden na de laatste wijziging of reservering, plus verlopen of verweesde tokens en sessies (`src/lib/data-lifecycle.ts`). Het back-upbeleid is nog niet definitief vastgesteld; de Supabase-tabellen gebruiken RLS zonder publieke policies.
-- E-mail is optioneel en eenmalig (Resend, `src/lib/email.ts`): het adres gaat mee met het aanmaakverzoek, wordt niet opgeslagen of gelogd, en de UI meldt alleen "verstuurd" als de provider het accepteerde. Zonder `EMAIL_PROVIDER_API_KEY` en `EMAIL_FROM` wordt niets verzonden. Nog niet gedekt: DNS (SPF, DKIM, DMARC) voor de verzenddomeinen, een bounce- en complaintwebhook en een e-mailteller in het dashboard.
-- De productiedeployment is publiek bereikbaar, maar blijft voorlopig een besloten proefversie; er zijn nog geen analytics of externe scripts.
-- Geen herstelroute wanneer een beheerlink verloren is.
+- E-mail is optioneel (Resend, `src/lib/email.ts`, `src/lib/email-delivery.ts`). De mail gaat na het antwoord de deur uit (`after()`), met twee herhaalpogingen bij tijdelijke fouten (429/5xx/netwerk) en een vaste idempotency-key, zodat er hooguit één mail aankomt. Het adres wordt gebruikt voor die ene verzending en niet opgeslagen of gelogd; alleen de status (`queued`, `sent`, `failed` plus tijdstip) komt op de trekking of het lijstje en staat in het beheer. Vanuit het beheer kan de organisator een nieuwe beheerlink naar een adres mailen. Zonder `EMAIL_PROVIDER_API_KEY` en `EMAIL_FROM` wordt niets verzonden. Nog niet gedekt: DNS (SPF, DKIM, DMARC) voor de verzenddomeinen, een bounce- en complaintwebhook en een e-mailteller in het dashboard.
+- Herstel van een verloren beheerlink is opt-in (`src/lib/recovery.ts`, `POST /api/recovery`, pagina `/beheerlink-kwijt`). Alleen als de organisator dat aanvinkt bewaren we een gesleutelde HMAC-SHA256 van het genormaliseerde adres (`recoveryHash`), nooit het adres zelf. Een herstelverzoek geeft altijd hetzelfde 202-antwoord, ongeacht of het adres bekend is; matchen, nieuwe links aanmaken en mailen gebeuren pas na het antwoord. Beperkt tot 10 verzoeken per uur per IP en 3 per uur per adres. Nieuwe links komen erbij; bestaande blijven werken, zodat een vreemde die een adres intikt de echte organisator niet kan buitensluiten. Persoonlijke lootjeslinks zijn niet terug te halen; de organisator vervangt die in het beheer. De sleutel is `RECOVERY_HASH_SECRET`, met `SUPABASE_SECRET_KEY` als terugval: roteer je die laatste zonder eerste, dan matchen bestaande herstelhashes niet meer.
+- De site is publiek. Er zijn geen analytics of externe scripts; een nieuwe externe bron moet bewust in de CSP worden toegestaan.
 - De oorspronkelijke persoonlijke lootjeslink is na uitgifte niet terug te halen; beheer kan een nieuwe link maken en de oude intrekken.
-- Een bestaand los verlanglijstje kan nog niet aan een trekking worden gekoppeld; deelnemers maken binnen de trekking een eigen lijstje.
+- Een gekoppeld los verlanglijstje wordt live getoond aan de gever. Wordt dat lijstje verwijderd, dan verdwijnen de wensen daaruit stilzwijgend bij de gever.
+- De opslag is één versioned JSON-document met optimistic concurrency (jittered retries, `src/lib/backoff.ts`). Dat volstaat voor een pilot; het plan voor echte tabellen staat in [ROADMAP.md](ROADMAP.md).
 
-Gebruik voorlopig alleen verzonnen testgegevens. Voor publieke ingebruikname zijn privacy- en bewaarkeuzes, aanvullende abusepreventie, monitoring, e-mailtests en aanvullende end-to-endgebruikerstests nog vereist.
+Nog open vóór grootschalig gebruik: externe uptimemonitoring en deploy-alerts (zie [INCIDENT_PLAYBOOK.md](INCIDENT_PLAYBOOK.md)), DNS voor e-mail, een vastgesteld back-upbeleid en de opslagmigratie naar tabellen.

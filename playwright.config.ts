@@ -19,6 +19,10 @@ const serverEnv = {
   THEME_ADMIN_SESSION_SECRET: "e2e-test-session-secret-0123456789abcdef",
   CRON_SECRET: "e2e-test-cron-secret-0123456789abcdef",
   NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${APP_PORT}`,
+  // Mail goes to the stand-in, which records it; nothing is ever sent to a real provider.
+  EMAIL_PROVIDER_API_KEY: "re_e2e_not_real",
+  EMAIL_FROM: "E2E <noreply@example.test>",
+  EMAIL_API_URL: `${MOCK_URL}/emails`,
 };
 
 const hostRules = "MAP lijstjesenlootjes.nl 127.0.0.1, MAP wishanddraw.com 127.0.0.1";

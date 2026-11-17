@@ -47,23 +47,9 @@ Keep user-created content unchanged:
 - Use short BCP 47 language tags in routes and application state; use full regional locales such as `nl-NL` and `en-GB` only for formatting.
 - Locale choice belongs to the browser/interface session, not the draw or wishlist database record.
 
-## Target routing
+## Routing
 
-Public routes should eventually use a locale prefix:
-
-- `/nl/wishlist/create`
-- `/en/wishlist/create`
-- `/nl/draw/create`
-- `/en/draw/create`
-
-Personal capability routes should also be locale-prefixed but remain backed by the same API and token:
-
-- `/nl/draw#token=…`
-- `/en/draw#token=…`
-
-Changing locale must preserve the URL fragment token and the active session. Existing Dutch routes need redirects during migration so current links keep working.
-
-Public slugs may later be localized through rewrites, but internal route names and API routes stay English. Do not encode locale in `/api` paths.
+Locale-prefixed routes (`/nl/...`, `/en/...`) are not used. The interface language defaults to the domain (`lijstjesenlootjes.nl` is Dutch, `wishanddraw.com` is English); an explicit choice by the visitor (cookie `ll_locale`) overrides the language of the text. Paths follow the domain, never the cookie, and every path lives in `src/lib/paths.ts` (see "Localized URL paths" below). Personal capability routes keep the token in the URL fragment, so switching domain or language never exposes it to a server. Do not encode locale in `/api` paths.
 
 ## Translation catalogs
 
@@ -149,32 +135,29 @@ Do not assume:
 - Dutch and English browser translations exist for every current API error code.
 - Participant-link statuses are stored and returned as `viewed` or `available`, then translated in the client.
 - Date formatting reads the active HTML language instead of hardcoding `nl-NL` in interactive components.
-- Existing Dutch public URL paths remain as a compatibility layer until locale routing is implemented.
-- Most general UI copy is still inline Dutch and will move to typed catalogs in Phase 2.
+- All UI copy lives in the typed catalogs `messages/nl.ts` and `messages/en.ts`; a test enforces identical keys and placeholders.
+- Paths are per domain (`src/lib/paths.ts`) with 308 redirects for the other language's and for renamed paths.
 
-### Phase 1 — language-neutral backend
+### Phase 1 — language-neutral backend (done)
 
 - Replace translated backend errors with stable codes.
 - Replace translated status values with English enums.
 - Keep API and storage field names English.
 - Translate error codes in the current Dutch client.
 
-### Phase 2 — typed UI catalogs
+### Phase 2 — typed UI catalogs (done)
 
 - Move all Dutch literals from pages and components to `messages/nl.ts`.
 - Create `messages/en.ts` with the same typed shape.
 - Add locale-aware metadata, sharing text, dates, and accessibility labels.
 
-### Phase 3 — locale routing
+### Phase 3 — domain routing (done)
 
-- Introduce locale-prefixed public and personal routes.
-- Preserve token fragments and sessions when switching language.
-- Add redirects from existing Dutch URLs.
-- Add canonical and `hreflang` metadata.
+- Domain-based defaults, per-domain paths, redirects, canonical and `hreflang` metadata, and a language switcher that links to the same page on the other domain.
 
-### Phase 4 — translation quality
+### Phase 4 — translation quality (partly done)
 
-- Add missing-key and catalog-shape tests.
+- Missing-key and catalog-shape tests exist.
 - Add a pseudo-locale for expansion testing.
 - Review Dutch and English in context on desktop and mobile.
 - Add German only after the underlying flows are stable.

@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getServerI18n } from "@/i18n/server";
-import { getAmazonLinkConfig } from "@/lib/affiliate/server";
+import { getAmazonLinkConfig, getBolLinkConfig } from "@/lib/affiliate/server";
 import { getRequestSiteUrl } from "@/lib/request-site";
 import { socialImages } from "@/lib/seo";
 import { isVercelPreview } from "@/lib/site-url";
@@ -47,6 +47,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const { locale, t } = await getServerI18n();
   const appearance = await getActiveAppearance(locale);
   const amazonLink = await getAmazonLinkConfig(locale);
+  const bolLink = await getBolLinkConfig(locale);
   return (
     <html
       lang={locale}
@@ -57,7 +58,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     >
       <body>
         <I18nProvider locale={locale}>
-          <AmazonAffiliateProvider config={amazonLink}>
+          <AmazonAffiliateProvider config={amazonLink} bol={bolLink}>
             <a className="skip-link" href="#inhoud">{t("global.skipLink")}</a>
             <SiteHeader />
             <main id="inhoud">{children}</main>

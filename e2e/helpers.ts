@@ -31,6 +31,19 @@ export async function mockState() {
   };
 }
 
+export type MockMail = { key?: string; from: string; to: string[]; subject: string; text: string };
+
+/** Mails the app handed to the (mock) provider so far. */
+export async function mockMails() {
+  const response = await fetch(`${MOCK_URL}/__mails`);
+  return ((await response.json()) as { mails: MockMail[] }).mails;
+}
+
+/** Personal links (with their #token fragment) found in a mail body. */
+export function linksIn(text: string) {
+  return text.match(/https?:\/\/[^\s]+#token=[A-Za-z0-9_-]+/g) ?? [];
+}
+
 export function label(t: (key: MessageKey) => string, key: MessageKey) {
   return t(key).replace(/\s*\*\s*$/, "");
 }

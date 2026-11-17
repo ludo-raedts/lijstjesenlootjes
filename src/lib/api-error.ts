@@ -4,6 +4,7 @@ export const apiErrorCodes = [
   "rate_limited",
   "access_link_invalid",
   "access_link_expired",
+  "access_link_replaced",
   "session_required",
   "session_expired",
   "access_revoked",
@@ -41,6 +42,8 @@ export const apiErrorCodes = [
   "invalid_json",
   "payload_too_large",
   "too_many_exclusions",
+  "wishlist_link_invalid",
+  "email_not_configured",
 ] as const;
 
 export type ApiErrorCode = (typeof apiErrorCodes)[number];

@@ -1,33 +1,22 @@
 # Product and delivery roadmap
 
-Status date: 2026-11-17
+Status date: 2026-11-17 (updated after the CI, recovery, mail-status and linking sprint)
 
 This roadmap follows the product, design, localization, and deployment constraints in
 `PROJECT_CONTEXT.md`, `DESIGN.md`, `LOCALIZATION.md`, and `README.md`.
 
-## Current release candidate
+## Where we are
 
-Already implemented locally:
+Live on `lijstjesenlootjes.nl` and `wishanddraw.com`: wishlists with reservations, draws with exclusions and personal links, the name wheel, Dutch and English interfaces with per-domain paths, seasonal themes with a protected admin, durable rate limiting, retention cleanup, security headers with a nonce CSP, anonymous usage counters, optional one-off email, and Amazon affiliate links with disclosure.
 
-- Dutch and English interface architecture, including domain-based defaults.
-- Responsive navigation and a verified 320 px layout.
-- Neutral, Sinterklaas, Christmas, winter, spring, summer, and autumn artwork.
-- Automatic seasonal scheduling plus protected manual theme and layout controls.
-- Durable Supabase-backed rate limiting for public write actions, token exchange, and
-  admin login. Identifiers are HMAC-hashed before storage.
-- Physical deletion of wishlists and draws, including their access tokens and sessions.
+Added in the latest sprint (not yet pushed when this was written; check `git log` for the commit):
 
-Release order matters:
-
-1. Review the local changes and decide how to handle the existing local commit.
-2. Apply `supabase/migrations/20261117140000_rate_limits.sql` to the existing
-   `lijstjes-en-lootjes` project. The application intentionally fails closed when this
-   RPC is unavailable.
-3. Configure the two theme-admin secrets through the approved Vercel workflow.
-4. Run the production build and smoke tests again.
-5. Push only after explicit approval. The push to `main` starts production deployment.
-6. Verify both domains, both languages, the admin flow, list creation, draw creation,
-   personal links, and physical deletion on the deployed version.
+- GitHub Actions CI (`.github/workflows/ci.yml`): typecheck, unit tests, and the full e2e suite.
+- Opt-in recovery of a lost management link, without storing the address.
+- Email sent after the response with retries and a visible status; the organizer can mail a fresh link.
+- Clear explanation of expired, replaced, or unknown links; the organizer can move a draw's date and every link follows.
+- Progress and reminder messages per participant; a participant can link an existing wishlist.
+- Footer and privacy text no longer describe a closed preview.
 
 ## Phase 1 — Public-pilot readiness
 
@@ -57,7 +46,7 @@ Required implementation after approval of these periods:
 
 ### 2. Monitoring and incident readiness
 
-**Status (2026-11-17): partly implemented.** `GET /api/health` (database probe via the `app_health` RPC, migration `20261117160000_app_health.sql`) and `INCIDENT_PLAYBOOK.md` exist. Still manual: apply the migration, point an uptime monitor at `/api/health`, and configure Vercel alerts for 5xx and failed deploys.
+**Status (2026-11-17): partly implemented.** Parked on purpose: the external parts (uptime monitor, Vercel failed-deploy notifications, a check that the daily cron ran). `GET /api/health` (database probe via the `app_health` RPC, migration `20261117160000_app_health.sql`) and `INCIDENT_PLAYBOOK.md` exist. Still manual: apply the migration, point an uptime monitor at `/api/health`, and configure Vercel alerts for 5xx and failed deploys.
 
 - Add a minimal health endpoint that checks application-to-database connectivity without
   returning database contents.
@@ -69,7 +58,7 @@ Required implementation after approval of these periods:
 
 ### 3. End-to-end quality gate
 
-**Status (2026-11-17): implemented** in `e2e/` (`npm run test:e2e`, 45 tests across the `nl` and `en` projects, against an in-memory Supabase stand-in so no real data is touched). Not yet automated: running it in CI and in a deploy gate.
+**Status (2026-11-17): implemented** in `e2e/` (`npm run test:e2e`, 45 tests across the `nl` and `en` projects, against an in-memory Supabase stand-in so no real data is touched). Runs in CI on every pull request and push to `main`. Still manual: a GitHub branch-protection rule that makes the checks mandatory before merging, since Vercel deploys `main` on its own.
 
 Automate these browser flows in both Dutch and English:
 
@@ -91,14 +80,46 @@ Implemented (2026-11-17): `/admin/usage` with anonymous daily counters and a sto
 
 ## Phase 2 — Product completeness
 
-- One-off mail of the links at creation is implemented (Resend, address never stored).
-  Add an optional reminder flow only after an email provider, sender identity, delivery
-  monitoring, unsubscribe handling, and localized templates are ready.
-- Let organizers set or extend an expiry date within policy limits.
-- Add a clear “link expired” recovery path without exposing assignments.
-- Add export/share options that never put access tokens in analytics or referrer headers.
-- Consider accounts only if link-based ownership becomes a proven support problem; do not
-  add authentication complexity pre-emptively.
+Done:
+
+- One-off mail of the links at creation, sent after the response with retries and a visible status.
+- Opt-in link recovery (keyed hash of the address, never the address) with a neutral, rate-limited recovery page.
+- Organizers can mail themselves a fresh management link and move a draw's date; links follow the new expiry.
+- A "link expired / replaced / unknown" experience that says what to do next, without exposing assignments.
+- Progress per draw and per-participant reminder messages (no link in a reminder, because personal links cannot be retrieved).
+- A participant can link a standalone wishlist; the giver sees its live wishes, never its reservations.
+
+Still open:
+
+- Bounce and complaint handling (Resend webhook) and an email counter in the usage dashboard.
+- SPF, DKIM and DMARC for both sending domains (DNS, outside the code).
+- Optional automatic reminders only after delivery monitoring and unsubscribe handling exist.
+- Export/share options that never put access tokens in analytics or referrer headers.
+- Consider accounts only if link-based ownership proves to be a support problem.
+
+## Storage migration (do before heavy traffic)
+
+The store (`src/lib/store.ts`) keeps one versioned JSON document and commits with optimistic concurrency. Collisions now retry with full-jitter backoff (12 attempts) and are logged as `Supabase state commit conflict`, which is the signal to act on: a steady stream of them, or `The database was too busy` errors, means the single document has become the bottleneck. The document also grows with every list and draw, and every request reads all of it.
+
+Why it was not cut over in the same sprint: it moves all production data, needs migrations applied to the live Supabase project, and cannot be validated against real data from a development machine. Do it as its own, supervised release.
+
+Target schema (private schema, RLS on, no public policies, all access through `security definer` RPCs or the server key as today):
+
+- `wishlists(id, title, occasion, date, created_at, updated_at, recovery_hash, email_state, email_at)`
+- `wishes(id, wishlist_id, position, title, url, price, note, reserved_by_session_hash, reserved_at)`
+- `draws(id, request_id unique, title, organizer_name, budget, date, created_at, recovery_hash, email_state, email_at)`
+- `participants(id, draw_id, name, active_token_hash, viewed_at, linked_wishlist_id)`, `draw_wishes(id, participant_id, position, title, url, price, note)`
+- `exclusions(draw_id, from_id, to_id)`, `assignments(draw_id, giver_id, recipient_id)`
+- `access_tokens(hash pk, role, scope_id, participant_id, expires_at, revoked_at)`, `sessions(hash pk, access_hash, role, scope_id, participant_id, expires_at)`
+- `site_settings(key pk, value jsonb)` for the theme settings
+
+Cutover plan:
+
+1. Add the tables in a migration; keep `app_state` untouched.
+2. Write a one-off, idempotent copy from the JSON document into the tables, plus a verification query that compares counts and hashes.
+3. Introduce a store interface with the current document implementation and a table implementation; route by a server-side flag. Reservation becomes one atomic `UPDATE ... WHERE reserved_by_session_hash IS NULL`.
+4. Run the e2e suite against both implementations (the in-memory mock needs a table-shaped twin).
+5. Freeze writes briefly (Vercel Firewall rule from the incident playbook), copy, verify, flip the flag, unfreeze; keep the JSON document for one retention period as a fallback, then drop it.
 
 ## Phase 3 — Affiliate validation
 

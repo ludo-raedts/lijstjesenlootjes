@@ -12,6 +12,8 @@ export default async function HelpPage() {
   const { t } = await getServerI18n();
   const items = [
     ["help.manageQuestion", "help.manageAnswer"],
+    ["help.lostQuestion", "help.lostAnswer"],
+    ["help.expiredQuestion", "help.expiredAnswer"],
     ["help.assignmentsQuestion", "help.assignmentsAnswer"],
     ["help.ownWishlistQuestion", "help.ownWishlistAnswer"],
     ["help.reservedQuestion", "help.reservedAnswer"],

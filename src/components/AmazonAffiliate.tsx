@@ -3,75 +3,104 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
 import { buildAmazonSearchUrl, tagAmazonUrl, type AmazonLinkConfig } from "@/lib/affiliate/amazon";
+import { disclosureKey } from "@/lib/affiliate/disclosure";
+import { buildBolSearchUrl, wrapBolUrl, type BolLinkConfig } from "@/lib/affiliate/bol";
 
-const AmazonContext = createContext<AmazonLinkConfig | null>(null);
+type ShopLinks = { amazon: AmazonLinkConfig | null; bol: BolLinkConfig | null };
 
-export function AmazonAffiliateProvider({ config, children }: { config: AmazonLinkConfig | null; children: ReactNode }) {
-  return <AmazonContext.Provider value={config}>{children}</AmazonContext.Provider>;
+const ShopLinksContext = createContext<ShopLinks>({ amazon: null, bol: null });
+
+const SPONSORED_REL = "sponsored nofollow noopener noreferrer";
+
+export function AmazonAffiliateProvider({
+  config,
+  bol = null,
+  children,
+}: {
+  config: AmazonLinkConfig | null;
+  bol?: BolLinkConfig | null;
+  children: ReactNode;
+}) {
+  return <ShopLinksContext.Provider value={{ amazon: config, bol }}>{children}</ShopLinksContext.Provider>;
 }
 
 export function useAmazonAffiliate() {
-  return useContext(AmazonContext);
+  return useContext(ShopLinksContext).amazon;
 }
 
-/** Deliberate "search on Amazon" action for a wish without its own link. Renders nothing when affiliate links are off. */
-export function AmazonSearchLink({ title }: { title: string }) {
-  const config = useAmazonAffiliate();
+export function useBolAffiliate() {
+  return useContext(ShopLinksContext).bol;
+}
+
+/** Deliberate "search in a shop" actions for a wish without its own link. Renders nothing when affiliate links are off. */
+export function ShopSearchLinks({ title }: { title: string }) {
+  const amazon = useAmazonAffiliate();
+  const bol = useBolAffiliate();
   const { t } = useI18n();
-  const href = config ? buildAmazonSearchUrl(title, config) : null;
-  if (!href) return null;
+  const amazonHref = amazon ? buildAmazonSearchUrl(title, amazon) : null;
+  const bolHref = bol ? buildBolSearchUrl(title, bol) : null;
+  if (!amazonHref && !bolHref) return null;
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="sponsored nofollow noopener noreferrer"
-      aria-label={t("affiliate.amazon.searchLabel", { title })}
-    >
-      {t("affiliate.amazon.search")}
-    </a>
+    <>
+      {bolHref ? (
+        <a href={bolHref} target="_blank" rel={SPONSORED_REL} aria-label={t("affiliate.bol.searchLabel", { title })}>
+          {t("affiliate.bol.search")}
+        </a>
+      ) : null}
+      {amazonHref ? (
+        <a href={amazonHref} target="_blank" rel={SPONSORED_REL} aria-label={t("affiliate.amazon.searchLabel", { title })}>
+          {t("affiliate.amazon.search")}
+        </a>
+      ) : null}
+    </>
   );
 }
 
 /**
- * The "view link" action for a wish. A user-entered amazon.com link is tagged at display
- * time (the stored URL is untouched); other links stay as entered. Wishes without a link
- * get the deliberate Amazon search action.
+ * The "view link" action for a wish. A user-entered amazon.com or bol.com link is tagged at
+ * display time (the stored URL is untouched); other links stay as entered. Wishes without a
+ * link get the deliberate shop search actions.
  */
 export function WishLink({ url, title }: { url?: string; title: string }) {
-  const config = useAmazonAffiliate();
+  const amazon = useAmazonAffiliate();
+  const bol = useBolAffiliate();
   const { t } = useI18n();
-  if (!url) return <AmazonSearchLink title={title} />;
-  const tagged = config ? tagAmazonUrl(url, config) : null;
+  if (!url) return <ShopSearchLinks title={title} />;
+  const tagged = (amazon ? tagAmazonUrl(url, amazon) : null) ?? (bol ? wrapBolUrl(url, bol) : null);
   if (tagged) {
-    return <a href={tagged} target="_blank" rel="sponsored nofollow noopener noreferrer">{t("common.viewLink")}</a>;
+    return <a href={tagged} target="_blank" rel={SPONSORED_REL}>{t("common.viewLink")}</a>;
   }
   return <a href={url} target="_blank" rel="noopener noreferrer nofollow">{t("common.viewLink")}</a>;
 }
 
-/** Helper in the wish editor: search Amazon for the typed title, then paste the chosen link back. */
+/** Helper in the wish editor: search a shop for the typed title, then paste the chosen link back. */
 export function AmazonEditorHelper({ title }: { title: string }) {
-  const config = useAmazonAffiliate();
+  const amazon = useAmazonAffiliate();
+  const bol = useBolAffiliate();
   const { t } = useI18n();
-  const href = config ? buildAmazonSearchUrl(title, config) : null;
-  if (!config) return null;
+  if (!amazon && !bol) return null;
+  const hasSearch = Boolean(
+    (amazon && buildAmazonSearchUrl(title, amazon)) || (bol && buildBolSearchUrl(title, bol)),
+  );
   return (
     <p className="hint amazon-helper">
-      {href ? (
-        <a href={href} target="_blank" rel="sponsored nofollow noopener noreferrer" aria-label={t("affiliate.amazon.searchLabel", { title })}>
-          {t("affiliate.amazon.search")}
-        </a>
+      {hasSearch ? (
+        <>
+          <ShopSearchLinks title={title} />
+          <span> {t("affiliate.helperHint")}</span>
+        </>
       ) : (
-        <span>{t("affiliate.amazon.helperEmpty")}</span>
+        <span>{t("affiliate.helperEmpty")}</span>
       )}
-      {href ? <span> {t("affiliate.amazon.helperHint")}</span> : null}
     </p>
   );
 }
 
 /** Short disclosure shown next to a list that may contain commercial links. */
 export function AmazonDisclosure() {
-  const config = useAmazonAffiliate();
+  const amazon = useAmazonAffiliate();
+  const bol = useBolAffiliate();
   const { t } = useI18n();
-  if (!config) return null;
-  return <p className="hint affiliate-disclosure">{t("affiliate.disclosure")}</p>;
+  if (!amazon && !bol) return null;
+  return <p className="hint affiliate-disclosure">{t(disclosureKey(Boolean(amazon), Boolean(bol)))}</p>;
 }

@@ -1,5 +1,7 @@
 # SEO-plan — Lijstjes & Lootjes / Wishlists & Draws
 
+**Status (17 november 2026, na de laatste sprint):** fase 0 en 1 en het grootste deel van fase 2 zijn uitgevoerd (robots-fix, per-pagina OG-metadata, deelafbeelding `/og`, keywordtitels en -koppen, Engelse padhernoeming met 308's, taalschakelaar met domeinlinks, JSON-LD, contentblokken met FAQ, de Sinterklaas-landingspagina). Open: Search Console en Bing Webmaster Tools instellen, analytics kiezen, linkbuilding. De vinkjes hieronder zijn bijgewerkt; de bevindingen en tabellen laten de situatie van vóór de uitvoering zien.
+
 Opgesteld op 17 november 2026 op basis van de code en de live sites `lijstjesenlootjes.nl` en `wishanddraw.com`. Alle bevindingen over titels, headings, robots en sitemap zijn live gecontroleerd. Zoekvolumes zijn **niet** gemeten: valideer de keywordkeuzes in Search Console en een keywordtool voordat je er grote beslissingen op neemt.
 
 ## 1. Samenvatting
@@ -29,7 +31,7 @@ Timing: Sinterklaas is 5 december en het zoekpiek-seizoen loopt van ruwweg oktob
 |---|-----------|-----------|
 | 5 | Sitemap zet `lastModified: new Date()` bij elk verzoek en gebruikt `changeFrequency`/`priority` (worden door Google genegeerd). Een altijd-nieuwe lastmod ondermijnt het vertrouwen in het veld. | Vaste datum per pagina (constante in `paths.ts` of bij build), `priority`/`changeFrequency` weglaten. |
 | 6 | Alle publieke pagina’s worden dynamisch gerenderd (`Cache-Control: private, no-store`), omdat host, cookie en thema per verzoek worden gelezen. Elke crawl en bezoek kost een serverrender; dat drukt TTFB/LCP. | Fase 3: meten (CrUX/PageSpeed); overweeg per-host statische varianten of `use cache` voor de contentdelen. Niet urgent bij lage traffic. |
-| 7 | Het footerlabel “besloten proefversie · nog niet publiek” en de privacypagina (“nog niet geschikt voor publieke ingebruikname of echte persoonsgegevens”) staan op elke geïndexeerde pagina. Dat is een vertrouwens- en snippetprobleem zodra je actief gaat werven. | Productbeslissing (zie 6). Tot de publieke lancering: overweeg `noindex` of verwijder deze teksten zodra de lancering een feit is. |
+| 7 | (Opgelost: de footer en de privacytekst spreken niet meer over een proefversie.) Het footerlabel “besloten proefversie · nog niet publiek” en de privacypagina (“nog niet geschikt voor publieke ingebruikname of echte persoonsgegevens”) staan op elke geïndexeerde pagina. Dat is een vertrouwens- en snippetprobleem zodra je actief gaat werven. | Productbeslissing (zie 6). Tot de publieke lancering: overweeg `noindex` of verwijder deze teksten zodra de lancering een feit is. |
 | 8 | Geen structured data. | Zie 4. |
 | 9 | Geen hreflang in de HTML-`<head>` (wel in Link-header en sitemap). Dat is geldig, maar tools en collega’s zien het minder snel. | `alternates.languages` in metadata erbij zetten (kleine moeite, geen conflict). |
 | 10 | Geen analytics en geen Search Console (README: “nog geen analytics”). Zonder meting valt SEO niet te sturen. | Zie 5, fase 0. |
@@ -133,24 +135,24 @@ Interne links: verwijs vanuit de tools naar de hulppagina, vanuit de lijst naar 
 
 ### Fase 0 — deze week (klein, hoogste rendement)
 
-- [ ] Robots-fix `/lootje` → `/lootje$` en `/lootje/`, met test (2.1 #1).
-- [ ] Per-pagina `openGraph`/Twitter-metadata + `og:url` (2.1 #2).
-- [ ] Titels en descriptions uit 3.1/3.2 doorvoeren in `nl.ts`/`en.ts` (alleen catalogus; sleutels blijven stabiel).
+- [x] Robots-fix `/lootje` → `/lootje$` en `/lootje/`, met test (2.1 #1).
+- [x] Per-pagina `openGraph`/Twitter-metadata + `og:url` (2.1 #2).
+- [x] Titels en descriptions uit 3.1/3.2 doorvoeren in `nl.ts`/`en.ts` (alleen catalogus; sleutels blijven stabiel).
 - [ ] Google Search Console als **domeinproperty** voor beide domeinen + Bing Webmaster Tools; sitemap indienen; URL-inspectie op `/lootjes-trekken`.
-- [ ] Sitemap-`lastmod` vast zetten (2.2 #5).
+- [x] Sitemap-`lastmod` vast zetten (2.2 #5).
 
 ### Fase 1 — komende 2 weken
 
-- [ ] H1-herziening en keywordkoppen onder de formulieren (3.1–3.3).
-- [ ] OG-afbeeldingen per seizoensthema (2.1 #3).
-- [ ] Taalschakelaar naar domeinlinks (2.1 #4) + `alternates.languages` in `<head>` (2.2 #9).
-- [ ] Engelse URL’s hernoemen met 308’s, in dezelfde release de sitemap en tests bijwerken (3.2).
-- [ ] JSON-LD `WebSite`/`Organization`/`WebApplication` (4).
-- [ ] Contentblok op `/lootjes-trekken` en `/verlanglijstje-maken` (5).
+- [x] H1-herziening en keywordkoppen onder de formulieren (3.1–3.3).
+- [x] OG-afbeeldingen per seizoensthema (2.1 #3).
+- [x] Taalschakelaar naar domeinlinks (2.1 #4) + `alternates.languages` in `<head>` (2.2 #9).
+- [x] Engelse URL’s hernoemen met 308’s, in dezelfde release de sitemap en tests bijwerken (3.2).
+- [x] JSON-LD `WebSite`/`Organization`/`WebApplication` (4).
+- [x] Contentblok op `/lootjes-trekken` en `/verlanglijstje-maken` (5).
 
 ### Fase 2 — vóór volgend seizoen (Q1–Q3 2027)
 
-- [ ] Seizoens- en doelgroeplandingspagina’s uit 5; `paths.ts` per-locale optioneel.
+- [x] Seizoens- en doelgroeplandingspagina’s uit 5; `paths.ts` per-locale optioneel.
 - [ ] Uitgebreide helpvragen, interne linkstructuur.
 - [ ] Eerste externe vermeldingen: lijsten met Sinterklaas-/kerstgidsen, familie- en teamblogs, Product Hunt/vergelijkingssites voor tools; persberichten rond de lancering. Spreek geen “gratis”-claim uit zonder besluit.
 

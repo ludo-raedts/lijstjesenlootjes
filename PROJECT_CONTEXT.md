@@ -15,6 +15,7 @@ The name wheel is a secondary utility and must not return to the primary navigat
 
 - No account is required in the MVP.
 - Capability links grant access and must be treated as secrets.
+- Addresses are never stored in readable form. Link recovery is opt-in and keeps only a keyed hash; mail goes out once, after the response.
 - The organizer never receives a readable overview of draw assignments.
 - Raw personal tokens are not persisted.
 - User-facing flows should feel warm, simple, communal, and gift-oriented rather than technical.

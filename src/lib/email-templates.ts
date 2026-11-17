@@ -136,3 +136,34 @@ export function renderDrawEmail(
     site: input.site,
   });
 }
+
+export type RecoveryItem =
+  | { kind: "wishlist"; title: string; manageUrl: string; guestUrl: string }
+  | { kind: "draw"; title: string; adminUrl: string };
+
+/** One mail with fresh management links for every list or draw that was asked for. */
+export function renderRecoveryEmail(
+  t: Translator,
+  input: { items: RecoveryItem[]; site: string; locale?: Locale },
+): RenderedEmail {
+  const blocks: Block[] = input.items.flatMap((item): Block[] =>
+    item.kind === "wishlist"
+      ? [
+          { label: t("email.recovery.wishlistManageLabel", { title: item.title }), help: t("email.recovery.wishlistManageHelp"), url: item.manageUrl, button: t("email.recovery.wishlistManageButton"), tone: "primary" },
+          { label: t("email.recovery.wishlistGuestLabel", { title: item.title }), help: t("email.recovery.wishlistGuestHelp"), url: item.guestUrl, button: t("email.recovery.wishlistGuestButton"), tone: "accent" },
+        ]
+      : [
+          { label: t("email.recovery.drawAdminLabel", { title: item.title }), help: t("email.recovery.drawAdminHelp"), url: item.adminUrl, button: t("email.recovery.drawAdminButton"), tone: "primary" },
+        ],
+  );
+  return layout({
+    t,
+    locale: input.locale ?? "nl",
+    heading: t("email.recovery.subject"),
+    intro: t("email.recovery.intro"),
+    preheader: t("email.recovery.preheader"),
+    blocks,
+    notice: t("email.recovery.notice"),
+    site: input.site,
+  });
+}

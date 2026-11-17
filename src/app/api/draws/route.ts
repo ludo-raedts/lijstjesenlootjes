@@ -1,5 +1,8 @@
 import { personalLink } from "@/lib/personal-links";
-import { sendEmail } from "@/lib/email";
+import { deliverEmailAfterResponse, queuedStatus } from "@/lib/email-delivery";
+import { emailConfigured } from "@/lib/email";
+import { recoveryHash, recoverySecret } from "@/lib/recovery";
+import type { Draw } from "@/lib/types";
 import { renderDrawEmail } from "@/lib/email-templates";
 import { getServerI18n } from "@/i18n/server";
 import { getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
@@ -68,7 +71,7 @@ export async function POST(request: NextRequest) {
       participant,
       token: createAccessToken("draw_participant", drawId, accessExpiry, participant.id),
     }));
-    const draw = {
+    const draw: Draw = {
       id: drawId,
       requestId,
       title: optionalText(body.title, "groupName", 100),
@@ -76,7 +79,9 @@ export async function POST(request: NextRequest) {
       budget: optionalText(body.budget, "budget", 40),
       date,
       createdAt,
-      status: "complete" as const,
+      status: "complete",
+      recoveryHash: email && body.recoverable === true ? recoveryHash(email, recoverySecret()) : undefined,
+      emailStatus: email && emailConfigured() ? queuedStatus() : undefined,
       exclusions,
       assignments: result.assignments,
       participants: participantAccess.map(({ participant, token }) => ({
@@ -98,7 +103,7 @@ export async function POST(request: NextRequest) {
       name: participant.name,
       url: personalLink(request, "drawReveal", token.raw),
     }));
-    let emailStatus: "not_requested" | "sent" | "failed" = "not_requested";
+    let emailStatus: "not_requested" | "queued" | "failed" = "not_requested";
     if (email) {
       const { t, locale } = await getServerI18n();
       const rendered = renderDrawEmail(t, {
@@ -107,8 +112,11 @@ export async function POST(request: NextRequest) {
         participants: participantLinks,
         locale, site: (await getRequestSiteUrl()).replace(/^https?:\/\//, ""),
       });
-      const result = await sendEmail({ to: email, ...rendered, host: await getRequestHost(), idempotencyKey: `draw-${drawId}` });
-      emailStatus = result === "sent" ? "sent" : "failed";
+      const queued = deliverEmailAfterResponse(
+        { to: email, ...rendered, host: await getRequestHost(), idempotencyKey: `draw-${drawId}` },
+        { kind: "draw", id: drawId },
+      );
+      emailStatus = queued ? "queued" : "failed";
     }
     return noStoreJson({ adminUrl, participantLinks, emailStatus }, { status: 201 });
   } catch (error) {

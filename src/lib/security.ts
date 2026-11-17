@@ -71,11 +71,9 @@ export async function exchangeToken(rawToken: string) {
   const hash = tokenHash(rawToken);
   return transaction((database) => {
     const access = database.accessTokens.find((candidate) => candidate.hash === hash);
-    if (
-      !access ||
-      access.revokedAt ||
-      new Date(access.expiresAt).getTime() <= Date.now()
-    ) {
+    if (!access) throw new HttpError(401, "access_link_invalid");
+    if (access.revokedAt) throw new HttpError(401, "access_link_replaced");
+    if (new Date(access.expiresAt).getTime() <= Date.now()) {
       throw new HttpError(401, "access_link_expired");
     }
     const session = createSession(access);
@@ -145,9 +143,9 @@ export async function isWithinRateLimit(
   return consumeRateLimit(bucketKey, maximum, windowSeconds);
 }
 
-export async function limit(request: NextRequest, key: string, maximum = 40) {
+export async function limit(request: NextRequest, key: string, maximum = 40, windowSeconds = 60) {
   const identifier = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
-  await limitIdentifier(identifier, key, maximum);
+  await limitIdentifier(identifier, key, maximum, windowSeconds);
 }
 
 export function secureRandomInt(maxExclusive: number) {

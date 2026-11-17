@@ -59,6 +59,8 @@ export const config = {
     "/verlanglijstje/bekijken/:path*",
     "/trekking-beheren/:path*",
     "/lootje/:path*",
+    "/beheerlink-kwijt/:path*",
+    "/recover-link/:path*",
     "/wishlist/manage/:path*",
     "/wishlist/view/:path*",
     "/draw/manage/:path*",

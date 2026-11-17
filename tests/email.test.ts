@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test, { afterEach } from "node:test";
 import { createTranslator } from "../src/i18n/messages";
-import { emailConfigured, senderForHost, sendEmail } from "../src/lib/email";
-import { escapeHtml, renderDrawEmail, renderWishlistEmail } from "../src/lib/email-templates";
+import { emailConfigured, senderForHost, sendEmail, sendEmailWithRetry } from "../src/lib/email";
+import { escapeHtml, renderDrawEmail, renderRecoveryEmail, renderWishlistEmail } from "../src/lib/email-templates";
 import { optionalEmail } from "../src/lib/validation";
 
 const realFetch = globalThis.fetch;
@@ -100,4 +100,57 @@ test("each public domain sends from its own sender and falls back to EMAIL_FROM"
   assert.equal(senderForHost("www.wishanddraw.com:443"), "EN <noreply@wishanddraw.com>");
   assert.equal(senderForHost("lijstjesenlootjes.nl"), "NL <noreply@lijstjesenlootjes.nl>");
   assert.equal(senderForHost("localhost:3000"), "NL <noreply@lijstjesenlootjes.nl>");
+});
+
+function configureProvider() {
+  process.env.EMAIL_PROVIDER_API_KEY = "re_test";
+  process.env.EMAIL_FROM = "Test <noreply@example.nl>";
+}
+
+test("sendEmailWithRetry retries a provider error and stops at the first success", async () => {
+  configureProvider();
+  const statuses = [503, 429, 200];
+  let calls = 0;
+  globalThis.fetch = (async () => new Response("{}", { status: statuses[calls++] })) as typeof fetch;
+  assert.equal(await sendEmailWithRetry(message, [0, 0, 0]), "sent");
+  assert.equal(calls, 3);
+});
+
+test("sendEmailWithRetry does not retry a request the provider rejected", async () => {
+  configureProvider();
+  let calls = 0;
+  globalThis.fetch = (async () => { calls += 1; return new Response("{}", { status: 422 }); }) as typeof fetch;
+  assert.equal(await sendEmailWithRetry(message, [0, 0, 0]), "failed");
+  assert.equal(calls, 1);
+});
+
+test("sendEmailWithRetry gives up after the last attempt and reuses the idempotency key", async () => {
+  configureProvider();
+  const keys: Array<string | null> = [];
+  globalThis.fetch = (async (_url: unknown, init?: RequestInit) => {
+    keys.push(new Headers(init?.headers).get("Idempotency-Key"));
+    throw new Error("network down");
+  }) as typeof fetch;
+  assert.equal(await sendEmailWithRetry(message, [0, 0, 0]), "failed");
+  assert.deepEqual(keys, ["k-1", "k-1", "k-1"]);
+});
+
+test("sendEmailWithRetry skips quietly when email is not configured", async () => {
+  globalThis.fetch = (async () => { throw new Error("must not be called"); }) as typeof fetch;
+  assert.equal(await sendEmailWithRetry(message, [0, 0, 0]), "skipped");
+});
+
+test("the recovery email lists every list and draw with its own links and no participant links", () => {
+  const t = createTranslator("nl");
+  const rendered = renderRecoveryEmail(t, {
+    site: "lijstjesenlootjes.nl",
+    items: [
+      { kind: "wishlist", title: "Mijn lijst", manageUrl: "https://x.nl/m#token=m", guestUrl: "https://x.nl/g#token=g" },
+      { kind: "draw", title: "Kerst <b>", adminUrl: "https://x.nl/a#token=a" },
+    ],
+  });
+  for (const url of ["https://x.nl/m#token=m", "https://x.nl/g#token=g", "https://x.nl/a#token=a"]) {
+    assert.ok(rendered.text.includes(url) && rendered.html.includes(url));
+  }
+  assert.ok(rendered.html.includes("Kerst &lt;b&gt;") && !rendered.html.includes("Kerst <b>"));
 });
