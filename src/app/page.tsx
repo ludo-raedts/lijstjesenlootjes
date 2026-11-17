@@ -2,9 +2,11 @@ import { getImageProps } from "next/image";
 import Link from "next/link";
 import { BowlArt, ClipboardArt, CobaltDashes, GroupIcon, GiftMark, LinkIcon, PencilIcon } from "@/components/Art";
 import { getServerI18n } from "@/i18n/server";
+import { getActiveAppearance } from "@/lib/theme-store";
 
 export default async function HomePage() {
-  const { t } = await getServerI18n();
+  const { locale, t } = await getServerI18n();
+  const appearance = await getActiveAppearance(locale);
   const tools = [
     {
       title: t("home.wishlist.title"),
@@ -32,40 +34,42 @@ export default async function HomePage() {
   ];
 
   const common = { alt: t("home.hero.imageAlt"), sizes: "(min-width: 1200px) 1120px, 100vw", quality: 80 };
-  const { props: { srcSet: desktopSrcSet } } = getImageProps({ ...common, src: "/images/hero-neutral-desktop.png", width: 1536, height: 1024 });
-  const { props: heroImage } = getImageProps({ ...common, src: "/images/hero-neutral-mobile.png", width: 1122, height: 1402, fetchPriority: "high" });
+  const { props: { srcSet: desktopSrcSet } } = getImageProps({ ...common, src: appearance.definition.desktopImage, width: 1536, height: 1024 });
+  const { props: heroImage } = getImageProps({ ...common, src: appearance.definition.mobileImage, width: 1122, height: 1402, fetchPriority: "high" });
 
   return (
     <>
-      <section className="editorial-hero shell">
-        <div className="hero-art" aria-hidden="true">
-          <img className="hero-art-tulip" src="/motifs/motif-neutral-tulip.svg" alt="" />
-          <ClipboardArt className="hero-art-list" />
-          <BowlArt className="hero-art-bowl" />
-          <img className="hero-art-blossom" src="/motifs/motif-neutral-blossom.svg" alt="" />
-        </div>
-        <div className="hero-copy">
-          <span className="eyebrow">{t("home.hero.eyebrow")}</span>
-          <h1>{t("home.hero.title")}</h1>
-          <CobaltDashes className="hero-dashes" />
-        </div>
-        <div className="hero-aside">
-          <p className="hero-intro">{t("home.hero.supporting")}</p>
-          <div className="hero-actions">
-            <Link className="button" href="/verlanglijstje-maken">{t("home.actions.createWishlist")}</Link>
-            <Link className="button button-brick" href="/lootjes-trekken">{t("home.actions.createDraw")}</Link>
+      <div className="home-stage">
+        <section className="editorial-hero shell">
+          <div className="hero-art" aria-hidden="true">
+            <span className="hero-art-season hero-art-season-primary" />
+            <ClipboardArt className="hero-art-list" />
+            <BowlArt className="hero-art-bowl" />
+            <span className="hero-art-season hero-art-season-secondary" />
           </div>
-        </div>
-      </section>
+          <div className="hero-copy">
+            <span className="eyebrow">{t("home.hero.eyebrow")}</span>
+            <h1>{t("home.hero.title")}</h1>
+            <CobaltDashes className="hero-dashes" />
+          </div>
+          <div className="hero-aside">
+            <p className="hero-intro">{t("home.hero.supporting")}</p>
+            <div className="hero-actions">
+              <Link className="button" href="/verlanglijstje-maken">{t("home.actions.createWishlist")}</Link>
+              <Link className="button button-brick" href="/lootjes-trekken">{t("home.actions.createDraw")}</Link>
+            </div>
+          </div>
+        </section>
 
-      <figure className="shell hero-figure">
-        <picture>
-          <source media="(min-width: 861px)" srcSet={desktopSrcSet} />
-          <img {...heroImage} alt={common.alt} />
-        </picture>
-        <img className="figure-corner figure-corner-left" src="/motifs/motif-neutral-flower-corner.svg" alt="" aria-hidden="true" />
-        <img className="figure-corner figure-corner-right" src="/motifs/motif-neutral-flower-corner.svg" alt="" aria-hidden="true" />
-      </figure>
+        <figure className="shell hero-figure">
+          <picture>
+            <source media="(min-width: 861px)" srcSet={desktopSrcSet} />
+            <img {...heroImage} alt={common.alt} />
+          </picture>
+          <img className="figure-corner figure-corner-left" src={appearance.definition.cornerMotif} alt="" aria-hidden="true" />
+          <img className="figure-corner figure-corner-right" src={appearance.definition.cornerMotif} alt="" aria-hidden="true" />
+        </figure>
+      </div>
 
       <section className="shell tool-index" aria-labelledby="home-products-title">
         <header className="index-header">
@@ -105,14 +109,14 @@ export default async function HomePage() {
       </section>
 
       <section className="shell trust-band">
-        <img className="trust-sprig" src="/motifs/motif-neutral-sprig.svg" alt="" aria-hidden="true" />
+        <img className="trust-sprig" src={appearance.definition.accentMotif} alt="" aria-hidden="true" />
         <div className="trust-copy">
           <GroupIcon className="trust-group" />
           <h2>{t("home.trust.line")}</h2>
           <p>{t("home.trust.detail")}</p>
           <Link className="text-link" href="/privacy">{t("footer.privacy")} <span aria-hidden="true">→</span></Link>
         </div>
-        <img className="trust-sprig" src="/motifs/motif-neutral-sprig.svg" alt="" aria-hidden="true" />
+        <img className="trust-sprig" src={appearance.definition.accentMotif} alt="" aria-hidden="true" />
       </section>
     </>
   );

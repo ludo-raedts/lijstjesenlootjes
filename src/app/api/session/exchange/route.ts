@@ -5,7 +5,7 @@ import { errorResponse, noStoreJson } from "@/lib/http";
 export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
-    limit(request, "session-exchange", 80);
+    await limit(request, "session-exchange", 80);
     const body = (await request.json()) as { token?: unknown };
     if (typeof body.token !== "string") throw new HttpError(400, "access_token_missing");
     const { access, session } = await exchangeToken(body.token);

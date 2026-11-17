@@ -1,3 +1,5 @@
+import type { ThemeSettings } from "@/lib/theme";
+
 export type AccessRole =
   | "wishlist_manage"
   | "wishlist_guest"
@@ -74,6 +76,9 @@ export type Database = {
   draws: Draw[];
   accessTokens: AccessToken[];
   sessions: Session[];
+  siteSettings?: {
+    theme?: ThemeSettings;
+  };
 };
 
 export const emptyDatabase = (): Database => ({

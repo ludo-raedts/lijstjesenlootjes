@@ -16,5 +16,6 @@ export const config = {
     "/verlanglijstje/bekijken/:path*",
     "/trekking-beheren/:path*",
     "/lootje/:path*",
+    "/admin/:path*",
   ],
 };

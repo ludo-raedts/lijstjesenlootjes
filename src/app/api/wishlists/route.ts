@@ -20,7 +20,7 @@ function parseWish(input: unknown): Wish {
 export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
-    limit(request, "wishlist-create", 12);
+    await limit(request, "wishlist-create", 12);
     const body = (await request.json()) as Record<string, unknown>;
     if (!Array.isArray(body.wishes) || body.wishes.length < 1 || body.wishes.length > 50) {
       throw new HttpError(400, "invalid_wishlist_wish_count", { min: 1, max: 50 });

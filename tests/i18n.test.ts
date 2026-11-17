@@ -21,6 +21,17 @@ test("field validation is localized in the browser", () => {
   );
 });
 
+test("the visitor's domain selects the default locale", async () => {
+  const { localeForHost, originForHost } = await import("../src/lib/domains");
+  assert.equal(localeForHost("lijstjesenlootjes.nl"), "nl");
+  assert.equal(localeForHost("wishanddraw.com"), "en");
+  assert.equal(localeForHost("WWW.WishAndDraw.com:443"), "en");
+  assert.equal(localeForHost("lijstjes-en-lootjes.vercel.app"), null);
+  assert.equal(localeForHost(null), null);
+  assert.equal(originForHost("www.wishanddraw.com"), "https://wishanddraw.com");
+  assert.equal(originForHost("localhost:3000"), null);
+});
+
 test("Dutch and English catalogs have identical keys and placeholders", async () => {
   const { nlMessages } = await import("../src/i18n/messages/nl");
   const { enMessages } = await import("../src/i18n/messages/en");

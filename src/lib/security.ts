@@ -2,12 +2,12 @@ import "server-only";
 import { createHash, randomBytes, randomInt, randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 import { HttpError } from "@/lib/api-error";
-import { read, transaction } from "@/lib/store";
+import { createRateLimitBucketKey } from "@/lib/rate-limit";
+import { consumeRateLimit, read, transaction } from "@/lib/store";
 import { AccessRole, AccessToken, Session } from "@/lib/types";
 
 const ACCESS_DAYS = 30;
 const SESSION_DAYS = 7;
-const rateBuckets = new Map<string, { count: number; resetsAt: number }>();
 
 export { HttpError } from "@/lib/api-error";
 
@@ -116,19 +116,29 @@ export function assertSameOrigin(request: NextRequest) {
   }
 }
 
-export function limit(request: NextRequest, key: string, maximum = 40) {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
-  const bucketKey = `${ip}:${key}`;
-  const now = Date.now();
-  const bucket = rateBuckets.get(bucketKey);
-  if (!bucket || bucket.resetsAt <= now) {
-    rateBuckets.set(bucketKey, { count: 1, resetsAt: now + 60_000 });
-    return;
+function rateLimitSecret() {
+  const secret = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!secret) {
+    throw new Error("The server is missing the Supabase secret server key.");
   }
-  bucket.count += 1;
-  if (bucket.count > maximum) {
+  return secret;
+}
+
+export async function limitIdentifier(
+  identifier: string,
+  key: string,
+  maximum = 40,
+  windowSeconds = 60,
+) {
+  const bucketKey = createRateLimitBucketKey(identifier, key, rateLimitSecret());
+  if (!await consumeRateLimit(bucketKey, maximum, windowSeconds)) {
     throw new HttpError(429, "rate_limited");
   }
+}
+
+export async function limit(request: NextRequest, key: string, maximum = 40) {
+  const identifier = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  await limitIdentifier(identifier, key, maximum);
 }
 
 export function secureRandomInt(maxExclusive: number) {

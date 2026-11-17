@@ -18,7 +18,8 @@ The name wheel is a secondary utility and must not return to the primary navigat
 - The organizer never receives a readable overview of draw assignments.
 - Raw personal tokens are not persisted.
 - User-facing flows should feel warm, simple, communal, and gift-oriented rather than technical.
-- The neutral interface must work year-round; Sinterklaas and Christmas are theme layers, not separate products.
+- The neutral interface must work year-round; Sinterklaas, Christmas, and the four seasons are appearance layers, not separate products.
+- Seasonal appearance is resolved server-side from locale-aware Europe/Amsterdam calendar rules. A protected `/admin` route can persist manual theme/layout overrides and schedule changes in the private application-state document.
 
 ## Sources of truth
 
@@ -37,6 +38,7 @@ If documents disagree, security and data integrity take precedence, followed by 
 - Server routes own validation, sessions, capability-token exchange, and mutations.
 - Browser code never receives database credentials or raw stored token hashes.
 - API field names and persisted domain values are English and locale-independent.
+- The root layout publishes the resolved `data-theme` and `data-layout` attributes; theme CSS and hero assets change without changing page semantics or content order.
 
 ## Language architecture
 

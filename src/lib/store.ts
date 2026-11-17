@@ -67,3 +67,24 @@ export async function transaction<T>(
 
   throw new Error("The database was too busy to commit the change.");
 }
+
+export async function consumeRateLimit(
+  bucketKey: string,
+  maximum: number,
+  windowSeconds: number,
+) {
+  const { data, error } = await getClient().rpc("consume_app_rate_limit", {
+    p_bucket_key: bucketKey,
+    p_maximum: maximum,
+    p_window_seconds: windowSeconds,
+  });
+
+  if (error) {
+    console.error("Supabase consume_app_rate_limit failed", error.code, error.message);
+    throw new Error("The rate limit could not be checked.");
+  }
+  if (typeof data !== "boolean") {
+    throw new Error("The database returned an invalid rate-limit result.");
+  }
+  return data;
+}

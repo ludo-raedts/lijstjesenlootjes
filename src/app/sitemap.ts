@@ -1,12 +1,13 @@
 import type { MetadataRoute } from "next";
-import { getSiteUrl } from "@/lib/site-url";
+import { PUBLIC_PATHS } from "@/lib/domains";
+import { getRequestSiteUrl } from "@/lib/request-site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const base = getSiteUrl();
-  return ["", "/verlanglijstje-maken", "/lootjes-trekken", "/rad-draaien", "/help", "/privacy"].map((route) => ({
-    url: `${base}${route}`,
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const base = await getRequestSiteUrl();
+  return PUBLIC_PATHS.map((route) => ({
+    url: route === "/" ? base : `${base}${route}`,
     lastModified: new Date(),
-    changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : 0.8,
+    changeFrequency: route === "/" ? "weekly" : "monthly",
+    priority: route === "/" ? 1 : 0.8,
   }));
 }

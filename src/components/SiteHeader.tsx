@@ -12,12 +12,28 @@ export async function SiteHeader() {
           <GiftMark className="wordmark-mark" />
           <span className="wordmark-text">{t("app.name")}</span>
         </Link>
-        <nav className="main-nav" aria-label={t("nav.label")}>
+        <nav className="main-nav desktop-nav" aria-label={t("nav.label")}>
           <Link href="/verlanglijstje-maken">{t("nav.wishlist")}</Link>
           <Link href="/lootjes-trekken">{t("nav.draw")}</Link>
           <Link href="/help">{t("nav.help")}</Link>
           <LanguageSwitcher />
         </nav>
+        <details className="mobile-nav">
+          <summary>
+            <span className="mobile-nav-icon" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+            <span>{t("nav.menu")}</span>
+          </summary>
+          <nav className="mobile-nav-panel" aria-label={t("nav.label")}>
+            <Link href="/verlanglijstje-maken">{t("nav.wishlist")}</Link>
+            <Link href="/lootjes-trekken">{t("nav.draw")}</Link>
+            <Link href="/help">{t("nav.help")}</Link>
+            <LanguageSwitcher />
+          </nav>
+        </details>
       </div>
     </header>
   );

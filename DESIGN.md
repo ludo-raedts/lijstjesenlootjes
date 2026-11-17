@@ -527,7 +527,7 @@ Het basismerk blijft in alle varianten minimaal 80% hetzelfde. Alleen accenten, 
 - Motieven: bloemen, lint, lijstjes, gevouwen papier en cadeaulabels.
 - Kleding: gewone casual kleding, geen duidelijke winter- of feestkleding.
 
-### Sinterklaas — later uitwerken
+### Sinterklaas
 
 - Toevoegingen: nachtblauw, warm goud, boekpapier, briefvormen en subtiele dakenlijn.
 - De focus blijft op samen lootjes trekken en cadeaus geven.
@@ -535,16 +535,42 @@ Het basismerk blijft in alle varianten minimaal 80% hetzelfde. Alleen accenten, 
 - Eventuele helpers worden eigentijds, inclusief en zonder stereotiepe kenmerken weergegeven.
 - Geen volledige herbouw van de layout; het is een themalaag.
 
-### Kerst — later uitwerken
+### Kerst
 
 - Toevoegingen: dieper dennengroen, besrood, amberlicht en eenvoudige dennentakmotieven.
 - Warm licht mag, maar tekstvlakken behouden hun contrast.
 - Vermijd een overdaad aan sneeuw, glitters, ornamenten en standaard stockkerstbeelden.
 - De groep blijft cultureel en qua gezinssamenstelling gevarieerd.
 
+### Winter
+
+- Cool blue-grey paper, cobalt accents, bare branches, and soft winter light.
+- No Christmas ornaments, Santa imagery, or Sinterklaas references.
+- The scene remains communal and warm rather than becoming a snow landscape.
+
+### Spring
+
+- Fresh leaf green, powder blue, new foliage, and restrained blossom motifs.
+- Flowers remain graphic folk-art accents and do not replace the people or product task.
+- Keep sufficient contrast when the overall palette becomes lighter.
+
+### Summer
+
+- Sun-warmed cream, cobalt, leafy greens, and small sun or meadow accents.
+- Prefer natural daylight and relaxed clothing; avoid travel-advertising or beach clichés.
+- Warm yellow remains an accent and never becomes a low-contrast text background.
+
+### Autumn
+
+- Warm paper, rust, muted green, berries, and a few falling-leaf motifs.
+- Avoid Halloween imagery and keep the visual language relevant across cultures.
+- Rich seasonal colors remain secondary to the core forest-green and brick-red brand anchors.
+
 ### Technische themaregel
 
-Thema’s worden uiteindelijk gestuurd door semantische tokens, bijvoorbeeld `data-theme="neutral"`, `data-theme="sinterklaas"` en `data-theme="christmas"`. Componentmarkup en interactie veranderen niet per seizoen.
+Themes are selected through semantic `data-theme` and `data-layout` attributes on the document root. The seven supported themes are `neutral`, `sinterklaas`, `christmas`, `winter`, `spring`, `summer`, and `autumn`; the layout variants are `editorial`, `split`, and `showcase`. Component semantics, keyboard order, copy, and interaction do not change per season. On screens up to 860px, every layout returns to the same single-column flow.
+
+Automatic selection uses the Europe/Amsterdam date and the interface locale. The default Dutch sequence is Sinterklaas from 15 November through 5 December and Christmas from 6 through 26 December. English uses Christmas from 15 November through 26 December. The four generic seasons fill the remaining calendar. Administrators can adjust these windows or select a manual theme and layout through `/admin`.
 
 ## 16. Benodigde assetbibliotheek
 
@@ -559,20 +585,21 @@ Thema’s worden uiteindelijk gestuurd door semantische tokens, bijvoorbeeld `da
 - 8 eigen pictogrammen: cadeau, lijst, potlood, link, kopiëren, lootje, kom en groep.
 - 3 statuspictogrammen: succes, waarschuwing en fout.
 
-### Later per seizoen
+### Per season
 
-- 1 hero-variant desktop en mobiel.
-- 4 seizoensmotieven.
-- Aangepaste kleurentokens.
+- 1 optimized AVIF hero variant for desktop and mobile.
+- 2 compact SVG motifs: one corner motif and one accent motif.
+- Semantic color-token overrides.
+- A preferred desktop layout selected from the three shared compositions.
 - Geen nieuwe iconenset of componentvormen.
 
 ### Bestandsnamen
 
 Gebruik lowercase kebab-case met thema en formaat:
 
-`hero-neutral-desktop.avif`  
-`hero-neutral-mobile.webp`  
-`motif-neutral-flower-corner.svg`  
+`hero-neutral-desktop.avif`
+`hero-neutral-mobile.avif`
+`motif-neutral-flower-corner.svg`
 `paper-edge-neutral-01.svg`
 
 ## 17. Ontwerp- en implementatieplan
@@ -603,11 +630,11 @@ Gebruik lowercase kebab-case met thema en formaat:
 - Rollenmatrix invullen vóór illustraties worden gemaakt.
 - Illustraties door minimaal twee mensen laten reviewen op representatie en anatomie.
 
-### Fase 5 — Seizoensthema’s
+### Fase 5 — Seizoensthema’s (implemented)
 
-- Eerst Sinterklaas en kerst als kleur- en motiefproef.
-- Daarna alleen goedgekeurde accenten produceren.
-- Neutraliteit buiten het seizoen opnieuw controleren.
+- Sinterklaas, Christmas, winter, spring, summer, and autumn each have approved desktop and mobile hero art, tokens, and motifs.
+- The locale-aware resolver and protected administration route control theme and layout without duplicating components.
+- Review the neutral and generic-season variants whenever new holiday motifs are introduced so visual references do not leak between themes.
 
 ## 18. Definition of done
 

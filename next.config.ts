@@ -1,26 +1,36 @@
 import type { NextConfig } from "next";
+import { PUBLIC_PATHS, SITE_DOMAINS } from "./src/lib/domains";
 
-const PRIMARY_HOST = "lijstjesenlootjes.nl";
+const escapeHost = (host: string) => host.replace(/\./g, "\\.");
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   async redirects() {
-    return [
-      // One canonical host: www -> apex (permanent).
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: `www.${PRIMARY_HOST}` }],
-        destination: `https://${PRIMARY_HOST}/:path*`,
-        permanent: true,
-      },
-      // Reserved international domain: temporary until an English site exists.
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "(www\\.)?wishanddraw\\.com" }],
-        destination: `https://${PRIMARY_HOST}/:path*`,
-        permanent: false,
-      },
-    ];
+    // One canonical host per domain: www -> apex (permanent). The URL stays on the visitor's own domain.
+    return SITE_DOMAINS.map((domain) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: `www.${domain.host}` }],
+      destination: `https://${domain.host}/:path*`,
+      permanent: true,
+    }));
+  },
+  async headers() {
+    // hreflang alternates for every public page, announced on each domain.
+    return SITE_DOMAINS.flatMap((domain) =>
+      PUBLIC_PATHS.map((path) => ({
+        source: path,
+        has: [{ type: "host" as const, value: escapeHost(domain.host) }],
+        headers: [
+          {
+            key: "Link",
+            value: [
+              ...SITE_DOMAINS.map((alternate) => `<https://${alternate.host}${path}>; rel="alternate"; hreflang="${alternate.locale}"`),
+              `<https://${SITE_DOMAINS[0].host}${path}>; rel="alternate"; hreflang="x-default"`,
+            ].join(", "),
+          },
+        ],
+      })),
+    );
   },
 };
 

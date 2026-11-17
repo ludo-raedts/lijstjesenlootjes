@@ -8,7 +8,7 @@ import { optionalDate, optionalText, text } from "@/lib/validation";
 export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
-    limit(request, "draw-create", 10);
+    await limit(request, "draw-create", 10);
     const body = (await request.json()) as Record<string, unknown>;
     const requestId = text(body.requestId, "requestId", 100);
     if (!Array.isArray(body.participants) || body.participants.length < 3 || body.participants.length > 50) {
