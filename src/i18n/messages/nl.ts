@@ -309,7 +309,7 @@ export const nlMessages = {
   "wishlist.seo.faq5Question": "Is een verlanglijstje maken gratis?",
   "wishlist.seo.faq5Answer": "Ja. Op dit moment kost het gebruik niets en hoef je nergens voor te betalen. Op de site kunnen Amazon-partnerlinks staan: koop je daarna iets bij Amazon, dan ontvangen wij een commissie en betaal jij niet meer.",
   "wishlist.seo.faq6Question": "Kan ik mijn verlanglijstje via WhatsApp delen?",
-  "wishlist.seo.faq6Answer": "Ja. De site maakt een persoonlijk bericht met de gastenlink klaar. Jij kiest de ontvanger en verstuurt het zelf, bijvoorbeeld via WhatsApp. Er wordt niets automatisch verstuurd.",
+  "wishlist.seo.faq6Answer": "Ja. Met de deelknop open je het deelmenu van je apparaat, waarin je WhatsApp kunt kiezen. Is dat menu er niet, dan wordt het bericht met de gastenlink gekopieerd en plak je het zelf in WhatsApp. Er wordt niets automatisch verstuurd.",
   "wishlist.seo.faq7Question": "Waar kan ik mijn wensenlijstje invullen?",
   "wishlist.seo.faq7Answer": "Direct op deze pagina: geef je lijstje een titel en voeg je wensen toe, met of zonder winkellink. Daarna krijg je een beheerlink om het lijstje later aan te passen en een gastenlink om te delen.",
   "wishlist.seo.faq8Question": "Hoe lang blijft mijn verlanglijstje bewaard?",

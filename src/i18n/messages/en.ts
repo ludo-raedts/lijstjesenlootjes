@@ -311,7 +311,7 @@ export const enMessages: Record<MessageKey, string> = {
   "wishlist.seo.faq5Question": "Is making a wishlist free?",
   "wishlist.seo.faq5Answer": "Yes. Using it currently costs nothing and you don’t pay for anything. The site may contain Amazon partner links: if you then buy something from Amazon, we receive a commission and you pay no more.",
   "wishlist.seo.faq6Question": "Can I share my wishlist via WhatsApp?",
-  "wishlist.seo.faq6Answer": "Yes. The site prepares a personal message with the guest link. You choose the recipient and send it yourself, for example via WhatsApp. Nothing is sent automatically.",
+  "wishlist.seo.faq6Answer": "Yes. The share button opens your device’s share menu, where you can choose WhatsApp. If there is no share menu, the message with the guest link is copied and you paste it into WhatsApp yourself. Nothing is sent automatically.",
   "wishlist.seo.faq7Question": "Where can I fill in my wishlist?",
   "wishlist.seo.faq7Answer": "Right on this page: give your list a title and add your wishes, with or without a shop link. You then get a management link to edit the list later and a guest link to share.",
   "wishlist.seo.faq8Question": "How long is my wishlist kept?",
