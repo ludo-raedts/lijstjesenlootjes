@@ -1,3 +1,4 @@
+import { personalLink } from "@/lib/personal-links";
 import { NextRequest } from "next/server";
 import { assertSameOrigin, createAccessToken, HttpError, requireSession } from "@/lib/security";
 import { errorResponse, noStoreJson } from "@/lib/http";
@@ -51,8 +52,7 @@ export async function POST(request: NextRequest) {
       database.accessTokens.push(next.record);
       return { raw: next.raw, name: participant.name };
     });
-    const origin = new URL(request.url).origin;
-    return noStoreJson({ name: regenerated.name, url: `${origin}/lootje#token=${regenerated.raw}` });
+    return noStoreJson({ name: regenerated.name, url: personalLink(request, "drawReveal", regenerated.raw) });
   } catch (error) {
     return errorResponse(error);
   }

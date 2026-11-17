@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerI18n } from "@/i18n/server";
+import { getPagePath } from "@/lib/request-site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getServerI18n();
@@ -29,7 +30,7 @@ export default async function HelpPage() {
       <div className="callout">
         <strong>{t("help.calloutTitle")}</strong>
         <p>{t("help.calloutBody")}</p>
-        <Link className="button" href="/lootjes-trekken">{t("help.calloutAction")}</Link>
+        <Link className="button" href={await getPagePath("drawCreate")}>{t("help.calloutAction")}</Link>
       </div>
     </div>
   );

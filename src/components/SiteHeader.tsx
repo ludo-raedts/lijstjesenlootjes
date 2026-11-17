@@ -2,9 +2,12 @@ import Link from "next/link";
 import { GiftMark } from "@/components/Art";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { getServerI18n } from "@/i18n/server";
+import { getPagePath } from "@/lib/request-site";
 
 export async function SiteHeader() {
   const { t } = await getServerI18n();
+  const wishlistHref = await getPagePath("wishlistCreate");
+  const drawHref = await getPagePath("drawCreate");
   return (
     <header className="site-header">
       <div className="shell header-inner">
@@ -13,8 +16,8 @@ export async function SiteHeader() {
           <span className="wordmark-text">{t("app.name")}</span>
         </Link>
         <nav className="main-nav desktop-nav" aria-label={t("nav.label")}>
-          <Link href="/verlanglijstje-maken">{t("nav.wishlist")}</Link>
-          <Link href="/lootjes-trekken">{t("nav.draw")}</Link>
+          <Link href={wishlistHref}>{t("nav.wishlist")}</Link>
+          <Link href={drawHref}>{t("nav.draw")}</Link>
           <Link href="/help">{t("nav.help")}</Link>
           <LanguageSwitcher />
         </nav>
@@ -28,8 +31,8 @@ export async function SiteHeader() {
             <span>{t("nav.menu")}</span>
           </summary>
           <nav className="mobile-nav-panel" aria-label={t("nav.label")}>
-            <Link href="/verlanglijstje-maken">{t("nav.wishlist")}</Link>
-            <Link href="/lootjes-trekken">{t("nav.draw")}</Link>
+            <Link href={wishlistHref}>{t("nav.wishlist")}</Link>
+            <Link href={drawHref}>{t("nav.draw")}</Link>
             <Link href="/help">{t("nav.help")}</Link>
             <LanguageSwitcher />
           </nav>
