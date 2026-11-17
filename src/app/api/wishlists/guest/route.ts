@@ -42,11 +42,13 @@ export async function POST(request: NextRequest) {
       if (!wishlist) throw new HttpError(410, "wishlist_not_found");
       const wish = wishlist.wishes.find((item) => item.id === body.wishId);
       if (!wish) throw new HttpError(404, "wish_not_found");
+      const now = new Date().toISOString();
       if (body.action === "reserve") {
         if (wish.reservation && wish.reservation.ownerSessionHash !== session.hash) {
           throw new HttpError(409, "wish_already_reserved");
         }
-        wish.reservation = { ownerSessionHash: session.hash, reservedAt: new Date().toISOString() };
+        wish.reservation = { ownerSessionHash: session.hash, reservedAt: now };
+        wishlist.updatedAt = now;
         return { reserved: true };
       }
       if (body.action === "release") {
@@ -54,6 +56,7 @@ export async function POST(request: NextRequest) {
           throw new HttpError(403, "reservation_not_owned");
         }
         delete wish.reservation;
+        wishlist.updatedAt = now;
         return { reserved: false };
       }
       throw new HttpError(400, "unknown_action");

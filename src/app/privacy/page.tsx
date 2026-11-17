@@ -17,6 +17,8 @@ export default async function PrivacyPage() {
       <p className="lead">{t("privacy.lead")}</p>
       <h2>{t("privacy.storedTitle")}</h2>
       <p>{t("privacy.storedBody")}</p>
+      <h2>{t("privacy.retentionTitle")}</h2>
+      <p>{t("privacy.retentionBody")}</p>
       <h2>{t("privacy.notSentTitle")}</h2>
       <p>{t("privacy.notSentBody")}</p>
       {amazonLink ? (

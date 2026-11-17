@@ -62,7 +62,7 @@ Capabilitytokens bevatten 256 bits willekeur en worden alleen als SHA-256-hash o
 
 ## Bewuste beperkingen
 
-- Handmatig verwijderen wist een verlanglijstje of trekking met alle bijbehorende tokens en sessies direct. Automatische bewaartermijnen en het back-upbeleid zijn nog niet definitief vastgesteld; de Supabase-tabellen gebruiken RLS zonder publieke policies.
+- Handmatig verwijderen wist een verlanglijstje of trekking met alle bijbehorende tokens en sessies direct. Een dagelijkse Vercel Cron-job (`/api/cron/cleanup`, `vercel.json`, beveiligd met `CRON_SECRET`) verwijdert verlopen scopes: trekkingen 45 dagen na de datum of 90 dagen na aanmaak zonder datum, verlanglijstjes 12 maanden na de laatste wijziging of reservering, plus verlopen of verweesde tokens en sessies (`src/lib/data-lifecycle.ts`). Het back-upbeleid is nog niet definitief vastgesteld; de Supabase-tabellen gebruiken RLS zonder publieke policies.
 - Geen e-mailprovider; de UI claimt nergens dat e-mail is verzonden.
 - De productiedeployment is publiek bereikbaar, maar blijft voorlopig een besloten proefversie; er zijn nog geen analytics of externe scripts.
 - Geen herstelroute wanneer een beheerlink verloren is.

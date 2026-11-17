@@ -26,6 +26,7 @@ export type Wishlist = {
   occasion?: string;
   date?: string;
   createdAt: string;
+  updatedAt?: string;
   deletedAt?: string;
   wishes: Wish[];
 };

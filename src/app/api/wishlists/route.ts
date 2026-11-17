@@ -28,12 +28,14 @@ export async function POST(request: NextRequest) {
     const wishlistId = id();
     const manage = createAccessToken("wishlist_manage", wishlistId);
     const guest = createAccessToken("wishlist_guest", wishlistId);
+    const createdAt = new Date().toISOString();
     const wishlist = {
       id: wishlistId,
       title: text(body.title, "title", 120),
       occasion: optionalText(body.occasion, "occasion", 80),
       date: optionalDate(body.date),
-      createdAt: new Date().toISOString(),
+      createdAt,
+      updatedAt: createdAt,
       wishes: body.wishes.map(parseWish),
     };
     await transaction((database) => {

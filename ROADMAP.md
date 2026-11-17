@@ -33,6 +33,8 @@ Release order matters:
 
 ### 1. Decide and implement retention
 
+**Status (2026-11-17): implemented** with the periods below. `updatedAt` is set on wishlist create, edit and reservation changes; `GET /api/cron/cleanup` (daily via `vercel.json`, Bearer `CRON_SECRET`) purges expired scopes in one transaction and logs counts only. Still open: document the backup deletion window.
+
 Recommended starting policy:
 
 - Sessions: 7 days, as currently implemented.

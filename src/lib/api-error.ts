@@ -36,6 +36,7 @@ export const apiErrorCodes = [
   "draw_reveal_failed",
   "invalid_draw_wish_count",
   "access_token_missing",
+  "cron_unauthorized",
 ] as const;
 
 export type ApiErrorCode = (typeof apiErrorCodes)[number];

@@ -63,6 +63,7 @@ export async function PATCH(request: NextRequest) {
       wishlist.occasion = optionalText(body.occasion, "occasion", 80);
       wishlist.date = optionalDate(body.date);
       wishlist.wishes = wishes;
+      wishlist.updatedAt = new Date().toISOString();
       return publicWishlist(wishlist);
     });
     return noStoreJson({ wishlist: updated });
