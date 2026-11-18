@@ -6,13 +6,13 @@ import { AmazonAffiliateProvider } from "../src/components/AmazonAffiliate";
 import { WishIdeas } from "../src/components/WishIdeas";
 import { I18nProvider } from "../src/i18n/I18nProvider";
 
-function renderIdeas(locale: "nl" | "en", bol: { siteId: string } | null) {
+function renderIdeas(locale: "nl" | "en", bol: { siteId: string } | null, initialCategory: "under15" | null = "under15") {
   return renderToStaticMarkup(createElement(I18nProvider, {
     locale,
     children: createElement(AmazonAffiliateProvider, {
       config: null,
       bol,
-      children: createElement(WishIdeas, { existingTitles: [], full: false, onAdd: () => {} }),
+      children: createElement(WishIdeas, { existingTitles: [], full: false, onAdd: () => {}, initialCategory }),
     }),
   }));
 }
@@ -33,4 +33,11 @@ test("English visitors see English ideas without Dutch shop products", () => {
   assert.match(english, /A lovely notebook/);
   assert.doesNotMatch(english, /Peter Pauper Bookbound/);
   assert.doesNotMatch(english, /€ 15/);
+});
+
+test("no category is open at first, so no ideas are listed", () => {
+  const html = renderIdeas("nl", { siteId: "1560649" }, null);
+  assert.match(html, /Kies hierboven een categorie/);
+  assert.doesNotMatch(html, /idea-card/);
+  assert.doesNotMatch(html, /type="search"/);
 });

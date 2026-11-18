@@ -215,8 +215,3 @@ export function ideasForLocale(locale: Locale): LocalizedIdeaCategory[] {
     }),
   })).filter((entry) => entry.ideas.length > 0);
 }
-
-/** Folds case, accents, spaces and punctuation so "notitie boek" finds "notitieboek" and "cafe" finds "café". */
-export function normalizeIdeaSearch(value: string, locale: Locale): string {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase(locale).replace(/[^\p{L}\p{N}]+/gu, "");
-}

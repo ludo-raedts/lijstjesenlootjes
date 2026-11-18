@@ -36,7 +36,7 @@ export function WishFields({
   };
   return (
     <div className="wish-editor">
-      <WishIdeas existingTitles={wishes.map((wish) => wish.title)} full={wishes.length >= MAX_EDITOR_WISHES && !lastIsBlank} onAdd={addIdea} />
+      <div className="wish-editor-list">
       {wishes.map((wish, index) => (
         <fieldset className="wish-row" key={wish.id ?? index}>
           <div className="wish-row-head">
@@ -69,6 +69,10 @@ export function WishFields({
         </fieldset>
       ))}
       <button className="button button-secondary" type="button" onClick={() => onChange([...wishes, blankWish()])}>{t("wishes.add")}</button>
+      </div>
+      <aside className="wish-editor-ideas">
+        <WishIdeas existingTitles={wishes.map((wish) => wish.title)} full={wishes.length >= MAX_EDITOR_WISHES && !lastIsBlank} onAdd={addIdea} />
+      </aside>
     </div>
   );
 }
