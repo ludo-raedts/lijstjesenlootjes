@@ -167,6 +167,12 @@ export const enMessages: Record<MessageKey, string> = {
   "wishlist.guest.release": "Make available again",
   "wishlist.guest.reserve": "I will give this gift",
   "wishlist.guest.sessionHint": "You can release your own reservation as long as you use the same browser and cookies.",
+  "promo.title": "Need a list of your own?",
+  "promo.body": "Make your own wishlist for free, or draw names with your group. No account needed.",
+  "promo.button": "Make your own list",
+  "email.promo.wishlistBody": "Does someone else have a birthday or holiday coming up? Make a list of your own in a minute, no account needed.",
+  "email.promo.drawBody": "Want gifts on a wishlist of your own too? Make one for free, no account needed.",
+  "email.promo.button": "Make your own list",
 
   "draw.page.eyebrow": "Draw names online",
   "draw.page.title": "Secret Santa generator",

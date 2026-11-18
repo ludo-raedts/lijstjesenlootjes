@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AmazonDisclosure, WishLink } from "@/components/AmazonAffiliate";
+import { MakeOwnList } from "@/components/MakeOwnList";
 import { formattingLocales } from "@/i18n/config";
 import { api, ensureSession, linkProblemCode } from "@/lib/client";
 import type { ApiErrorCode } from "@/lib/api-error";
@@ -46,6 +47,7 @@ export function WishlistGuest() {
       </ul>
       <AmazonDisclosure />
       <p className="hint">{t("wishlist.guest.sessionHint")}</p>
+      <MakeOwnList />
     </section>
   );
 }

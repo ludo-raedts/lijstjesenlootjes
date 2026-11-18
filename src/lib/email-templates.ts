@@ -1,5 +1,6 @@
 import type { Translator } from "@/i18n/messages";
 import type { Locale } from "@/i18n/config";
+import { pathForLocale } from "@/lib/paths";
 
 export type RenderedEmail = { subject: string; text: string; html: string };
 
@@ -38,6 +39,7 @@ type LayoutInput = {
   blocks: Block[];
   sectionHeading?: { beforeIndex: number; text: string };
   notice?: string;
+  promo?: { body: string; button: string; url: string };
   site: string;
 };
 
@@ -47,7 +49,7 @@ function button(block: Block, linkFallback: string) {
 }
 
 function layout(input: LayoutInput): RenderedEmail {
-  const { t, locale, heading, intro, preheader, blocks, notice, site, sectionHeading } = input;
+  const { t, locale, heading, intro, preheader, blocks, notice, site, sectionHeading, promo } = input;
   const footer = t("email.footer", { site });
   const fallback = t("email.linkFallback");
   const brand = t("email.brand");
@@ -64,6 +66,7 @@ function layout(input: LayoutInput): RenderedEmail {
       block.help,
     ]),
     ...(notice ? ["", notice] : []),
+    ...(promo ? ["", promo.body, promo.url] : []),
     "",
     "--",
     footer,
@@ -82,9 +85,21 @@ function layout(input: LayoutInput): RenderedEmail {
     ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 0"><tr><td style="background:#FBE7DD;border-left:4px solid ${C.brick};border-radius:6px;padding:14px 16px;font-family:${SANS};font-size:14px;line-height:1.5;color:${C.ink}">${escapeHtml(notice)}</td></tr></table>`
     : "";
 
-  const html = `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(heading)}</title></head><body style="margin:0;padding:0;background:${C.paper}"><div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${C.paper}">${escapeHtml(preheader)}</div><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="${C.paper}" style="background:${C.paper}"><tr><td align="center" style="padding:24px 12px"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px"><tr><td style="background:${C.forest};border-radius:12px 12px 0 0;padding:20px 28px"><p style="margin:0;font-family:${SERIF};font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:0.2px">${escapeHtml(brand)}</p><div style="height:3px;width:56px;background:${C.brick};margin-top:10px;border-radius:2px"></div></td></tr><tr><td style="background:${C.white};border:1px solid ${C.line};border-top:none;border-radius:0 0 12px 12px;padding:28px"><h1 style="margin:0 0 12px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.ink}">${escapeHtml(heading)}</h1><p style="margin:0 0 24px;font-family:${SANS};font-size:16px;line-height:1.6;color:${C.ink}">${escapeHtml(intro)}</p>${body}${noticeHtml}<hr style="border:none;border-top:1px solid ${C.line};margin:28px 0 14px"><p style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:${C.muted}">${escapeHtml(footer)}</p></td></tr></table></td></tr></table></body></html>`;
+  const promoHtml = promo
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:20px 0 0"><tr><td style="border:1px dashed ${C.line};border-radius:10px;padding:16px 18px"><p style="margin:0 0 12px;font-family:${SANS};font-size:14px;line-height:1.5;color:${C.ink}">${escapeHtml(promo.body)}</p><a href="${escapeHtml(promo.url)}" style="font-family:${SANS};font-size:14px;font-weight:bold;color:${C.forest}">${escapeHtml(promo.button)} &rarr;</a></td></tr></table>`
+    : "";
+
+  const html = `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>${escapeHtml(heading)}</title></head><body style="margin:0;padding:0;background:${C.paper}"><div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${C.paper}">${escapeHtml(preheader)}</div><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="${C.paper}" style="background:${C.paper}"><tr><td align="center" style="padding:24px 12px"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px"><tr><td style="background:${C.forest};border-radius:12px 12px 0 0;padding:20px 28px"><p style="margin:0;font-family:${SERIF};font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:0.2px">${escapeHtml(brand)}</p><div style="height:3px;width:56px;background:${C.brick};margin-top:10px;border-radius:2px"></div></td></tr><tr><td style="background:${C.white};border:1px solid ${C.line};border-top:none;border-radius:0 0 12px 12px;padding:28px"><h1 style="margin:0 0 12px;font-family:${SERIF};font-size:28px;line-height:1.25;color:${C.ink}">${escapeHtml(heading)}</h1><p style="margin:0 0 24px;font-family:${SANS};font-size:16px;line-height:1.6;color:${C.ink}">${escapeHtml(intro)}</p>${body}${noticeHtml}${promoHtml}<hr style="border:none;border-top:1px solid ${C.line};margin:28px 0 14px"><p style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:${C.muted}">${escapeHtml(footer)}</p></td></tr></table></td></tr></table></body></html>`;
 
   return { subject: heading, text, html };
+}
+
+function promoFor(t: Translator, site: string, locale: Locale, kind: "wishlist" | "draw") {
+  return {
+    body: t(kind === "wishlist" ? "email.promo.wishlistBody" : "email.promo.drawBody"),
+    button: t("email.promo.button"),
+    url: `https://${site}${pathForLocale("wishlistCreate", locale)}`,
+  };
 }
 
 export function renderWishlistEmail(
@@ -101,6 +116,7 @@ export function renderWishlistEmail(
       { label: t("email.wishlist.manageLabel"), help: t("email.wishlist.manageHelp"), url: input.manageUrl, button: t("email.wishlist.manageButton"), tone: "primary" },
       { label: t("email.wishlist.guestLabel"), help: t("email.wishlist.guestHelp"), url: input.guestUrl, button: t("email.wishlist.guestButton"), tone: "accent" },
     ],
+    promo: promoFor(t, input.site, input.locale ?? "nl", "wishlist"),
     site: input.site,
   });
 }
@@ -133,6 +149,7 @@ export function renderDrawEmail(
     ],
     sectionHeading: { beforeIndex: 1, text: t("email.draw.participantsHeading") },
     notice: t("email.draw.spoilerWarning"),
+    promo: promoFor(t, input.site, input.locale ?? "nl", "draw"),
     site: input.site,
   });
 }

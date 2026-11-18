@@ -958,3 +958,7 @@ body {
 .seo-content p, .seo-content li, .seo-content summary { color: inherit; }
 .seo-content summary { color: var(--ink); }
 .seo-content { padding-top: 0; border-top: 1px solid var(--line); margin-top: 1rem; }
+
+.make-own-list { margin-top: 1.5rem; padding: 1rem 1.1rem; border: 1px dashed var(--line, #cdbea9); border-radius: 12px; background: var(--paper-deep, #f8f0e3); display: grid; gap: .5rem; justify-items: start; }
+.make-own-list h3 { margin: 0; font-size: 1.05rem; }
+.make-own-list p { margin: 0; color: var(--muted); }

@@ -2,6 +2,7 @@
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { AmazonDisclosure, WishLink } from "@/components/AmazonAffiliate";
+import { MakeOwnList } from "@/components/MakeOwnList";
 import { WishFields, blankWish, type WishDraft } from "@/components/WishFields";
 import { formattingLocales } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -83,6 +84,7 @@ function RecipientWishlist({
       <button className="button button-secondary button-small" disabled={refreshing} type="button" onClick={onRefresh}>
         {refreshing ? t("draw.reveal.refreshing") : t("draw.reveal.refresh")}
       </button>
+      <MakeOwnList />
     </section>
   );
 }

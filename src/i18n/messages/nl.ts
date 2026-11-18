@@ -165,6 +165,12 @@ export const nlMessages = {
   "wishlist.guest.release": "Maak weer beschikbaar",
   "wishlist.guest.reserve": "Ik geef dit cadeau",
   "wishlist.guest.sessionHint": "Je kunt je eigen reservering herstellen zolang je dezelfde browser en cookies gebruikt.",
+  "promo.title": "Zelf ook een lijstje nodig?",
+  "promo.body": "Maak gratis je eigen verlanglijstje of trek lootjes met je groep. Zonder account.",
+  "promo.button": "Maak je eigen lijstje",
+  "email.promo.wishlistBody": "Kent iemand anders ook een verjaardag of feestdag? Zonder account maak je zo je eigen lijstje.",
+  "email.promo.drawBody": "Wil je zelf ook cadeaus op je verlanglijstje? Maak gratis je eigen lijstje, zonder account.",
+  "email.promo.button": "Maak je eigen lijstje",
 
   "draw.page.eyebrow": "Sinterklaas, kerst en kantoor",
   "draw.page.title": "Online lootjes trekken",

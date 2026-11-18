@@ -154,3 +154,10 @@ test("the recovery email lists every list and draw with its own links and no par
   }
   assert.ok(rendered.html.includes("Kerst &lt;b&gt;") && !rendered.html.includes("Kerst <b>"));
 });
+
+test("wishlist and draw emails invite the reader to make their own list on the sender's domain", () => {
+  const wishlist = renderWishlistEmail(createTranslator("en"), { title: "Mine", manageUrl: "https://wishanddraw.com/a#token=1", guestUrl: "https://wishanddraw.com/b#token=2", site: "wishanddraw.com", locale: "en" });
+  assert.ok(wishlist.text.includes("https://wishanddraw.com/wishlist-maker") && wishlist.html.includes("https://wishanddraw.com/wishlist-maker"));
+  const draw = renderDrawEmail(createTranslator("nl"), { group: "Team", adminUrl: "https://lijstjesenlootjes.nl/x#token=1", participants: [{ name: "Sam", url: "https://lijstjesenlootjes.nl/y#token=2" }], site: "lijstjesenlootjes.nl" });
+  assert.ok(draw.text.includes("https://lijstjesenlootjes.nl/verlanglijstje-maken"));
+});
