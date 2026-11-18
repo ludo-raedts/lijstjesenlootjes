@@ -989,4 +989,4 @@ body {
 
 .tool-hero .tool-hero-actions { grid-column: 2; margin-top: 1.5rem; }
 @media (max-width: 860px) { .tool-hero .tool-hero-actions { grid-column: 1; } }
-.language-links > .language-switch-button { display: inline-flex; align-items: center; min-height: 44px; padding: .4rem .6rem; border: 0; border-radius: 6px; background: none; color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: .2em; cursor: pointer; }
+.language-links > .language-switch-button { display: inline-flex; align-items: center; min-height: 44px; padding: .4rem .6rem; border: 0; border-radius: 6px; background: none; color: inherit; font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: .2em; cursor: pointer; }
