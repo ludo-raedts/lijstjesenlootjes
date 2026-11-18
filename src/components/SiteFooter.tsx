@@ -1,14 +1,10 @@
 import Link from "next/link";
-import { disclosureKey } from "@/lib/affiliate/disclosure";
 import { getServerI18n } from "@/i18n/server";
-import { getAmazonLinkConfig, getBolLinkConfig } from "@/lib/affiliate/server";
 import { hasPath } from "@/lib/paths";
 import { getPagePath } from "@/lib/request-site";
 
 export async function SiteFooter() {
   const { locale, t } = await getServerI18n();
-  const amazonLink = await getAmazonLinkConfig(locale);
-  const bolLink = await getBolLinkConfig(locale);
   return (
     <footer className="site-footer">
       <span className="footer-flowers" aria-hidden="true" />
@@ -26,7 +22,6 @@ export async function SiteFooter() {
           <Link href={await getPagePath("recover")}>{t("footer.recover")}</Link>
           <Link href="/privacy">{t("footer.privacy")}</Link>
         </nav>
-        {amazonLink || bolLink ? <p className="hint affiliate-disclosure">{t(disclosureKey(Boolean(amazonLink), Boolean(bolLink)))}</p> : null}
       </div>
     </footer>
   );

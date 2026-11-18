@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { api, copyText } from "@/lib/client";
+import { AmazonDisclosure } from "@/components/AmazonAffiliate";
 import { blankWish, WishDraft, WishFields } from "@/components/WishFields";
 import { CopyButton } from "@/components/CopyButton";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -83,6 +84,7 @@ export function WishlistCreate() {
       <div className="step-heading"><span>2</span><h2>{t("wishlist.create.step2")}</h2></div>
       <p className="muted">{t("wishlist.create.wishesIntro")}</p>
       <WishFields wishes={wishes} onChange={setWishes} />
+      <AmazonDisclosure />
       <div className="field"><label htmlFor="email">{t("email.field.label")} <span className="hint">{t("common.optional")}</span></label><input id="email" type="email" autoComplete="email" maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t("email.field.placeholder")} aria-describedby="email-hint" /><p className="hint" id="email-hint">{t("email.field.wishlistHint")}</p>{email.trim() ? <><label className="checkbox-label"><input type="checkbox" checked={recoverable} onChange={(event) => setRecoverable(event.target.checked)} />{t("recover.optIn.label")}</label><p className="hint">{t("recover.optIn.hint")}</p></> : null}</div>
       {error && <div className="notice error" role="alert">{error}</div>}
       <button className="button" disabled={busy} type="submit">{busy ? t("wishlist.create.submitting") : t("wishlist.create.submit")}</button>

@@ -6,6 +6,7 @@ import type { ApiErrorCode } from "@/lib/api-error";
 import { CopyButton } from "@/components/CopyButton";
 import { LinkProblem } from "@/components/LinkProblem";
 import { MailPanel, type MailStatus } from "@/components/MailPanel";
+import { AmazonDisclosure } from "@/components/AmazonAffiliate";
 import { WishDraft, WishFields } from "@/components/WishFields";
 import { formattingLocales } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -107,6 +108,7 @@ export function WishlistManage() {
         <div className="field"><label htmlFor="manage-date">{t("wishlist.manage.dateLabel")}</label><input id="manage-date" type="date" value={wishlist.date ?? ""} onChange={(event) => setWishlist({ ...wishlist, date: event.target.value })} /></div>
       </div>
       <WishFields wishes={wishlist.wishes} onChange={(wishes) => setWishlist({ ...wishlist, wishes: wishes as Array<WishDraft & { id: string }> })} />
+      <AmazonDisclosure />
       {error && <div className="notice error" role="alert">{error}</div>}
       {message && <div className="notice success" role="status">{message}</div>}
       <div className="button-row"><button className="button" disabled={busy} type="submit">{busy ? t("wishlist.manage.saving") : t("wishlist.manage.save")}</button><button className="button button-danger" disabled={busy} type="button" onClick={async () => {
