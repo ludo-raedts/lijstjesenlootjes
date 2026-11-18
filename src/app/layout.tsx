@@ -18,7 +18,7 @@ import "@fontsource/atkinson-hyperlegible/latin-700.css";
 import "@fontsource/atkinson-hyperlegible/latin-ext-700.css";
 import "./globals.css";
 
-const openGraphLocales = { nl: "nl_NL", en: "en_GB" } as const;
+const openGraphLocales = { nl: "nl_NL", en: "en_GB", de: "de_DE" } as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { locale, t } = await getServerI18n();

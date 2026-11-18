@@ -32,7 +32,9 @@ function linkedWishlistSummary(database: Database, participant: Participant) {
   const linked = participant.linkedWishlistId
     ? database.wishlists.find((item) => item.id === participant.linkedWishlistId && !item.deletedAt)
     : undefined;
-  return linked ? { title: linked.title, wishCount: linked.wishes.length } : undefined;
+  if (linked) return { title: linked.title, wishCount: linked.wishes.length };
+  // A list that was linked and has since been deleted: say so, so the person can pick another.
+  return participant.linkedWishlistId ? { missing: true as const } : undefined;
 }
 
 export async function GET(request: NextRequest) {
@@ -48,6 +50,8 @@ export async function GET(request: NextRequest) {
           giverName: participant.name,
           budget: draw.budget,
           date: draw.date,
+          note: draw.note,
+          redrawnAt: draw.redrawnAt,
           revealedBefore: Boolean(participant.viewedAt),
           ownWishes: publicWishes(participant.wishes),
           linkedWishlist: linkedWishlistSummary(database, participant),
@@ -78,6 +82,7 @@ export async function POST(request: NextRequest) {
         title: draw.title,
         budget: draw.budget,
         date: draw.date,
+        note: draw.note,
         recipientWishes: visibleWishes(database, recipient),
       };
     });

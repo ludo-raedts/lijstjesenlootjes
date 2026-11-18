@@ -1,3 +1,4 @@
+import type { Locale } from "@/i18n/config";
 import type { ThemeSettings } from "@/lib/theme";
 
 export type AccessRole =
@@ -26,6 +27,26 @@ export type EmailStatus = {
   at: string;
 };
 
+/** An extra management link the owner handed out, so it can be listed and revoked without keeping the raw token. */
+export type CoManager = {
+  id: string;
+  label?: string;
+  tokenHash: string;
+  createdAt: string;
+};
+
+/**
+ * One reminder mail to the organizer, set up on purpose. The address is sealed with a server key, used once, and
+ * removed again after sending (or when the date has passed, or the draw is deleted).
+ */
+export type DrawReminder = {
+  emailSealed: string;
+  /** Day (YYYY-MM-DD, Europe/Amsterdam) on or after which the reminder is sent. */
+  sendOn: string;
+  locale: Locale;
+  host?: string;
+};
+
 export type Wishlist = {
   id: string;
   title: string;
@@ -38,6 +59,7 @@ export type Wishlist = {
   /** Keyed hash of the organizer's address, stored only when they opted in to link recovery. */
   recoveryHash?: string;
   emailStatus?: EmailStatus;
+  comanagers?: CoManager[];
 };
 
 export type Participant = {
@@ -64,6 +86,11 @@ export type Draw = {
   assignments: Array<{ giverId: string; recipientId: string }>;
   recoveryHash?: string;
   emailStatus?: EmailStatus;
+  /** Free text from the organizer for everyone in the draw (house rules, where to meet). */
+  note?: string;
+  /** Set when the organizer redrew after changing participants; participants see it. */
+  redrawnAt?: string;
+  reminder?: DrawReminder;
 };
 
 export type AccessToken = {

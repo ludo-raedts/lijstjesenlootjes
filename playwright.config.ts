@@ -26,6 +26,8 @@ const serverEnv = {
   EMAIL_PROVIDER_API_KEY: "re_e2e_not_real",
   EMAIL_FROM: "E2E <noreply@example.test>",
   EMAIL_API_URL: `${MOCK_URL}/emails`,
+  // 32 throwaway bytes (base64) that seal the reminder address in the tests.
+  REMINDER_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
 };
 
 const hostRules = "MAP lijstjesenlootjes.nl 127.0.0.1, MAP wishanddraw.com 127.0.0.1";

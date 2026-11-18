@@ -7,7 +7,7 @@ import { SITE_DOMAINS, findSiteDomain } from "@/lib/domains";
 import { alternatesFor, hasPath, pathForLocale, publicPages, type PageKey } from "@/lib/paths";
 import type { Locale } from "@/i18n/config";
 
-const openGraphLocales = { nl: "nl_NL", en: "en_GB" } as const;
+const openGraphLocales = { nl: "nl_NL", en: "en_GB", de: "de_DE" } as const;
 
 /**
  * Metadata for a public page. Next.js replaces (not merges) the openGraph object of the layout, so every page
@@ -28,8 +28,10 @@ export async function pageAlternates(key: PageKey): Promise<NonNullable<Metadata
  * on previews and local hosts the switcher keeps using the language cookie.
  */
 export async function getLanguageLinks(): Promise<Record<string, Record<Locale, string>> | null> {
-  if (!findSiteDomain(await getRequestHost())) return null;
-  const locale = (await getServerI18n()).locale;
+  const domain = findSiteDomain(await getRequestHost());
+  if (!domain) return null;
+  // Paths follow the domain, not the interface language (German has no domain of its own).
+  const locale = domain.locale;
   const links: Record<string, Record<Locale, string>> = {};
   for (const page of publicPages().filter((candidate) => hasPath(candidate.key, locale))) {
     const urls = Object.fromEntries(

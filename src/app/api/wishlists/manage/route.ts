@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
 import { mintWishlistLinks } from "@/lib/access-links";
+import { accessExpiryIso } from "@/lib/data-lifecycle";
+import { createAccessToken } from "@/lib/security";
 import { extendWishlistAccess, wishlistExpiresAt } from "@/lib/data-lifecycle";
 import { deliverEmailAfterResponse, queuedStatus } from "@/lib/email-delivery";
 import { emailConfigured } from "@/lib/email";
@@ -14,6 +16,8 @@ import { read, transaction } from "@/lib/store";
 import { optionalDate, optionalEmail, optionalText, optionalUrl, text } from "@/lib/validation";
 import type { Wishlist } from "@/lib/types";
 
+const MAX_COMANAGERS = 5;
+
 function publicWishlist(wishlist: Wishlist) {
   const expiresAt = wishlistExpiresAt(wishlist);
   return {
@@ -24,6 +28,7 @@ function publicWishlist(wishlist: Wishlist) {
     expiresAt: expiresAt === undefined ? undefined : new Date(expiresAt).toISOString(),
     emailStatus: wishlist.emailStatus,
     recoverable: Boolean(wishlist.recoveryHash),
+    managers: (wishlist.comanagers ?? []).map(({ id: managerId, label, createdAt }) => ({ id: managerId, label, createdAt })),
     wishes: wishlist.wishes.map(({ reservation: _reservation, ...wish }) => wish),
   };
 }
@@ -47,6 +52,37 @@ export async function POST(request: NextRequest) {
     assertSameOrigin(request);
     const session = await requireSession(request, "wishlist_manage");
     const body = await readJson(request);
+    if (body.action === "add_manager") {
+      const label = optionalText(body.label, "name", 60);
+      const created = await transaction((database) => {
+        const wishlist = database.wishlists.find((item) => item.id === session.scopeId && !item.deletedAt);
+        if (!wishlist) throw new HttpError(410, "wishlist_not_found");
+        const managers = wishlist.comanagers ?? [];
+        if (managers.length >= MAX_COMANAGERS) throw new HttpError(400, "too_many_managers", { max: MAX_COMANAGERS });
+        const token = createAccessToken("wishlist_manage", wishlist.id, accessExpiryIso(wishlistExpiresAt(wishlist)));
+        database.accessTokens.push(token.record);
+        wishlist.comanagers = [...managers, { id: id(), label, tokenHash: token.record.hash, createdAt: new Date().toISOString() }];
+        return { raw: token.raw, managers: publicWishlist(wishlist).managers };
+      });
+      return noStoreJson({ manageUrl: personalLink(request, "wishlistManage", created.raw), managers: created.managers }, { status: 201 });
+    }
+
+    if (body.action === "revoke_manager") {
+      if (typeof body.managerId !== "string") throw new HttpError(400, "manager_not_found");
+      const managers = await transaction((database) => {
+        const wishlist = database.wishlists.find((item) => item.id === session.scopeId && !item.deletedAt);
+        if (!wishlist) throw new HttpError(410, "wishlist_not_found");
+        const entry = (wishlist.comanagers ?? []).find((item) => item.id === body.managerId);
+        if (!entry) throw new HttpError(404, "manager_not_found");
+        const now = new Date().toISOString();
+        for (const token of database.accessTokens) if (token.hash === entry.tokenHash) token.revokedAt = now;
+        database.sessions = database.sessions.filter((item) => item.accessHash !== entry.tokenHash);
+        wishlist.comanagers = (wishlist.comanagers ?? []).filter((item) => item.id !== entry.id);
+        return publicWishlist(wishlist).managers;
+      });
+      return noStoreJson({ managers });
+    }
+
     if (body.action !== "email_link") throw new HttpError(400, "unknown_action");
     await limit(request, "email-send", 5);
     if (!emailConfigured()) throw new HttpError(503, "email_not_configured");

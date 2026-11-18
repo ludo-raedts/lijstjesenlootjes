@@ -184,3 +184,22 @@ export function renderRecoveryEmail(
     site: input.site,
   });
 }
+
+/** The one reminder the organizer asked for: who has not looked yet, with a fresh management link. */
+export function renderReminderEmail(
+  t: Translator,
+  input: { group: string; date: string; pending: number; total: number; adminUrl: string; site: string; locale: Locale },
+): RenderedEmail {
+  return layout({
+    t,
+    locale: input.locale,
+    heading: t("email.reminder.subject", { group: input.group }),
+    intro: t("email.reminder.intro", { date: input.date, pending: input.pending, total: input.total }),
+    preheader: t("email.reminder.preheader", { pending: input.pending }),
+    blocks: [
+      { label: t("email.reminder.adminLabel"), help: t("email.reminder.adminHelp"), url: input.adminUrl, button: t("email.reminder.adminButton"), tone: "primary" },
+    ],
+    notice: t("email.reminder.notice"),
+    site: input.site,
+  });
+}

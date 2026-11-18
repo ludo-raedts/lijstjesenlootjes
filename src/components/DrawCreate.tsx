@@ -20,6 +20,7 @@ export function DrawCreate() {
   const [title, setTitle] = useState("");
   const [budget, setBudget] = useState("");
   const [date, setDate] = useState("");
+  const [note, setNote] = useState("");
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState("");
   const [recoverable, setRecoverable] = useState(false);
@@ -53,7 +54,7 @@ export function DrawCreate() {
     if (!requestId.current) requestId.current = crypto.randomUUID();
     setError(""); setBusy(true);
     try {
-      const created = await api<DrawResult>("/api/draws", { method: "POST", body: JSON.stringify({ requestId: requestId.current, organizerName, title, budget, date, participants, exclusions, email, recoverable }) });
+      const created = await api<DrawResult>("/api/draws", { method: "POST", body: JSON.stringify({ requestId: requestId.current, organizerName, title, budget, date, participants, exclusions, note, email, recoverable }) });
       setSentTo(email.trim());
       setResult(created);
     } catch (submitError) { setError((submitError as Error).message); }
@@ -90,6 +91,8 @@ export function DrawCreate() {
         <div className="field"><label htmlFor="budget">{t("draw.create.budgetLabel")} <span className="hint">{t("common.optional")}</span></label><input id="budget" maxLength={40} value={budget} onChange={(event) => setBudget(event.target.value)} placeholder={t("draw.create.budgetPlaceholder")} /></div>
       </div>
       <div className="field"><label htmlFor="draw-date">{t("draw.create.dateLabel")} <span className="hint">{t("common.optional")}</span></label><input id="draw-date" type="date" value={date} onChange={(event) => setDate(event.target.value)} /></div>
+
+      <div className="field"><label htmlFor="draw-note">{t("draw.create.noteLabel")} <span className="hint">{t("common.optional")}</span></label><textarea id="draw-note" maxLength={500} rows={2} value={note} onChange={(event) => setNote(event.target.value)} placeholder={t("draw.create.notePlaceholder")} /></div>
 
       <div className="field"><label htmlFor="email">{t("email.field.label")} <span className="hint">{t("common.optional")}</span></label><input id="email" type="email" autoComplete="email" maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t("email.field.placeholder")} aria-describedby="email-hint" /><p className="hint" id="email-hint">{t("email.field.drawHint")}</p>{email.trim() ? <><label className="checkbox-label"><input type="checkbox" checked={recoverable} onChange={(event) => setRecoverable(event.target.checked)} />{t("recover.optIn.label")}</label><p className="hint">{t("recover.optIn.hint")}</p></> : null}</div>
 

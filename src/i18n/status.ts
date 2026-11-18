@@ -11,6 +11,10 @@ const participantLinkStatus: Record<Locale, Record<ParticipantLinkStatus, string
     viewed: "draw viewed",
     available: "link available",
   },
+  de: {
+    viewed: "Los angesehen",
+    available: "Link verfügbar",
+  },
 };
 
 export function translateParticipantLinkStatus(

@@ -21,7 +21,7 @@ export default async function SinterklaasDrawPage() {
         <span className="eyebrow">{t("sinterklaas.eyebrow")}</span>
         <h1>{t("sinterklaas.title")}</h1>
         <p className="lead">{t("sinterklaas.lead")}</p>
-        <div className="hero-actions" style={{ gridColumn: 2, marginTop: "1.5rem" }}>
+        <div className="hero-actions tool-hero-actions">
           <Link className="button button-brick" href={await getPagePath("drawCreate")}>{t("sinterklaas.cta")}</Link>
           <Link className="button" href={await getPagePath("wishlistCreate")}>{t("sinterklaas.ctaWishlist")}</Link>
         </div>

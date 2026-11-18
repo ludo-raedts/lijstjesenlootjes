@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
       title: optionalText(body.title, "groupName", 100),
       organizerName: text(body.organizerName, "organizerName", 80),
       budget: optionalText(body.budget, "budget", 40),
+      note: optionalText(body.note, "note", 500),
       date,
       createdAt,
       status: "complete",

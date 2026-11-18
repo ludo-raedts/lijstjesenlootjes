@@ -41,3 +41,25 @@ test("Dutch and English catalogs have identical keys and placeholders", async ()
     assert.deepEqual(placeholders(enMessages[key]), placeholders(nlMessages[key]), key);
   }
 });
+
+test("German only uses real keys, keeps every placeholder and falls back to English for the rest", async () => {
+  const { deMessages } = await import("../src/i18n/messages/de");
+  const { enMessages } = await import("../src/i18n/messages/en");
+  const { translate } = await import("../src/i18n/messages");
+  const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).sort();
+  for (const [key, value] of Object.entries(deMessages)) {
+    assert.ok(key in enMessages, `${key} is not a known message key`);
+    assert.deepEqual(placeholders(value as string), placeholders(enMessages[key as keyof typeof enMessages]), key);
+  }
+  // The interface a visitor touches must be translated; pages without German copy fall back to English.
+  assert.equal(translate("de", "nav.draw"), "Wichteln");
+  assert.equal(translate("de", "admin.page.title"), enMessages["admin.page.title"]);
+  assert.ok(Object.keys(deMessages).length > Object.keys(enMessages).length * 0.55);
+});
+
+test("German formats dates and API errors in German", async () => {
+  const { formattingLocales } = await import("../src/i18n/config");
+  assert.equal(formattingLocales.de, "de-DE");
+  assert.match(translateApiError("rate_limited", {}, "de"), /Minute/);
+  assert.equal(translateApiError("field_required", { field: "groupName" }, "de"), "Gruppenname fehlt.");
+});

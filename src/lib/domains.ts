@@ -1,8 +1,8 @@
-import type { Locale } from "../i18n/config";
+import type { SiteLocale } from "../i18n/config";
 
 export interface SiteDomain {
   host: string;
-  locale: Locale;
+  locale: SiteLocale;
 }
 
 /** Public domains served by this app. The first entry is the primary (x-default) domain. */
@@ -21,7 +21,7 @@ export function findSiteDomain(rawHost: string | null | undefined): SiteDomain |
   return SITE_DOMAINS.find((domain) => domain.host === host) ?? null;
 }
 
-export function localeForHost(rawHost: string | null | undefined): Locale | null {
+export function localeForHost(rawHost: string | null | undefined): SiteLocale | null {
   return findSiteDomain(rawHost)?.locale ?? null;
 }
 

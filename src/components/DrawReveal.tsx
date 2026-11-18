@@ -25,7 +25,9 @@ type NeutralDraw = {
   date?: string;
   revealedBefore: boolean;
   ownWishes: DrawWish[];
-  linkedWishlist?: { title: string; wishCount: number };
+  linkedWishlist?: { title: string; wishCount: number } | { missing: true };
+  note?: string;
+  redrawnAt?: string;
 };
 
 type Reveal = {
@@ -33,6 +35,7 @@ type Reveal = {
   title?: string;
   budget?: string;
   date?: string;
+  note?: string;
   recipientWishes: DrawWish[];
 };
 
@@ -188,6 +191,8 @@ export function DrawReveal() {
         <div className="reveal-intro">
           <p>{t("draw.reveal.intro", { group: draw.title || t("draw.reveal.defaultGroup") })}</p>
           {draw.revealedBefore ? <p className="hint">{t("draw.reveal.viewedBefore")}</p> : null}
+          {draw.redrawnAt ? <div className="notice warning" role="status">{t("draw.reveal.redrawn", { date: new Intl.DateTimeFormat(formattingLocales[locale], { dateStyle: "long" }).format(new Date(draw.redrawnAt)) })}</div> : null}
+          {draw.note ? <div className="notice"><strong>{t("draw.reveal.noteTitle")}</strong><span className="draw-note">{draw.note}</span></div> : null}
           <button className="button" disabled={revealBusy} type="button" onClick={revealDraw}>
             {revealBusy ? t("draw.reveal.opening") : t("draw.reveal.open")}
           </button>
@@ -228,7 +233,12 @@ export function DrawReveal() {
               <h3 id="link-wishlist-title">{t("draw.reveal.linkTitle")}</h3>
               <p>{t("draw.reveal.linkBody")}</p>
             </div>
-            {draw.linkedWishlist ? (
+            {draw.linkedWishlist && "missing" in draw.linkedWishlist ? (
+              <div className="notice warning" role="status">
+                <span>{t("draw.reveal.linkedMissing")}</span>
+                <button className="button button-secondary button-small" disabled={linkBusy} type="button" onClick={() => void changeLink("unlink_wishlist")}>{t("draw.reveal.unlink")}</button>
+              </div>
+            ) : draw.linkedWishlist ? (
               <div className="linked-wishlist">
                 <p role="status"><strong>{t("draw.reveal.linked", { title: draw.linkedWishlist.title })}</strong></p>
                 <button className="button button-secondary button-small" disabled={linkBusy} type="button" onClick={() => void changeLink("unlink_wishlist")}>

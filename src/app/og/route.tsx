@@ -16,6 +16,10 @@ const HEADLINE_KEYS: Partial<Record<PageKey, MessageKey>> = {
   wheel: "meta.wheel.title",
   help: "meta.help.title",
   privacy: "meta.privacy.title",
+  sinterklaasDraw: "meta.sinterklaasDraw.title",
+  officeDraw: "meta.office.title",
+  christmasDraw: "meta.christmas.title",
+  birthdayWishlist: "meta.birthday.title",
 };
 
 async function loadAsset(url: URL): Promise<ArrayBuffer> {

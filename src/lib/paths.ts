@@ -1,4 +1,4 @@
-import type { Locale } from "../i18n/config";
+import { siteLocaleFor, type Locale, type SiteLocale } from "../i18n/config";
 import { SITE_DOMAINS, findSiteDomain, type SiteDomain } from "./domains";
 
 /**
@@ -19,7 +19,7 @@ export interface PageDefinition {
   /** Required when a locale has no path: where links to this page and its Dutch path lead on that domain. */
   fallback?: PageKey;
   /** Former paths per locale that permanently redirect (308) to the canonical path on that locale's domain. */
-  legacyPaths?: Partial<Record<Locale, readonly string[]>>;
+  legacyPaths?: Partial<Record<SiteLocale, readonly string[]>>;
 }
 
 export type PageKey =
@@ -28,6 +28,9 @@ export type PageKey =
   | "drawCreate"
   | "wheel"
   | "sinterklaasDraw"
+  | "officeDraw"
+  | "christmasDraw"
+  | "birthdayWishlist"
   | "help"
   | "privacy"
   | "wishlistManage"
@@ -42,6 +45,9 @@ export const PAGES: readonly PageDefinition[] = [
   { key: "drawCreate", visibility: "public", paths: { nl: "/lootjes-trekken", en: "/secret-santa-generator" }, legacyPaths: { en: ["/draw-names"] } },
   { key: "wheel", visibility: "public", paths: { nl: "/rad-draaien", en: "/name-wheel" }, legacyPaths: { en: ["/spin-the-wheel"] } },
   { key: "sinterklaasDraw", visibility: "public", paths: { nl: "/sinterklaas-lootjes-trekken" }, fallback: "drawCreate" },
+  { key: "officeDraw", visibility: "public", paths: { nl: "/lootjes-trekken-op-kantoor", en: "/office-secret-santa" } },
+  { key: "christmasDraw", visibility: "public", paths: { nl: "/kerst-lootjes-trekken" }, fallback: "drawCreate" },
+  { key: "birthdayWishlist", visibility: "public", paths: { nl: "/verlanglijstje-voor-verjaardag", en: "/birthday-wishlist" } },
   { key: "help", visibility: "public", paths: { nl: "/help", en: "/help" } },
   { key: "privacy", visibility: "public", paths: { nl: "/privacy", en: "/privacy" } },
   { key: "wishlistManage", visibility: "private", paths: { nl: "/verlanglijstje/beheren", en: "/wishlist/manage" } },
@@ -52,7 +58,7 @@ export const PAGES: readonly PageDefinition[] = [
   { key: "recover", visibility: "private", paths: { nl: "/beheerlink-kwijt", en: "/recover-link" } },
 ];
 
-const DEFAULT_LOCALE: Locale = "nl";
+const DEFAULT_LOCALE: SiteLocale = "nl";
 
 export function getPage(key: PageKey): PageDefinition {
   const page = PAGES.find((candidate) => candidate.key === key);
@@ -67,13 +73,13 @@ export function internalPath(key: PageKey): string {
 
 /** Whether the page exists on the locale's domain. */
 export function hasPath(key: PageKey, locale: Locale): boolean {
-  return getPage(key).paths[locale] !== undefined;
+  return getPage(key).paths[siteLocaleFor(locale)] !== undefined;
 }
 
 /** The page's path on the locale's domain; for a page that domain lacks, the path of its fallback page. */
 export function pathForLocale(key: PageKey, locale: Locale): string {
   const page = getPage(key);
-  const path = page.paths[locale];
+  const path = page.paths[siteLocaleFor(locale)];
   if (path !== undefined) return path;
   if (!page.fallback) throw new Error(`Page ${key} has no ${locale} path and no fallback`);
   return pathForLocale(page.fallback, locale);

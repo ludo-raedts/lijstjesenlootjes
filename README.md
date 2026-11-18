@@ -32,6 +32,16 @@ npm run test:e2e
 
 Vercel deployt een push naar `main` zelf, los van deze workflow. Om CI een echte releasepoort te maken moet er één keer, in GitHub, een branch-protectionregel voor `main` worden gezet die de checks `Typecheck, unit tests and build` en `End-to-end (Playwright, nl + en)` verplicht stelt en werken via pull requests afdwingt (Settings → Branches). Dat is een repository-instelling en staat dus niet in de code.
 
+## Beheer van een trekking en lijstje
+
+- **Deelnemers aanpassen:** de organisator kan namen toevoegen of weghalen of gewoon opnieuw trekken (`POST /api/draws/admin`, actie `redraw`, `src/lib/redraw.ts`). Er wordt voor iedereen opnieuw getrokken met de bestaande uitsluitingen (uitsluitingen van vertrokken mensen vervallen); bestaande links blijven werken, links van weggehaalden worden ingetrokken, iedereen krijgt `viewedAt` gewist en `redrawnAt` verschijnt als melding. Minimaal 3 en maximaal 50 deelnemers.
+- **Notitie:** een vrij tekstveld (max 500 tekens) bij de trekking, zichtbaar voor alle deelnemers; instelbaar bij het maken en in het beheer.
+- **Herinnering (opt-in):** één mail aan de organisator, drie dagen voor de datum (niet eerder dan vandaag), en alleen als dan nog niet iedereen zijn lootje heeft geopend. Het adres wordt met AES-256-GCM versleuteld (`src/lib/secret-box.ts`, sleutel `REMINDER_ENCRYPTION_KEY`, 32 bytes base64) en direct na het versturen gewist; ook een verlopen of onleesbare herinnering wordt gewist. De dagelijkse cron `/api/cron/reminders` (`vercel.json`, zelfde `CRON_SECRET`) verstuurt de mail met een nieuwe beheerlink. Zonder sleutel of e-mailconfiguratie is de optie verborgen.
+- **Medebeheerders:** de eigenaar van een lijstje kan tot 5 extra beheerlinks maken (met optioneel een naam), die te zien zijn en altijd ingetrokken kunnen worden. De ruwe link wordt eenmalig getoond.
+- **Gekoppeld lijstje verwijderd:** de deelnemer krijgt een melding en kan het ontkoppelen of een ander lijstje koppelen.
+- **Duits:** een extra interfacetaal via de taalschakelaar (`DE`, cookie), zonder eigen domein en dus niet geïndexeerd; zie [LOCALIZATION.md](LOCALIZATION.md) voor wat vertaald is en de terugval op Engels.
+- **Landingspagina’s:** `/lootjes-trekken-op-kantoor` (`/office-secret-santa`), `/kerst-lootjes-trekken` (alleen NL; EN valt terug op de generator) en `/verlanglijstje-voor-verjaardag` (`/birthday-wishlist`), allemaal via `AudiencePage` en de catalogus, met sitemap en hreflang uit `paths.ts`.
+
 ## Seasonal themes and administration
 
 The homepage appearance is resolved server-side from the active locale and the Europe/Amsterdam calendar. The built-in schedule uses Sinterklaas for Dutch visitors from 15 November through 5 December, Christmas for Dutch visitors from 6 through 26 December, and Christmas for English visitors from 15 November through 26 December. Outside those windows, winter, spring, summer, and autumn follow the configured month/day boundaries. Neutral is available as a manual theme but is not selected by the default automatic calendar.

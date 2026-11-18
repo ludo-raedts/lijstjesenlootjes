@@ -14,6 +14,8 @@ export default async function HelpPage() {
     ["help.manageQuestion", "help.manageAnswer"],
     ["help.lostQuestion", "help.lostAnswer"],
     ["help.expiredQuestion", "help.expiredAnswer"],
+    ["help.changeQuestion", "help.changeAnswer"],
+    ["help.reminderQuestion", "help.reminderAnswer"],
     ["help.assignmentsQuestion", "help.assignmentsAnswer"],
     ["help.ownWishlistQuestion", "help.ownWishlistAnswer"],
     ["help.reservedQuestion", "help.reservedAnswer"],

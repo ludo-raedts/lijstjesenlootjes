@@ -89,11 +89,13 @@ Done:
 - Progress per draw and per-participant reminder messages (no link in a reminder, because personal links cannot be retrieved).
 - A participant can link a standalone wishlist; the giver sees its live wishes, never its reservations.
 
+Also done (second sprint): an opt-in one-off reminder to the organizer (address sealed, wiped after sending), adding and removing participants with a fresh draw, a group note, co-managers for a wishlist with revocable links, a notice when a linked wishlist was deleted, landing pages for the office, Christmas and birthdays, and a German interface (cookie-selectable, partial catalog with English fallback; no German domain yet).
+
 Still open:
 
 - Bounce and complaint handling (Resend webhook) and an email counter in the usage dashboard.
 - SPF, DKIM and DMARC for both sending domains (DNS, outside the code).
-- Optional automatic reminders only after delivery monitoring and unsubscribe handling exist.
+- Reminders to participants (not only the organizer) need participant addresses and are deliberately not built.
 - Export/share options that never put access tokens in analytics or referrer headers.
 - Consider accounts only if link-based ownership proves to be a support problem.
 

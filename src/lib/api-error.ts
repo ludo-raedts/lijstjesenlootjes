@@ -45,6 +45,9 @@ export const apiErrorCodes = [
   "too_many_exclusions",
   "wishlist_link_invalid",
   "email_not_configured",
+  "reminder_needs_future_date",
+  "too_many_managers",
+  "manager_not_found",
 ] as const;
 
 export type ApiErrorCode = (typeof apiErrorCodes)[number];
