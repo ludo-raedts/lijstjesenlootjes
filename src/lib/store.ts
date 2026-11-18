@@ -110,6 +110,8 @@ export async function checkDatabaseHealth() {
 
 /** Best-effort anonymous counter. A failure here must never break the user's action. */
 export async function recordUsage(event: UsageEvent, amount = 1) {
+  // Only real production traffic counts: local dev servers and preview deployments must not skew the figures.
+  if (process.env.VERCEL_ENV !== "production") return;
   try {
     const parameters = amount === 1 ? { p_event: event } : { p_event: event, p_amount: amount };
     const { error } = await getClient().rpc("record_usage_event", parameters);
