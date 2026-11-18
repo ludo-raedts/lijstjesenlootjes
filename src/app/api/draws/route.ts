@@ -97,6 +97,7 @@ export async function POST(request: NextRequest) {
       database.accessTokens.push(admin.record, ...participantAccess.map(({ token }) => token.record));
     });
     await recordUsage("draw_created");
+    await recordUsage("participant_links_issued", participantAccess.length);
     const adminUrl = personalLink(request, "drawAdmin", admin.raw);
     const participantLinks = participantAccess.map(({ participant, token }) => ({
       participantId: participant.id,

@@ -3,8 +3,10 @@ import type { Database } from "@/lib/types";
 
 export const usageEvents = [
   "wishlist_created",
-  "draw_created",
+  "shared_wishlist_opened",
   "reservation_made",
+  "draw_created",
+  "participant_links_issued",
   "personal_link_opened",
   "admin_login",
 ] as const;
@@ -50,6 +52,21 @@ export function totalUsage(series: UsageDay[]): Record<UsageEvent, number> {
     for (const event of usageEvents) totals[event] += counts[event];
   }
   return totals;
+}
+
+/** A calendar-day window from the prior year, used for a like-for-like seasonal comparison. */
+export function previousYearWindow(series: UsageDay[], days: number, now: Date = new Date()): UsageDay[] {
+  const currentEnd = amsterdamDay(now);
+  const currentStart = amsterdamDay(new Date(now.getTime() - (days - 1) * 86_400_000));
+  const previousYear = (day: string) => {
+    const [year, month, date] = day.split("-").map(Number);
+    const candidate = new Date(Date.UTC(year - 1, month - 1, date));
+    if (candidate.getUTCMonth() !== month - 1) candidate.setUTCDate(0);
+    return candidate.toISOString().slice(0, 10);
+  };
+  const start = previousYear(currentStart);
+  const end = previousYear(currentEnd);
+  return series.filter(({ day }) => day >= start && day <= end);
 }
 
 export type StockSummary = {

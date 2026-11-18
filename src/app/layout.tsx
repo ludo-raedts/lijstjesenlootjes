@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AmazonAffiliateProvider } from "@/components/AmazonAffiliate";
+import { PublicTrafficMeasurement } from "@/components/PublicTrafficMeasurement";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { I18nProvider } from "@/i18n/I18nProvider";
@@ -7,7 +8,7 @@ import { getServerI18n } from "@/i18n/server";
 import { getAmazonLinkConfig, getBolLinkConfig } from "@/lib/affiliate/server";
 import { getRequestSiteUrl } from "@/lib/request-site";
 import { socialImages } from "@/lib/seo";
-import { isVercelPreview } from "@/lib/site-url";
+import { isVercelPreview, isVercelProduction } from "@/lib/site-url";
 import { getActiveAppearance } from "@/lib/theme-store";
 import "@fontsource-variable/fraunces/wght.css";
 import "@fontsource-variable/fraunces/wght-italic.css";
@@ -65,6 +66,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <SiteFooter />
           </AmazonAffiliateProvider>
         </I18nProvider>
+        {isVercelProduction() ? <PublicTrafficMeasurement /> : null}
       </body>
     </html>
   );

@@ -40,6 +40,7 @@ export const apiErrorCodes = [
   "access_token_missing",
   "cron_unauthorized",
   "invalid_json",
+  "invalid_traffic_measurement",
   "payload_too_large",
   "too_many_exclusions",
   "wishlist_link_invalid",

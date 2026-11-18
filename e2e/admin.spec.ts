@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { E2E_ADMIN_PASSWORD } from "../playwright.config";
-import { createDrawViaApi, createWishlistViaApi, expectNoAxeViolations, i18n, resetBackend } from "./helpers";
+import { createDrawViaApi, createWishlistViaApi, expectNoAxeViolations, i18n, mockTraffic, pagePath, rebase, resetBackend } from "./helpers";
 
 test.beforeEach(resetBackend);
 
@@ -88,9 +88,25 @@ test("the usage dashboard needs a login and shows anonymous counts only", async 
   // Generate some synthetic activity in separate visitor contexts.
   const visitor = await browser.newContext();
   const visitorPage = await visitor.newPage();
-  await visitorPage.goto(`${baseURL}/`);
+  const firstMeasurement = visitorPage.waitForRequest((request) =>
+    request.method() === "POST" && new URL(request.url()).pathname === "/api/traffic",
+  );
+  await visitorPage.goto(`${baseURL}/?campaign=not-stored#not-stored`);
+  const measurementRequest = await firstMeasurement;
+  expect(measurementRequest.headers().referer ?? "").toBe("");
+  expect(JSON.parse(measurementRequest.postData() ?? "{}")).toEqual({ page: "home", visit: true });
+  await visitorPage.goto(`${baseURL}${pagePath(testInfo, "wishlistCreate")}`);
   const created = await createWishlistViaApi(visitorPage, ["Private wish"]);
   await createDrawViaApi(visitorPage);
+  await expect.poll(async () => {
+    const traffic = await mockTraffic();
+    return {
+      pageViews: traffic.reduce((total, row) => total + row.page_view_count, 0),
+      visits: traffic.reduce((total, row) => total + row.visit_count, 0),
+    };
+  }).toEqual({ pageViews: 2, visits: 1 });
+  await visitorPage.goto(rebase(created.guestUrl, baseURL));
+  await expect(visitorPage.getByRole("heading", { name: "Synthetic list" })).toBeVisible();
   await visitor.close();
   expect(created.guestUrl).toContain("#token=");
 
@@ -100,9 +116,16 @@ test("the usage dashboard needs a login and shows anonymous counts only", async 
   await page.getByRole("link", { name: t("admin.nav.usage") }).click();
   await expect(page).toHaveURL(/\/admin\/usage$/);
 
-  await expect(page.locator('[data-event="wishlist_created"]')).toHaveText("1");
-  await expect(page.locator('[data-event="draw_created"]')).toHaveText("1");
-  await expect(page.locator('[data-event="admin_login"]')).toHaveText("1");
+  const last30Days = page.locator('[data-period="30"]');
+  await expect(last30Days.locator('[data-event="wishlist_created"]')).toHaveText("1");
+  await expect(last30Days.locator('[data-event="shared_wishlist_opened"]')).toHaveText("1");
+  await expect(last30Days.locator('[data-event="draw_created"]')).toHaveText("1");
+  await expect(last30Days.locator('[data-event="participant_links_issued"]')).toHaveText("4");
+  await expect(last30Days.locator('[data-event="admin_login"]')).toHaveText("1");
+  await expect(page.locator('[data-traffic-total="visits"]')).toHaveText("1");
+  await expect(page.locator('[data-traffic-total="pageViews"]')).toHaveText("2");
+  await expect(page.locator(`[data-traffic-page="home"]`)).toBeVisible();
+  await expect(page.locator(`[data-traffic-page="wishlistCreate"]`)).toBeVisible();
   await expect(page.locator('[data-stock="wishlists"]')).toHaveText("1");
   await expect(page.locator('[data-stock="draws"]')).toHaveText("1");
 

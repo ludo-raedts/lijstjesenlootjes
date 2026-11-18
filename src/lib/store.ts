@@ -2,6 +2,9 @@ import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { commitBackoffMs } from "@/lib/backoff";
 import { purgeDeletedWishlists } from "@/lib/data-lifecycle";
+import type { TrafficRow } from "@/lib/analytics";
+import type { Locale } from "@/i18n/config";
+import type { PageKey } from "@/lib/paths";
 import type { UsageEvent, UsageRow } from "@/lib/usage";
 import type { Database } from "@/lib/types";
 
@@ -106,9 +109,10 @@ export async function checkDatabaseHealth() {
 }
 
 /** Best-effort anonymous counter. A failure here must never break the user's action. */
-export async function recordUsage(event: UsageEvent) {
+export async function recordUsage(event: UsageEvent, amount = 1) {
   try {
-    const { error } = await getClient().rpc("record_usage_event", { p_event: event });
+    const parameters = amount === 1 ? { p_event: event } : { p_event: event, p_amount: amount };
+    const { error } = await getClient().rpc("record_usage_event", parameters);
     if (error) console.error("Supabase record_usage_event failed", error.code);
   } catch {
     console.error("Supabase record_usage_event failed");
@@ -126,4 +130,45 @@ export async function readUsageDaily(days: number): Promise<UsageRow[]> {
     event: row.event,
     eventCount: Number(row.event_count),
   }));
+}
+
+export async function recordTrafficMeasurement(site: Locale, page: PageKey, visit: boolean) {
+  const { error } = await getClient().rpc("record_traffic_measurement", {
+    p_site: site,
+    p_page: page,
+    p_visit: visit,
+  });
+  if (error) {
+    console.error("Supabase record_traffic_measurement failed", error.code);
+    throw new Error("Traffic measurement could not be recorded.");
+  }
+}
+
+export async function readTrafficDaily(days: number): Promise<TrafficRow[]> {
+  const { data, error } = await getClient().rpc("read_traffic_daily", { p_days: days });
+  if (error) {
+    console.error("Supabase read_traffic_daily failed", error.code);
+    throw new Error("Traffic measurements could not be read.");
+  }
+  return (Array.isArray(data) ? data : []).map((row: {
+    day: string;
+    site: Locale;
+    page: PageKey;
+    page_view_count: number;
+    visit_count: number;
+  }) => ({
+    day: row.day,
+    site: row.site,
+    page: row.page,
+    pageViews: Number(row.page_view_count),
+    visits: Number(row.visit_count),
+  }));
+}
+
+export async function cleanupMeasurementRetention() {
+  const { error } = await getClient().rpc("cleanup_usage_measurement");
+  if (error) {
+    console.error("Supabase cleanup_usage_measurement failed", error.code);
+    throw new Error("Measurement retention cleanup failed.");
+  }
 }

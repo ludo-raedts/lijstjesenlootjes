@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { assertSameOrigin, cookieName, exchangeToken, HttpError, limit } from "@/lib/security";
 import { errorResponse, noStoreJson, readJson } from "@/lib/http";
+import { recordUsage } from "@/lib/store";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +18,7 @@ export async function POST(request: NextRequest) {
       path: "/",
       maxAge: 7 * 24 * 60 * 60,
     });
+    if (access.role === "wishlist_guest") await recordUsage("shared_wishlist_opened");
     return response;
   } catch (error) {
     return errorResponse(error);

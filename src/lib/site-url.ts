@@ -19,3 +19,8 @@ export function getSiteUrl(): string {
 export function isVercelPreview(): boolean {
   return process.env.VERCEL === "1" && process.env.VERCEL_ENV !== "production";
 }
+
+/** Traffic measurement runs only on the real production deployment, never locally or in previews. */
+export function isVercelProduction(): boolean {
+  return process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
+}

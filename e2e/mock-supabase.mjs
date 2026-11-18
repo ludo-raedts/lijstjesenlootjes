@@ -9,6 +9,7 @@ let version = 1;
 let data = emptyState();
 let buckets = new Map();
 let usage = new Map();
+let traffic = new Map();
 // Stand-in for the email provider: records what would have been sent, once per idempotency key.
 let mails = [];
 
@@ -47,16 +48,36 @@ const rpc = {
     return current.count <= maximum;
   },
   app_health: () => true,
-  record_usage_event: ({ p_event: event }) => {
+  record_usage_event: ({ p_event: event, p_amount: amount = 1 }) => {
     const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Amsterdam" }).format(new Date());
     const key = `${day}|${event}`;
-    usage.set(key, (usage.get(key) ?? 0) + 1);
+    usage.set(key, (usage.get(key) ?? 0) + amount);
     return null;
   },
   read_usage_daily: () => [...usage.entries()].map(([key, count]) => {
     const [day, event] = key.split("|");
     return { day, event, event_count: count };
   }),
+  record_traffic_measurement: ({ p_site: site, p_page: page, p_visit: visit }) => {
+    const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Amsterdam" }).format(new Date());
+    const key = `${day}|${site}|${page}`;
+    const current = traffic.get(key) ?? { pageViews: 0, visits: 0 };
+    current.pageViews += 1;
+    current.visits += visit ? 1 : 0;
+    traffic.set(key, current);
+    return null;
+  },
+  read_traffic_daily: () => [...traffic.entries()].map(([key, counts]) => {
+    const [day, site, page] = key.split("|");
+    return {
+      day,
+      site,
+      page,
+      page_view_count: counts.pageViews,
+      visit_count: counts.visits,
+    };
+  }),
+  cleanup_usage_measurement: () => null,
 };
 
 createServer(async (request, response) => {
@@ -64,11 +85,14 @@ createServer(async (request, response) => {
 
   if (url.pathname === "/__health") return send(response, 200, { ok: true });
   if (url.pathname === "/__reset" && request.method === "POST") {
-    version = 1; data = emptyState(); buckets = new Map(); usage = new Map(); mails = [];
+    version = 1; data = emptyState(); buckets = new Map(); usage = new Map(); traffic = new Map(); mails = [];
     return send(response, 200, { reset: true });
   }
   if (url.pathname === "/__state" && request.method === "GET") {
     return send(response, 200, { version, data });
+  }
+  if (url.pathname === "/__traffic" && request.method === "GET") {
+    return send(response, 200, { traffic: rpc.read_traffic_daily() });
   }
 
   if (url.pathname === "/emails" && request.method === "POST") {

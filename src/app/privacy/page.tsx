@@ -20,6 +20,8 @@ export default async function PrivacyPage() {
       <p>{t("privacy.storedBody")}</p>
       <h2>{t("privacy.retentionTitle")}</h2>
       <p>{t("privacy.retentionBody")}</p>
+      <h2>{t("privacy.analyticsTitle")}</h2>
+      <p>{t("privacy.analyticsBody")}</p>
       <h2>{t("privacy.emailTitle")}</h2>
       <p>{t("privacy.emailBody")}</p>
       <h2>{t("privacy.notSentTitle")}</h2>

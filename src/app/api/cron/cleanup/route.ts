@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { purgeExpired } from "@/lib/data-lifecycle";
 import { errorResponse, noStoreJson } from "@/lib/http";
 import { HttpError } from "@/lib/api-error";
-import { transaction } from "@/lib/store";
+import { cleanupMeasurementRetention, transaction } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
   try {
     if (!isAuthorized(request)) throw new HttpError(401, "cron_unauthorized");
     const report = await transaction((database) => purgeExpired(database));
+    await cleanupMeasurementRetention();
     // Counts only: never log names, wishes, tokens, links or identifiers.
     console.info("retention_cleanup_completed", JSON.stringify(report));
     return noStoreJson({ purged: report });

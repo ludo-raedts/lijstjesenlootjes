@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { amsterdamDay, buildUsageSeries, summarizeStock, totalUsage } from "../src/lib/usage";
+import { amsterdamDay, buildUsageSeries, previousYearWindow, summarizeStock, totalUsage } from "../src/lib/usage";
 import type { Database } from "../src/lib/types";
 
 const now = new Date("2026-11-17T12:00:00.000Z");
@@ -21,11 +21,26 @@ test("the usage series fills missing days with zeros, oldest first", () => {
   assert.equal(series[3].counts.wishlist_created, 3);
   assert.deepEqual(totalUsage(series), {
     wishlist_created: 3,
-    draw_created: 2,
+    shared_wishlist_opened: 0,
     reservation_made: 0,
+    draw_created: 2,
+    participant_links_issued: 0,
     personal_link_opened: 0,
     admin_login: 0,
   });
+});
+
+test("the prior-year window compares the same calendar days", () => {
+  const series = buildUsageSeries(
+    [
+      { day: "2025-10-19", event: "wishlist_created", eventCount: 1 },
+      { day: "2025-11-17", event: "wishlist_created", eventCount: 2 },
+      { day: "2026-11-17", event: "wishlist_created", eventCount: 9 },
+    ],
+    800,
+    now,
+  );
+  assert.equal(totalUsage(previousYearWindow(series, 30, now)).wishlist_created, 3);
 });
 
 test("days are bucketed in Europe/Amsterdam time", () => {

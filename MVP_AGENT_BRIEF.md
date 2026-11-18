@@ -197,7 +197,7 @@ The MVP is ready for review when:
 
 - no account system;
 - no email delivery provider;
-- no public analytics or advertising scripts;
+- no third-party analytics, analytics on personal or management pages, or advertising scripts; first-party public traffic measurement must remain cookieless, aggregate, identifier-free, and free of user-created content;
 - no primary-navigation promotion for the name wheel;
 - no separate Sinterklaas or Christmas product;
 - no machine translation of user content;
