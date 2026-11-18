@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { IDEA_CATEGORIES, IDEA_IDS, ideasForLocale } from "../src/i18n/ideas";
+import { IDEA_CATEGORIES, IDEA_IDS, ideasForLocale, normalizeIdeaSearch } from "../src/i18n/ideas";
 
 test("every Dutch category has ten ideas with unique ids and titles", () => {
   const groups = ideasForLocale("nl");
@@ -17,11 +17,14 @@ test("every Dutch category has ten ideas with unique ids and titles", () => {
   assert.equal(titles.size, groups.length * 10);
 });
 
-test("a locale without written ideas shows no ideas block", () => {
-  assert.deepEqual(ideasForLocale("en"), []);
+test("English ideas are available without Dutch shop products or euro price claims", () => {
+  const groups = ideasForLocale("en");
+  assert.deepEqual(groups.map((group) => group.category), [...IDEA_CATEGORIES]);
+  assert.equal(groups.flatMap((group) => group.ideas).length, 60);
+  assert.ok(groups.every((group) => group.ideas.every((idea) => !idea.product)));
 });
 
-test("products are well-formed bol links and under-15 picks stay cheap-looking by construction", () => {
+test("curated products are unique, well-formed bol links", () => {
   const groups = ideasForLocale("nl");
   const withProduct = groups.flatMap((group) => group.ideas.filter((idea) => idea.product));
   assert.ok(withProduct.length >= 40);
@@ -33,5 +36,13 @@ test("products are well-formed bol links and under-15 picks stay cheap-looking b
   }
   assert.equal(urls.size, withProduct.length, "no product is used twice");
   // The English locale never gets bol products.
-  assert.deepEqual(ideasForLocale("en"), []);
+  assert.ok(ideasForLocale("en").flatMap((group) => group.ideas).every((idea) => !idea.product));
+});
+
+test("search folds case, accents, spaces and punctuation", () => {
+  assert.equal(normalizeIdeaSearch("Notitie boek", "nl"), normalizeIdeaSearch("notitieboek", "nl"));
+  assert.equal(normalizeIdeaSearch("Café-au-lait", "en"), "cafeaulait");
+  assert.equal(normalizeIdeaSearch("  ", "nl"), "");
+  const nl = ideasForLocale("nl").flatMap((group) => group.ideas);
+  assert.ok(nl.some((idea) => normalizeIdeaSearch(idea.title, "nl").includes(normalizeIdeaSearch("kaars geur", "nl")) || normalizeIdeaSearch(idea.title, "nl").includes("kaars")));
 });

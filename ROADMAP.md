@@ -126,6 +126,12 @@ Cutover plan:
 The affiliate feature should make adding a useful gift easier. It must not turn a personal
 wishlist into an advertising feed or silently alter user-entered content.
 
+The wish editor now offers searchable, curated Dutch and English gift ideas. Adding an idea
+creates an editable wish without a shop URL; Dutch bol product examples are separate, explicit
+choices and follow the existing domain, locale, and affiliate kill switch. Product imagery,
+prices, country-specific shops, and live Awin feeds remain future work until the relevant
+programme, feed access, and content-use terms have been verified.
+
 ### Recommended launch sequence
 
 1. **Apply and validate first.** Register the production domains with the bol Affiliate

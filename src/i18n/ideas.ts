@@ -1,9 +1,8 @@
 import type { Locale } from "@/i18n/config";
 
 /**
- * Curated gift ideas offered in the wish editor. An idea is only a short product title:
- * no price, image or fixed product page, so nothing here can go stale. The shop search
- * links are built from the title at display time.
+ * Curated gift ideas offered in the wish editor. Some Dutch ideas also have an optional
+ * concrete product; visitors choose separately whether to add it or only the general idea.
  *
  * Category and idea ids are stable English identifiers. Idea titles are editorial content
  * per locale (not UI strings); a locale without an entry simply shows no ideas block.
@@ -102,7 +101,28 @@ const NL_TITLES: Record<string, string> = {
   "camping-mug": "Emaille kampeermok",
 };
 
-const TITLES: Partial<Record<Locale, Record<string, string>>> = { nl: NL_TITLES };
+const EN_TITLES: Record<string, string> = {
+  "scented-candle": "Scented candle", notebook: "A lovely notebook", mug: "Large coffee or tea mug",
+  "puzzle-500": "500-piece puzzle", "card-game": "Card game", "plant-pot": "Indoor plant pot",
+  "bath-bomb-set": "Bath bomb set", "reusable-bottle": "Reusable water bottle", "fluffy-socks": "Cosy socks", "pen-set": "Nice pen set",
+  "building-blocks": "Building blocks", "picture-book": "Picture book", "board-game-family": "Family board game",
+  "art-set": "Children’s art set", "play-dough": "Modelling dough set", "dress-up": "Dress-up clothes",
+  "science-kit": "Science kit", "magnetic-tiles": "Magnetic building tiles", "jigsaw-kids": "Children’s jigsaw puzzle", "cuddly-toy": "Soft toy",
+  headphones: "Headphones", "power-bank": "Power bank", "phone-stand": "Phone stand", sketchbook: "Sketchbook",
+  "led-lights": "LED room lights", backpack: "Backpack", "card-game-party": "Party card game", hoodie: "Hoodie",
+  "bluetooth-speaker": "Bluetooth speaker", "gift-voucher-cinema": "Cinema gift card",
+  blanket: "Soft blanket", slippers: "Slippers", "tea-set": "Tea set", "book-light": "Reading light",
+  "hot-water-bottle": "Hot water bottle", bathrobe: "Bathrobe", "jigsaw-adult": "1,000-piece puzzle",
+  diffuser: "Aroma diffuser", "throw-pillow": "Cushion", "adult-colouring-book": "Colouring book",
+  "chocolate-box": "Box of chocolates", "tea-selection": "Selection of teas", "coffee-beans": "Coffee beans",
+  "cheese-board": "Cheese board", "spice-set": "Spice set", cookbook: "Cookbook", "baking-tin": "Baking tin",
+  "hot-sauce-set": "Hot sauce set", "olive-oil": "Good olive oil", "gin-tonic-set": "Drinks set",
+  "thermos-flask": "Thermos flask", "picnic-blanket": "Picnic blanket", headlamp: "Head torch",
+  "sports-bottle": "Sports bottle", binoculars: "Binoculars", "bike-light-set": "Bike lights", "yoga-mat": "Yoga mat",
+  "hiking-socks": "Hiking socks", frisbee: "Flying disc", "camping-mug": "Enamel camping mug",
+};
+
+const TITLES: Partial<Record<Locale, Record<string, string>>> = { nl: NL_TITLES, en: EN_TITLES };
 
 /**
  * A concrete bol product behind an idea. Only the bol product id and a short display name
@@ -194,4 +214,9 @@ export function ideasForLocale(locale: Locale): LocalizedIdeaCategory[] {
       return [{ id, title: titles[id], ...(product ? { product: { name: product.name, url: bolProductUrl(product.bolId) } } : {}) }];
     }),
   })).filter((entry) => entry.ideas.length > 0);
+}
+
+/** Folds case, accents, spaces and punctuation so "notitie boek" finds "notitieboek" and "cafe" finds "café". */
+export function normalizeIdeaSearch(value: string, locale: Locale): string {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase(locale).replace(/[^\p{L}\p{N}]+/gu, "");
 }

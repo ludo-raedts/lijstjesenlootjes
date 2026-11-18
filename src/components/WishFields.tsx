@@ -51,7 +51,7 @@ export function WishFields({
             <label htmlFor={`wish-title-${index}`}>{t("wishes.titleLabel")}</label>
             <input id={`wish-title-${index}`} value={wish.title} maxLength={160} required onChange={(event) => update(index, { title: event.target.value })} placeholder={t("wishes.titlePlaceholder")} />
           </div>
-          <AmazonEditorHelper title={wish.title} />
+          {!wish.url.trim() && <AmazonEditorHelper title={wish.title} />}
           <div className="field-row">
             <div className="field">
               <label htmlFor={`wish-url-${index}`}>{t("wishes.urlLabel")} <span className="hint">{t("common.optional")}</span></label>
