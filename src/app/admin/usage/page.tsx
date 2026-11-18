@@ -6,8 +6,15 @@ import { getServerI18n } from "@/i18n/server";
 import { hasAdminSession } from "@/lib/admin-auth";
 import { SITE_DOMAINS } from "@/lib/domains";
 import { pathForLocale } from "@/lib/paths";
-import { read, readTrafficDaily, readUsageDaily } from "@/lib/store";
-import { summarizeTraffic, trafficWindow, type TrafficRow } from "@/lib/analytics";
+import { read, readCountryTrafficDaily, readTrafficDaily, readUsageDaily } from "@/lib/store";
+import {
+  OTHER_COUNTRIES,
+  summarizeCountryTraffic,
+  summarizeTraffic,
+  trafficWindow,
+  type CountryTrafficRow,
+  type TrafficRow,
+} from "@/lib/analytics";
 import { buildUsageSeries, previousYearWindow, summarizeStock, totalUsage, usageEvents } from "@/lib/usage";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +32,7 @@ export default async function UsagePage() {
   if (!await hasAdminSession()) redirect("/admin");
   const { locale, formattingLocale, t } = await getServerI18n();
   const number = new Intl.NumberFormat(formattingLocales[locale]);
+  const regions = new Intl.DisplayNames([formattingLocale], { type: "region" });
   const date = (day?: string) =>
     day
       ? new Intl.DateTimeFormat(formattingLocale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`))
@@ -42,6 +50,12 @@ export default async function UsagePage() {
   } catch {
     traffic = undefined;
   }
+  let countryTraffic: CountryTrafficRow[] | undefined;
+  try {
+    countryTraffic = await readCountryTrafficDaily(800);
+  } catch {
+    countryTraffic = undefined;
+  }
   const stock = await read((database) => summarizeStock(database));
   const periods = usage ? [
     { id: "30", title: t("usage.totals.30Days"), totals: totalUsage(usage.slice(-30)) },
@@ -50,6 +64,9 @@ export default async function UsagePage() {
   ] : [];
   const recentDays = usage ? usage.slice(-14).reverse() : [];
   const trafficSummary = traffic ? summarizeTraffic(trafficWindow(traffic, 30)) : undefined;
+  const countryTrafficSummary = countryTraffic
+    ? summarizeCountryTraffic(trafficWindow(countryTraffic, 30))
+    : undefined;
   const trafficTotals = trafficSummary?.reduce(
     (totals, row) => ({ pageViews: totals.pageViews + row.pageViews, visits: totals.visits + row.visits }),
     { pageViews: 0, visits: 0 },
@@ -59,6 +76,10 @@ export default async function UsagePage() {
     const path = pathForLocale(row.page, row.site);
     return `${host}${path === "/" ? "" : path}`;
   };
+  const siteLabel = (site: CountryTrafficRow["site"]) =>
+    SITE_DOMAINS.find(({ locale: candidate }) => candidate === site)?.host ?? site;
+  const countryLabel = (country: string) =>
+    country === OTHER_COUNTRIES ? t("usage.traffic.otherCountries") : (regions.of(country) ?? country);
 
   return (
     <div className="shell page-section admin-page">
@@ -111,6 +132,35 @@ export default async function UsagePage() {
               </div>
             </>
           ) : <p className="muted">{t("usage.traffic.empty")}</p>}
+
+          <h3 id="usage-traffic-countries-title">{t("usage.traffic.countries")}</h3>
+          <p className="muted">{t("usage.traffic.countryNote")}</p>
+          {countryTrafficSummary ? (
+            countryTrafficSummary.length > 0 ? (
+              <div className="usage-table-wrap" role="region" aria-labelledby="usage-traffic-countries-title" tabIndex={0}>
+                <table className="usage-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{t("usage.traffic.site")}</th>
+                      <th scope="col">{t("usage.traffic.country")}</th>
+                      <th scope="col">{t("usage.traffic.visits")}</th>
+                      <th scope="col">{t("usage.traffic.pageViews")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {countryTrafficSummary.map((row) => (
+                      <tr data-country={row.country} data-country-site={row.site} key={`${row.site}-${row.country}`}>
+                        <th scope="row">{siteLabel(row.site)}</th>
+                        <td>{countryLabel(row.country)}</td>
+                        <td>{number.format(row.visits)}</td>
+                        <td>{number.format(row.pageViews)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : <p className="muted">{t("usage.traffic.countryEmpty")}</p>
+          ) : <p className="notice error" role="alert">{t("usage.traffic.countryError")}</p>}
         </section>
       ) : (
         <p className="notice error" role="alert">{t("usage.traffic.error")}</p>

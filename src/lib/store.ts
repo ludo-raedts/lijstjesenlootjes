@@ -2,7 +2,7 @@ import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { commitBackoffMs } from "@/lib/backoff";
 import { purgeDeletedWishlists } from "@/lib/data-lifecycle";
-import type { TrafficRow } from "@/lib/analytics";
+import type { CountryTrafficRow, TrafficAdjustment, TrafficRow } from "@/lib/analytics";
 import type { Locale } from "@/i18n/config";
 import type { PageKey } from "@/lib/paths";
 import type { UsageEvent, UsageRow } from "@/lib/usage";
@@ -132,14 +132,15 @@ export async function readUsageDaily(days: number): Promise<UsageRow[]> {
   }));
 }
 
-export async function recordTrafficMeasurement(site: Locale, page: PageKey, visit: boolean) {
-  const { error } = await getClient().rpc("record_traffic_measurement", {
+export async function recordTrafficMeasurement(site: Locale, page: PageKey, visit: boolean, country: string) {
+  const { error } = await getClient().rpc("record_traffic_measurement_with_country", {
     p_site: site,
     p_page: page,
     p_visit: visit,
+    p_country: country,
   });
   if (error) {
-    console.error("Supabase record_traffic_measurement failed", error.code);
+    console.error("Supabase record_traffic_measurement_with_country failed", error.code);
     throw new Error("Traffic measurement could not be recorded.");
   }
 }
@@ -163,6 +164,47 @@ export async function readTrafficDaily(days: number): Promise<TrafficRow[]> {
     pageViews: Number(row.page_view_count),
     visits: Number(row.visit_count),
   }));
+}
+
+export async function readCountryTrafficDaily(days: number): Promise<CountryTrafficRow[]> {
+  const { data, error } = await getClient().rpc("read_country_traffic_daily", { p_days: days });
+  if (error) {
+    console.error("Supabase read_country_traffic_daily failed", error.code);
+    throw new Error("Country traffic measurements could not be read.");
+  }
+  return (Array.isArray(data) ? data : []).map((row: {
+    day: string;
+    site: Locale;
+    country: string;
+    page_view_count: number;
+    visit_count: number;
+  }) => ({
+    day: row.day,
+    site: row.site,
+    country: row.country,
+    pageViews: Number(row.page_view_count),
+    visits: Number(row.visit_count),
+  }));
+}
+
+export async function excludeTrafficMeasurement(
+  site: Locale,
+  measurements: TrafficAdjustment[],
+  country: string,
+) {
+  const { error } = await getClient().rpc("exclude_traffic_measurement", {
+    p_site: site,
+    p_measurements: measurements.map(({ page, pageViews, visits }) => ({
+      page,
+      page_views: pageViews,
+      visits,
+    })),
+    p_country: country,
+  });
+  if (error) {
+    console.error("Supabase exclude_traffic_measurement failed", error.code);
+    throw new Error("Administrator traffic could not be excluded.");
+  }
 }
 
 export async function cleanupMeasurementRetention() {

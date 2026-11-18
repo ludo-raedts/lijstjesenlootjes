@@ -3,7 +3,7 @@ import { findSiteDomain } from "@/lib/domains";
 import { errorResponse, readJson } from "@/lib/http";
 import { getPage, hasPath } from "@/lib/paths";
 import { assertSameOrigin, HttpError } from "@/lib/security";
-import { isPublicTrafficPageKey } from "@/lib/analytics";
+import { isPublicTrafficPageKey, normalizeTrafficCountry } from "@/lib/analytics";
 import { recordTrafficMeasurement } from "@/lib/store";
 
 export async function POST(request: NextRequest) {
@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
     ) {
       throw new HttpError(400, "invalid_traffic_measurement");
     }
-    await recordTrafficMeasurement(site.locale, body.page, body.visit);
+    const country = normalizeTrafficCountry(request.headers.get("x-vercel-ip-country"));
+    await recordTrafficMeasurement(site.locale, body.page, body.visit, country);
     return new Response(null, {
       status: 204,
       headers: {

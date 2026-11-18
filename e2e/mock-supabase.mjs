@@ -10,6 +10,7 @@ let data = emptyState();
 let buckets = new Map();
 let usage = new Map();
 let traffic = new Map();
+let countryTraffic = new Map();
 // Stand-in for the email provider: records what would have been sent, once per idempotency key.
 let mails = [];
 
@@ -58,15 +59,21 @@ const rpc = {
     const [day, event] = key.split("|");
     return { day, event, event_count: count };
   }),
-  record_traffic_measurement: ({ p_site: site, p_page: page, p_visit: visit }) => {
+  record_traffic_measurement: ({ p_site: site, p_page: page, p_visit: visit, p_country: country = "ZZ" }) => {
     const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Amsterdam" }).format(new Date());
     const key = `${day}|${site}|${page}`;
     const current = traffic.get(key) ?? { pageViews: 0, visits: 0 };
     current.pageViews += 1;
     current.visits += visit ? 1 : 0;
     traffic.set(key, current);
+    const countryKey = `${day}|${site}|${country}`;
+    const countryCurrent = countryTraffic.get(countryKey) ?? { pageViews: 0, visits: 0 };
+    countryCurrent.pageViews += 1;
+    countryCurrent.visits += visit ? 1 : 0;
+    countryTraffic.set(countryKey, countryCurrent);
     return null;
   },
+  record_traffic_measurement_with_country: (parameters) => rpc.record_traffic_measurement(parameters),
   read_traffic_daily: () => [...traffic.entries()].map(([key, counts]) => {
     const [day, site, page] = key.split("|");
     return {
@@ -77,6 +84,44 @@ const rpc = {
       visit_count: counts.visits,
     };
   }),
+  read_country_traffic_daily: () => [...countryTraffic.entries()].map(([key, counts]) => {
+    const [day, site, country] = key.split("|");
+    return {
+      day,
+      site,
+      country,
+      page_view_count: counts.pageViews,
+      visit_count: counts.visits,
+    };
+  }),
+  exclude_traffic_measurement: ({ p_site: site, p_measurements: measurements, p_country: country }) => {
+    const day = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Amsterdam" }).format(new Date());
+    let removedPageViews = 0;
+    let removedVisits = 0;
+    for (const measurement of measurements) {
+      const key = `${day}|${site}|${measurement.page}`;
+      const current = traffic.get(key);
+      if (!current) continue;
+      const pageViews = Math.min(measurement.page_views, current.pageViews);
+      const visits = Math.min(measurement.visits, current.visits);
+      removedPageViews += pageViews;
+      removedVisits += visits;
+      current.pageViews -= pageViews;
+      current.visits = Math.min(Math.max(0, current.visits - visits), current.pageViews);
+      if (current.pageViews === 0) traffic.delete(key);
+    }
+    const countryKey = `${day}|${site}|${country}`;
+    const countryCurrent = countryTraffic.get(countryKey);
+    if (countryCurrent) {
+      countryCurrent.pageViews -= Math.min(removedPageViews, countryCurrent.pageViews);
+      countryCurrent.visits = Math.min(
+        Math.max(0, countryCurrent.visits - Math.min(removedVisits, countryCurrent.visits)),
+        countryCurrent.pageViews,
+      );
+      if (countryCurrent.pageViews === 0) countryTraffic.delete(countryKey);
+    }
+    return null;
+  },
   cleanup_usage_measurement: () => null,
 };
 
@@ -85,14 +130,17 @@ createServer(async (request, response) => {
 
   if (url.pathname === "/__health") return send(response, 200, { ok: true });
   if (url.pathname === "/__reset" && request.method === "POST") {
-    version = 1; data = emptyState(); buckets = new Map(); usage = new Map(); traffic = new Map(); mails = [];
+    version = 1; data = emptyState(); buckets = new Map(); usage = new Map(); traffic = new Map(); countryTraffic = new Map(); mails = [];
     return send(response, 200, { reset: true });
   }
   if (url.pathname === "/__state" && request.method === "GET") {
     return send(response, 200, { version, data });
   }
   if (url.pathname === "/__traffic" && request.method === "GET") {
-    return send(response, 200, { traffic: rpc.read_traffic_daily() });
+    return send(response, 200, {
+      traffic: rpc.read_traffic_daily(),
+      countries: rpc.read_country_traffic_daily(),
+    });
   }
 
   if (url.pathname === "/emails" && request.method === "POST") {

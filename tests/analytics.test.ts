@@ -2,9 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   isPublicTrafficPageKey,
+  normalizeTrafficCountry,
+  OTHER_COUNTRIES,
   publicTrafficPageForPath,
+  summarizeCountryTraffic,
   summarizeTraffic,
   trafficWindow,
+  type CountryTrafficRow,
   type TrafficRow,
 } from "../src/lib/analytics";
 import { privatePathPrefixes, publicPages } from "../src/lib/paths";
@@ -36,5 +40,27 @@ test("traffic summaries include only the requested calendar-day window", () => {
   assert.deepEqual(summary, [
     { site: "en", page: "drawCreate", pageViews: 3, visits: 2 },
     { site: "nl", page: "home", pageViews: 6, visits: 3 },
+  ]);
+});
+
+test("country codes are normalized without accepting detailed or malformed locations", () => {
+  assert.equal(normalizeTrafficCountry("nl"), "NL");
+  assert.equal(normalizeTrafficCountry(" GB "), "GB");
+  assert.equal(normalizeTrafficCountry("NLD"), "ZZ");
+  assert.equal(normalizeTrafficCountry("12"), "ZZ");
+  assert.equal(normalizeTrafficCountry(undefined), "ZZ");
+});
+
+test("countries with fewer than five visits and unknown countries are combined per site", () => {
+  const rows: CountryTrafficRow[] = [
+    { day: "2026-11-18", site: "nl", country: "NL", pageViews: 12, visits: 8 },
+    { day: "2026-11-18", site: "nl", country: "BE", pageViews: 4, visits: 3 },
+    { day: "2026-11-18", site: "nl", country: "ZZ", pageViews: 2, visits: 2 },
+    { day: "2026-11-18", site: "en", country: "GB", pageViews: 9, visits: 5 },
+  ];
+  assert.deepEqual(summarizeCountryTraffic(rows), [
+    { site: "en", country: "GB", pageViews: 9, visits: 5 },
+    { site: "nl", country: "NL", pageViews: 12, visits: 8 },
+    { site: "nl", country: OTHER_COUNTRIES, pageViews: 6, visits: 5 },
   ]);
 });

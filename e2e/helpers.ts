@@ -44,6 +44,19 @@ export async function mockTraffic() {
   return ((await response.json()) as { traffic: MockTrafficRow[] }).traffic;
 }
 
+export type MockCountryTrafficRow = {
+  day: string;
+  site: Locale;
+  country: string;
+  page_view_count: number;
+  visit_count: number;
+};
+
+export async function mockCountryTraffic() {
+  const response = await fetch(`${MOCK_URL}/__traffic`);
+  return ((await response.json()) as { countries: MockCountryTrafficRow[] }).countries;
+}
+
 export type MockMail = { key?: string; from: string; to: string[]; subject: string; text: string };
 
 /** Mails the app handed to the (mock) provider so far. */

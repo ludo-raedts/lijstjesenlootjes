@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { E2E_ADMIN_PASSWORD } from "../playwright.config";
-import { createDrawViaApi, createWishlistViaApi, expectNoAxeViolations, i18n, mockTraffic, pagePath, rebase, resetBackend } from "./helpers";
+import { createDrawViaApi, createWishlistViaApi, expectNoAxeViolations, i18n, mockCountryTraffic, mockTraffic, pagePath, rebase, resetBackend } from "./helpers";
 
 test.beforeEach(resetBackend);
 
@@ -78,7 +78,8 @@ test("repeated wrong passwords are rate limited", async ({ page }, testInfo) => 
 });
 
 test("the usage dashboard needs a login and shows anonymous counts only", async ({ page, browser, baseURL }, testInfo) => {
-  const { t } = i18n(testInfo);
+  const { locale, t } = i18n(testInfo);
+  const expectedCountry = locale === "nl" ? "NL" : "GB";
 
   // Without a session the usage page sends visitors to the login.
   await page.goto("/admin/usage");
@@ -86,7 +87,9 @@ test("the usage dashboard needs a login and shows anonymous counts only", async 
   await expect(page.getByLabel(t("admin.login.password"))).toBeVisible();
 
   // Generate some synthetic activity in separate visitor contexts.
-  const visitor = await browser.newContext();
+  const visitor = await browser.newContext({
+    extraHTTPHeaders: { "x-vercel-ip-country": expectedCountry },
+  });
   const visitorPage = await visitor.newPage();
   const firstMeasurement = visitorPage.waitForRequest((request) =>
     request.method() === "POST" && new URL(request.url()).pathname === "/api/traffic",
@@ -95,7 +98,12 @@ test("the usage dashboard needs a login and shows anonymous counts only", async 
   const measurementRequest = await firstMeasurement;
   expect(measurementRequest.headers().referer ?? "").toBe("");
   expect(JSON.parse(measurementRequest.postData() ?? "{}")).toEqual({ page: "home", visit: true });
+  expect((await measurementRequest.response())?.status()).toBe(204);
+  const secondMeasurement = visitorPage.waitForResponse((response) =>
+    response.request().method() === "POST" && new URL(response.url()).pathname === "/api/traffic",
+  );
   await visitorPage.goto(`${baseURL}${pagePath(testInfo, "wishlistCreate")}`);
+  expect((await secondMeasurement).status()).toBe(204);
   const created = await createWishlistViaApi(visitorPage, ["Private wish"]);
   await createDrawViaApi(visitorPage);
   await expect.poll(async () => {
@@ -105,10 +113,38 @@ test("the usage dashboard needs a login and shows anonymous counts only", async 
       visits: traffic.reduce((total, row) => total + row.visit_count, 0),
     };
   }).toEqual({ pageViews: 2, visits: 1 });
+  await expect.poll(async () => mockCountryTraffic()).toEqual([
+    expect.objectContaining({
+      site: locale,
+      country: expectedCountry,
+      page_view_count: 2,
+      visit_count: 1,
+    }),
+  ]);
   await visitorPage.goto(rebase(created.guestUrl, baseURL));
   await expect(visitorPage.getByRole("heading", { name: "Synthetic list" })).toBeVisible();
   await visitor.close();
   expect(created.guestUrl).toContain("#token=");
+
+  // A browser that opens /admin is removed again, even after first landing on the public homepage.
+  const adminCountry = expectedCountry === "NL" ? "BE" : "DE";
+  const adminVisitor = await browser.newContext({
+    extraHTTPHeaders: { "x-vercel-ip-country": adminCountry },
+  });
+  const adminVisitorPage = await adminVisitor.newPage();
+  await adminVisitorPage.goto(`${baseURL}/`);
+  await expect.poll(async () => (await mockTraffic()).reduce((total, row) => total + row.page_view_count, 0)).toBe(3);
+  await adminVisitorPage.goto(`${baseURL}/admin`);
+  await expect(adminVisitorPage.getByLabel(t("admin.login.password"))).toBeVisible();
+  await expect.poll(async () => {
+    const traffic = await mockTraffic();
+    return {
+      pageViews: traffic.reduce((total, row) => total + row.page_view_count, 0),
+      visits: traffic.reduce((total, row) => total + row.visit_count, 0),
+      countries: (await mockCountryTraffic()).map(({ country }) => country),
+    };
+  }).toEqual({ pageViews: 2, visits: 1, countries: [expectedCountry] });
+  await adminVisitor.close();
 
   await page.goto("/admin");
   await page.getByLabel(t("admin.login.password")).fill(E2E_ADMIN_PASSWORD);
@@ -126,6 +162,8 @@ test("the usage dashboard needs a login and shows anonymous counts only", async 
   await expect(page.locator('[data-traffic-total="pageViews"]')).toHaveText("2");
   await expect(page.locator(`[data-traffic-page="home"]`)).toBeVisible();
   await expect(page.locator(`[data-traffic-page="wishlistCreate"]`)).toBeVisible();
+  await expect(page.locator(`[data-country="OTHER"][data-country-site="${locale}"]`)).toBeVisible();
+  await expect(page.locator(`[data-country="${expectedCountry}"]`)).toHaveCount(0);
   await expect(page.locator('[data-stock="wishlists"]')).toHaveText("1");
   await expect(page.locator('[data-stock="draws"]')).toHaveText("1");
 
