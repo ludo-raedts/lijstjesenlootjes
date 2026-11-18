@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, randomBytes, randomInt, randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 import { HttpError } from "@/lib/api-error";
+import { clientIdentifier } from "@/lib/client-ip";
 import { createRateLimitBucketKey } from "@/lib/rate-limit";
 import { consumeRateLimit, read, transaction } from "@/lib/store";
 import { AccessRole, AccessToken, Session } from "@/lib/types";
@@ -144,8 +145,15 @@ export async function isWithinRateLimit(
 }
 
 export async function limit(request: NextRequest, key: string, maximum = 40, windowSeconds = 60) {
-  const identifier = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
-  await limitIdentifier(identifier, key, maximum, windowSeconds);
+  await limitIdentifier(clientIdentifier(request.headers), key, maximum, windowSeconds);
+}
+
+/**
+ * Caps how many mails one recipient can be sent per hour across every endpoint that accepts an address, so
+ * switching IP addresses does not let anyone flood a stranger's inbox. The address is only ever hashed.
+ */
+export async function limitRecipient(email: string, maximum = 5) {
+  await limitIdentifier(email.trim().toLowerCase(), "mail-recipient", maximum, 3600);
 }
 
 export function secureRandomInt(maxExclusive: number) {

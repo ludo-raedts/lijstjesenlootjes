@@ -10,7 +10,7 @@ import { getServerI18n } from "@/i18n/server";
 import { personalLink } from "@/lib/personal-links";
 import { recoveryHash, recoverySecret } from "@/lib/recovery";
 import { getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
-import { assertSameOrigin, HttpError, id, limit, requireSession } from "@/lib/security";
+import { assertSameOrigin, HttpError, id, limit, limitRecipient, requireSession } from "@/lib/security";
 import { errorResponse, LIST_BODY_BYTES, noStoreJson, readJson } from "@/lib/http";
 import { read, transaction } from "@/lib/store";
 import { optionalDate, optionalEmail, optionalText, optionalUrl, text } from "@/lib/validation";
@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
     if (!emailConfigured()) throw new HttpError(503, "email_not_configured");
     const email = optionalEmail(body.email);
     if (!email) throw new HttpError(400, "invalid_email");
+    await limitRecipient(email);
     const minted = await transaction((database) => {
       const wishlist = database.wishlists.find((item) => item.id === session.scopeId && !item.deletedAt);
       if (!wishlist) throw new HttpError(410, "wishlist_not_found");

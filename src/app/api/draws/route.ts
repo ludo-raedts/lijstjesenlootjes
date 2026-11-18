@@ -10,7 +10,7 @@ import { NextRequest } from "next/server";
 import { createAssignments } from "@/lib/draw";
 import { DRAW_BODY_BYTES, errorResponse, noStoreJson, readJson } from "@/lib/http";
 import { accessExpiryIso, drawExpiresAt } from "@/lib/data-lifecycle";
-import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
+import { assertSameOrigin, createAccessToken, HttpError, id, limit, limitRecipient } from "@/lib/security";
 import { recordUsage, transaction } from "@/lib/store";
 import { optionalDate, optionalEmail, optionalText, text } from "@/lib/validation";
 
@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
     const body = await readJson(request, DRAW_BODY_BYTES);
     const requestId = text(body.requestId, "requestId", 100);
     const email = optionalEmail(body.email);
-    if (email) await limit(request, "email-send", 5);
+    if (email) {
+      await limit(request, "email-send", 5);
+      await limitRecipient(email);
+    }
     if (!Array.isArray(body.participants) || body.participants.length < 3 || body.participants.length > 50) {
       throw new HttpError(400, "invalid_participant_count", { min: 3, max: 50 });
     }

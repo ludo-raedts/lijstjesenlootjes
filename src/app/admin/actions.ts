@@ -1,5 +1,6 @@
 "use server";
 
+import { clientIdentifier } from "@/lib/client-ip";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -42,7 +43,7 @@ export async function loginAdminAction(
 ): Promise<AdminActionState> {
   if (!isAdminConfigured()) return { code: "not_configured" };
   const headerStore = await headers();
-  const identifier = headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+  const identifier = clientIdentifier(headerStore);
   if (!await allowAdminLogin(identifier)) return { code: "rate_limited" };
   const password = formData.get("password");
   if (typeof password !== "string" || !verifyAdminPassword(password)) {

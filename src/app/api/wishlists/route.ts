@@ -7,7 +7,7 @@ import { getServerI18n } from "@/i18n/server";
 import { getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
 import { NextRequest } from "next/server";
 import { accessExpiryIso, wishlistExpiresAt } from "@/lib/data-lifecycle";
-import { assertSameOrigin, createAccessToken, HttpError, id, limit } from "@/lib/security";
+import { assertSameOrigin, createAccessToken, HttpError, id, limit, limitRecipient } from "@/lib/security";
 import { errorResponse, LIST_BODY_BYTES, noStoreJson, readJson } from "@/lib/http";
 import { recordUsage, transaction } from "@/lib/store";
 import { optionalDate, optionalEmail, optionalText, optionalUrl, text } from "@/lib/validation";
@@ -31,7 +31,10 @@ export async function POST(request: NextRequest) {
     await limit(request, "wishlist-create", 12);
     const body = await readJson(request, LIST_BODY_BYTES);
     const email = optionalEmail(body.email);
-    if (email) await limit(request, "email-send", 5);
+    if (email) {
+      await limit(request, "email-send", 5);
+      await limitRecipient(email);
+    }
     if (!Array.isArray(body.wishes) || body.wishes.length < 1 || body.wishes.length > 50) {
       throw new HttpError(400, "invalid_wishlist_wish_count", { min: 1, max: 50 });
     }

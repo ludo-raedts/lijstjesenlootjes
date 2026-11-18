@@ -12,7 +12,7 @@ import { renderRecoveryEmail } from "@/lib/email-templates";
 import { getServerI18n } from "@/i18n/server";
 import { getRequestHost, getRequestSiteUrl } from "@/lib/request-site";
 import { recoveryHash, recoverySecret } from "@/lib/recovery";
-import { assertSameOrigin, createAccessToken, HttpError, id, limit, requireSession } from "@/lib/security";
+import { assertSameOrigin, createAccessToken, HttpError, id, limit, limitRecipient, requireSession } from "@/lib/security";
 import { errorResponse, noStoreJson, readJson } from "@/lib/http";
 import { read, transaction } from "@/lib/store";
 import { optionalDate, optionalEmail, optionalText, text } from "@/lib/validation";
@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
       if (!emailConfigured()) throw new HttpError(503, "email_not_configured");
       const email = optionalEmail(body.email);
       if (!email) throw new HttpError(400, "invalid_email");
+      await limitRecipient(email);
       const minted = await transaction((database) => {
         const draw = database.draws.find((item) => item.id === session.scopeId);
         if (!draw) throw new HttpError(410, "draw_not_found");
@@ -126,6 +127,7 @@ export async function POST(request: NextRequest) {
       await limit(request, "email-send", 5);
       const email = optionalEmail(body.email);
       if (!email) throw new HttpError(400, "invalid_email");
+      await limitRecipient(email);
       const { locale } = await getServerI18n();
       const host = (await getRequestHost()) ?? undefined;
       const sendOn = await transaction((database) => {
