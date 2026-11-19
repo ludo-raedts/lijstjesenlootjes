@@ -8,6 +8,10 @@ Een Next.js/TypeScript-uitwerking van de productbriefing van 16 november 2026. D
 - `/lootjes-trekken`: deelnemers, wederzijdse uitsluitingen, cryptografische trekking, persoonlijke links en een eigen wensenlijstje per deelnemer zonder reserveringen. Een deelnemer kan ook een bestaand los verlanglijstje koppelen; de gever ziet dan de actuele wensen daarvan (nooit de reserveringen).
 - `/rad-draaien`: secundaire, volledig browserlokale tool met onbevooroordeelde cryptografische keuze, reduced-motionondersteuning en delen/kopiëren.
 
+## Licentie
+
+De code is openbaar leesbaar maar geen open source in de strikte zin: ze valt onder de [PolyForm Noncommercial License 1.0.0](LICENSE). Je mag ze lezen, uitproberen en voor niet-commerciële doeleinden gebruiken en aanpassen; commercieel gebruik is niet toegestaan zonder toestemming van de maker. De licentie geldt voor de code, niet voor de naam en het merk Lijstjes & Lootjes of Wishlists & Draws, het ontwerp, de illustraties en de teksten; daarvoor is aparte toestemming nodig. Neem contact op via info@lijstjesenlootjes.nl.
+
 ## Lokaal starten
 
 ```bash

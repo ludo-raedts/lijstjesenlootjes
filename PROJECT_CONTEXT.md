@@ -76,7 +76,7 @@ For implementation changes:
 
 ## Working agreement (people and coding agents)
 
-The repository is public and `main` is protected by a ruleset. Everyone, including Claude Code and Codex, works the same way:
+The repository is public under the PolyForm Noncommercial License 1.0.0 (see `LICENSE`: reading and non-commercial use only; the name, brand, design, illustrations and copy are not licensed) and `main` is protected by a ruleset. Everyone, including Claude Code and Codex, works the same way:
 
 - Never push to `main`. Create a branch, push it, open a pull request, wait for the two CI checks (`Lint, typecheck and unit tests`, `End-to-end (Playwright, nl + en)`), then merge. Vercel deploys `main` after the merge and builds a preview per pull request.
 - Never commit secrets, tokens, real links, real addresses or production data. `.env*` is ignored; only `.env.example` with empty values is tracked. Treat anything in this repository as world-readable.
