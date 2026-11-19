@@ -154,7 +154,7 @@ Interne links: verwijs vanuit de tools naar de hulppagina, vanuit de lijst naar 
 
 - [x] Seizoens- en doelgroeplandingspagina’s uit 5; `paths.ts` per-locale optioneel.
 - [ ] Uitgebreide helpvragen, interne linkstructuur.
-- [ ] Eerste externe vermeldingen: lijsten met Sinterklaas-/kerstgidsen, familie- en teamblogs, Product Hunt/vergelijkingssites voor tools; persberichten rond de lancering. Spreek geen “gratis”-claim uit zonder besluit.
+- [ ] Eerste externe vermeldingen: lijsten met Sinterklaas-/kerstgidsen, familie- en teamblogs, Product Hunt/vergelijkingssites voor tools; persberichten rond de lancering. Spreek geen “gratis”-claim uit zonder besluit. *Gestart op 18–19 november 2026: directory-aanmeldingen en redactionele pitches staan, met status en open punten, in `docs/EXTERNAL_LISTINGS.md`.*
 
 ### Fase 3 — doorlopend
 
