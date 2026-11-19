@@ -55,7 +55,7 @@ Sent after owner confirmation; no placement is guaranteed.
 - **BuildVoyage**: confirmation email still to be confirmed (see above).
 - **Your Christmas Countdown**: the suggestion widget below its "Best Christmas Websites" list did not complete after the owner tried it. Status: technically blocked; leave it out unless the widget changes.
 - **Christmas Countdown** (`christmascountdown.co.uk`): its current Secret Santa guide mentions using an online name-picker without naming one. The contact form was filled with draft H, but the tab was later closed before a confirmation page could be observed. Status: unverified; ask the owner before marking it sent.
-- **Convert.com**: its remote-team holiday article recommends Elfster. The general "None of the Above" contact form is fully filled with draft N in Chrome. Response-only privacy consent is checked, product marketing is set to `No`, and only the owner's final `Send Message` click remains.
+- ~~**Convert.com**~~: sent by the owner on 2026-11-19 (draft N, general contact form, product-marketing consent set to `No`).
 
 ## Skipped on purpose
 
@@ -106,7 +106,7 @@ Do not add a sitewide footer network or keyword-heavy anchor text across these d
 - [x] Send draft K to teambuilding.com; Zoho reported Delivered on 2026-11-19.
 - [x] Send draft L to Hoppier; Zoho reported Delivered on 2026-11-19.
 - [x] Send draft M to TechRadar; Zoho reported Delivered on 2026-11-19.
-- [ ] Fill and submit the Convert.com contact form after owner confirmation at the final form step.
+- [x] Convert.com contact form submitted by the owner on 2026-11-19.
 - [ ] Retry Share Your Startup later, or leave it out.
 - [ ] Check SaaSHub, The Tool Directory, Rivelo Labs, AlternativeTo and Startpagina for approval.
 - [x] Finish the assessment of the owner's other sites and decide what, if anything, to link.
@@ -367,7 +367,7 @@ Based on a review of this log, a live check of the DevElif listing and a short D
 
 ### Needs the owner (cannot be done from the repository)
 
-- [ ] Send the prepared Convert.com form (draft N); only the final `Send Message` click remains.
+- [x] Convert.com form (draft N) sent by the owner on 2026-11-19.
 - [ ] Confirm whether draft H went to Christmas Countdown. If unsure, resend it once rather than assume.
 - [ ] Click the BuildVoyage confirmation link.
 - [ ] Check the `info@wishanddraw.com` mailbox for replies, review-status mails (PRKatalog, SaaSHub, Rivelo Labs) and bounces; log each reply in this file.
@@ -426,3 +426,13 @@ Send it only once per target. Do not follow up with targets that replied or decl
 
 - [ ] Own-site links (`raedts.net` project page, one block on the Magic Melody Makers Christmas page) are separate pull requests in their own repositories.
 - [ ] IndexNow key file in this repository, if wanted (small pull request).
+
+### Search for free international Christmas listings (2026-11-19, evening)
+
+Web search, not exhaustively verified.
+
+- **No dedicated free Christmas link directory was found.** The results were general directories, church-website roundups, kids' Christmas lists and paid or reciprocal-link directories. Realistic free submission places for a Christmas-related tool are scarce; editorial pitches remain the main route.
+- **Skipped:** Old Avista's Christmas directory (1990s-era listings, no submission route stated); 5 Minutes for Mom (asks for a newsletter sign-up or a link back); Hotfrog and similar business directories (generic, low value); church-website roundups such as Steve Fogg's (wrong audience); digiXMAS (paid).
+- **Not reachable:** Priority Pixels' "50 best Christmas websites" returned 403 to the research tool; check the live page for a suggestion route before deciding.
+- **German market** (guides naming Wichtel-O-Mat, DrawNames, Wichtelmania, Gift Shuffle, flat.social): [inside-digital.de](https://www.inside-digital.de/ratgeber/die-besten-tools-fuer-online-wichteln-weihnachten), [Vodafone](https://www.vodafone.de/featured/article/digitales-wichteln-wichtelfieber-im-netz-und-auf-dem-smartphone-30209), [appgefahren.de](https://www.appgefahren.de/?p=186954). Do not pitch yet: German exists only as a cookie-selectable interface language with a partial catalog on the existing domains (`PROJECT_CONTEXT.md`), so German visitors would land on an English or Dutch page. Revisit when German has its own domain or paths.
+- **Conclusion:** more directory submissions add little. Wait for the 2026-12-03 measurement before deciding on more outreach.
