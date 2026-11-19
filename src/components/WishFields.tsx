@@ -34,6 +34,13 @@ export function WishFields({
       onChange([...wishes, { ...blankWish(), ...idea }]);
     }
   };
+  const undoIdea = (title: string) => {
+    const wanted = title.trim().toLocaleLowerCase();
+    const index = wishes.map((wish) => wish.title.trim().toLocaleLowerCase()).lastIndexOf(wanted);
+    if (index < 0) return;
+    const rest = wishes.filter((_, current) => current !== index);
+    onChange(rest.length > 0 ? rest : [blankWish()]);
+  };
   return (
     <div className="wish-editor">
       <div className="wish-editor-list">
@@ -71,7 +78,7 @@ export function WishFields({
       <button className="button button-secondary" type="button" onClick={() => onChange([...wishes, blankWish()])}>{t("wishes.add")}</button>
       </div>
       <aside className="wish-editor-ideas">
-        <WishIdeas existingTitles={wishes.map((wish) => wish.title)} full={wishes.length >= MAX_EDITOR_WISHES && !lastIsBlank} onAdd={addIdea} />
+        <WishIdeas existingTitles={wishes.map((wish) => wish.title)} full={wishes.length >= MAX_EDITOR_WISHES && !lastIsBlank} onAdd={addIdea} onUndo={undoIdea} />
       </aside>
     </div>
   );

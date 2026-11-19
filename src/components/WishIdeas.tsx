@@ -9,11 +9,12 @@ export const MAX_EDITOR_WISHES = 30;
 const INITIAL_IDEA_COUNT = 6;
 
 /** Suggestions modify the draft only; nothing leaves the browser. No category is chosen at first so the list stays in view. */
-export function WishIdeas({ existingTitles, full, onAdd, initialCategory = null }: {
+export function WishIdeas({ existingTitles, full, onAdd, onUndo, initialCategory = null }: {
   initialCategory?: IdeaCategory | null;
   existingTitles: string[];
   full: boolean;
   onAdd: (idea: { title: string; url: string }) => void;
+  onUndo?: (title: string) => void;
 }) {
   const { locale, t } = useI18n();
   const bol = useBolAffiliate();
@@ -33,6 +34,18 @@ export function WishIdeas({ existingTitles, full, onAdd, initialCategory = null 
     onAdd({ title, url });
     setAnnouncement(t("ideas.announceAdded", { title }));
   };
+
+  // Confirmation stays inside the card so it is not lost like a toast; the visitor can take the wish back.
+  const addedStatus = (title: string) => (
+    <p className="idea-added">
+      <span aria-hidden="true">✓ </span>{t("ideas.added")}
+      {onUndo && (
+        <button type="button" className="idea-undo" aria-label={t("ideas.undoLabel", { title })} onClick={() => onUndo(title)}>
+          {t("ideas.undo")}
+        </button>
+      )}
+    </p>
+  );
 
   return (
     <details className="wish-ideas" open={open} onToggle={(event) => setOpen(event.currentTarget.open)}>
@@ -60,21 +73,35 @@ export function WishIdeas({ existingTitles, full, onAdd, initialCategory = null 
                   <span className="idea-card-mark" aria-hidden="true">✳</span>
                   <strong>{idea.title}</strong>
                 </div>
-                <button type="button" className="button button-secondary button-small idea-add" disabled={full || generalAdded}
-                  aria-label={generalAdded ? t("ideas.addedLabel", { title: idea.title }) : t("ideas.addLabel", { title: idea.title })}
-                  onClick={() => add(idea.title)}>
-                  {generalAdded ? t("ideas.added") : t("ideas.add")}
-                </button>
-                {product && (
-                  <div className="idea-product">
-                    <span className="idea-product-label">{t("ideas.productExample")}</span>
-                    <span>{product.name}</span>
-                    <button type="button" className="idea-product-add" disabled={full || Boolean(productAdded)}
-                      aria-label={productAdded ? t("ideas.addedLabel", { title: product.name }) : t("ideas.addProductLabel", { title: product.name })}
-                      onClick={() => add(product.name, product.url)}>
-                      {productAdded ? t("ideas.added") : t("ideas.addProduct")}
-                    </button>
-                  </div>
+                {product ? (
+                  <>
+                    <div className="idea-product">
+                      <span className="idea-product-label">{t("ideas.suggestion")}</span>
+                      <strong className="idea-product-name">{product.name}</strong>
+                      <span className="idea-product-merchant">{t("ideas.merchant")}</span>
+                      {productAdded ? addedStatus(product.name) : (
+                        <button type="button" className="button idea-product-add" disabled={full}
+                          aria-label={t("ideas.addToListLabel", { title: product.name })}
+                          onClick={() => add(product.name, product.url)}>
+                          {t("ideas.addToList")}
+                        </button>
+                      )}
+                    </div>
+                    <p className="idea-or" aria-hidden="true">{t("ideas.or")}</p>
+                    {generalAdded ? addedStatus(idea.title) : (
+                      <button type="button" className="button button-secondary button-small idea-add" disabled={full}
+                        aria-label={t("ideas.addWithoutProductLabel", { title: idea.title })}
+                        onClick={() => add(idea.title)}>
+                        {t("ideas.addWithoutProduct")}
+                      </button>
+                    )}
+                  </>
+                ) : generalAdded ? addedStatus(idea.title) : (
+                  <button type="button" className="button idea-add" disabled={full}
+                    aria-label={t("ideas.addToListLabel", { title: idea.title })}
+                    onClick={() => add(idea.title)}>
+                    {t("ideas.addToList")}
+                  </button>
                 )}
               </li>
             );
