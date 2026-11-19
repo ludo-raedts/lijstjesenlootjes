@@ -21,9 +21,9 @@ test("shop-specific suggestions respect the active affiliate configuration", () 
   const enabled = renderIdeas("nl", { siteId: "1560649" });
   const disabled = renderIdeas("nl", null);
   assert.match(enabled, /Peter Pauper Bookbound/);
-  assert.match(enabled, /Product bij bol/);
+  assert.match(enabled, /Verkrijgbaar bij bol/);
   assert.doesNotMatch(disabled, /Peter Pauper Bookbound/);
-  assert.doesNotMatch(disabled, /Product bij bol/);
+  assert.doesNotMatch(disabled, /Verkrijgbaar bij bol/);
   assert.match(disabled, /Mooi notitieboek/);
 });
 

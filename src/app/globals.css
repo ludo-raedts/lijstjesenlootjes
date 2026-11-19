@@ -342,11 +342,15 @@ input:focus, textarea:focus, select:focus { border-color: var(--green); box-shad
 .idea-card-heading { display: flex; align-items: center; gap: .65rem; min-height: 2.3rem; font-family: var(--serif); font-size: 1.05rem; }
 .idea-card-mark { display: grid; place-items: center; flex: 0 0 2.25rem; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: #e6eee7; color: var(--forest); font-size: 1.25rem; }
 .idea-add { align-self: flex-start; }
-.idea-product { display: grid; gap: .3rem; width: 100%; margin-top: auto; padding-top: .8rem; border-top: 1px solid var(--line); font-size: .95rem; }
-.idea-product-label { color: var(--muted); font-weight: 700; }
-.idea-product-add { justify-self: start; min-height: 44px; padding: .3rem 0; border: 0; background: transparent; color: var(--forest); font: inherit; font-weight: 700; text-align: left; text-decoration: underline; text-underline-offset: .2em; cursor: pointer; }
-.idea-product-add:focus-visible { outline: 3px solid #1c4cb4; outline-offset: 3px; }
-.idea-product-add:disabled { color: var(--muted); text-decoration: none; cursor: default; }
+.idea-product { display: grid; justify-items: start; gap: .3rem; width: 100%; margin-top: auto; padding: .85rem; border: 1px solid var(--line); border-radius: 8px; background: var(--paper-deep, #f8f0e3); }
+.idea-product-label { color: var(--muted); font-weight: 700; font-size: .88rem; }
+.idea-product-name { font-size: 1rem; }
+.idea-product-merchant { color: var(--muted); font-size: .92rem; }
+.idea-product-add { margin-top: .35rem; white-space: normal; text-align: left; }
+.idea-or { margin: 0; color: var(--muted); font-weight: 700; font-size: .92rem; }
+.idea-added { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .75rem; margin: .35rem 0 0; font-weight: 700; color: var(--forest); }
+.idea-undo { min-height: 44px; padding: .3rem 0; border: 0; background: transparent; color: var(--ink); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: .2em; cursor: pointer; }
+.idea-undo:focus-visible { outline: 3px solid #1c4cb4; outline-offset: 3px; }
 .idea-more { margin-top: .85rem; }
 .idea-disclosure { margin: 1rem 0 0; }
 .idea-empty { margin: 1rem 0; }
