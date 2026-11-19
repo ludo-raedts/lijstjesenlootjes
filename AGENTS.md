@@ -32,3 +32,7 @@ These documents are project requirements, not optional background.
 - Treat `DESIGN.md` as the source of truth for implementation.
 - Preserve the 65/20/15 visual balance, multicultural representation rules, WCAG 2.2 AA target, and neutral/Sinterklaas/Christmas theme separation.
 - Important text must remain real HTML; generated mockups are references, not production page images.
+
+## Workflow boundary
+
+Follow the working agreement in `PROJECT_CONTEXT.md`: branch and pull request only (never push to `main`), no secrets or production data in the repository, run the checks listed in `README.md` before opening a pull request, flag new migrations for the owner, and keep documentation in step with behavior. This file is read by both Claude Code (through `CLAUDE.md`) and Codex.

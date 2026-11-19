@@ -122,7 +122,8 @@ A config like `BOL_PROGRAMS`: `{ siteHost, locales, programmeId, awinMerchantId,
 
 ## Gate findings (2026-11-18, read-only look in the Awin account and public terms)
 
-- **Programmes (gate 1):** 0 joined, 3 pending (ANWB Webwinkel NL, ICI PARIS XL NL, Proshop NL), all NL and all with a product feed.
+- **Update 2026-11-19:** the owner reports that Awin approval has been granted. Which programmes, countries and feed terms apply has not been re-read into this document yet: confirm it through the Awin account or MCP and update gate 1 below before building anything on it.
+- **Programmes (gate 1), as last read:** 0 joined, 3 pending (ANWB Webwinkel NL, ICI PARIS XL NL, Proshop NL), all NL and all with a product feed.
   Nothing is approved yet, so no licence to use any advertiser material exists today.
 - **Feeds (gate 2):** Awin Create-a-Feed (feed list + per-feed download URL with a personal key; keep it server-side,
   never in client code or the repo). Proshop NL: ~233,849 products, updated hourly, 3% commission, 30-day cookie.

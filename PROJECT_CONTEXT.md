@@ -16,7 +16,7 @@ The name wheel is a secondary utility and must not return to the primary navigat
 - No account is required in the MVP.
 - Capability links grant access and must be treated as secrets.
 - Addresses are never stored in readable form. Link recovery is opt-in and keeps only a keyed hash; mail goes out once, after the response.
-- The organizer never receives a readable overview of draw assignments.
+- The management screen never shows an overview of draw assignments. The organizer issues the personal links and could in principle open one, which the FAQ says plainly; never claim more than that.
 - Raw personal tokens are not persisted.
 - User-facing flows should feel warm, simple, communal, and gift-oriented rather than technical.
 - The neutral interface must work year-round; Sinterklaas, Christmas, and the four seasons are appearance layers, not separate products.
@@ -39,6 +39,8 @@ If documents disagree, security and data integrity take precedence, followed by 
 - Server routes own validation, sessions, capability-token exchange, and mutations.
 - Browser code never receives database credentials or raw stored token hashes.
 - API field names and persisted domain values are English and locale-independent.
+- Vercel Functions run in Frankfurt (`fra1`), next to the Supabase database. Resend reports delivery outcomes to `/api/webhooks/resend`; only anonymous daily counters are kept.
+- `error.tsx` and `global-error.tsx` provide localized error fallbacks.
 - The root layout publishes the resolved `data-theme` and `data-layout` attributes; theme CSS and hero assets change without changing page semantics or content order.
 
 ## Language architecture
@@ -46,7 +48,7 @@ If documents disagree, security and data integrity take precedence, followed by 
 - Internal language: English.
 - Default interface locale: Dutch (`nl`).
 - First planned additional interface locale: English (`en`).
-- Additional locales such as German (`de`) must be possible without changing backend contracts.
+- German (`de`) exists as a cookie-selectable interface language with a partial catalog and English fallback; further locales must be possible without changing backend contracts.
 - APIs return stable error codes rather than translated sentences.
 - Dates, numbers, currency, metadata, sharing text, validation feedback, and accessibility labels are all locale-sensitive UI concerns.
 - User-created titles, names, notes, budgets, and wishes are content, not interface copy, and remain unchanged.
@@ -71,3 +73,14 @@ For implementation changes:
 - check desktop and mobile layouts;
 - check keyboard focus, reduced motion, contrast, and meaningful errors;
 - update the relevant source-of-truth document when architecture or product behavior changes.
+
+## Working agreement (people and coding agents)
+
+The repository is public and `main` is protected by a ruleset. Everyone, including Claude Code and Codex, works the same way:
+
+- Never push to `main`. Create a branch, push it, open a pull request, wait for the two CI checks (`Lint, typecheck and unit tests`, `End-to-end (Playwright, nl + en)`), then merge. Vercel deploys `main` after the merge and builds a preview per pull request.
+- Never commit secrets, tokens, real links, real addresses or production data. `.env*` is ignored; only `.env.example` with empty values is tracked. Treat anything in this repository as world-readable.
+- Run `npm test`, `npm run lint`, `npm run typecheck` and, for UI or flow changes, `npm run build` and `npm run test:e2e` before opening a pull request.
+- A new migration in `supabase/migrations/` is not applied by merging. Say so in the pull request: the owner applies it to the production Supabase project before or together with the deploy.
+- Production changes that cannot be undone by a rollback (database migrations, DNS, Resend or Vercel settings, environment variables) are made or approved by the owner. Secrets are entered by the owner, never by an agent.
+- Update the relevant source-of-truth document in the same pull request as the behavior it describes.

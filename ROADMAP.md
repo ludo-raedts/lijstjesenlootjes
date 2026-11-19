@@ -1,22 +1,24 @@
 # Product and delivery roadmap
 
-Status date: 2026-11-17 (updated after the CI, recovery, mail-status and linking sprint)
+Status date: 2026-11-19 (updated after the Frankfurt, webhook, privacy and repository-protection sprint)
 
 This roadmap follows the product, design, localization, and deployment constraints in
 `PROJECT_CONTEXT.md`, `DESIGN.md`, `LOCALIZATION.md`, and `README.md`.
 
 ## Where we are
 
-Live on `lijstjesenlootjes.nl` and `wishanddraw.com`: wishlists with reservations, draws with exclusions and personal links, the name wheel, Dutch and English interfaces with per-domain paths, seasonal themes with a protected admin, durable rate limiting, retention cleanup, security headers with a nonce CSP, anonymous usage counters, optional one-off email, and Amazon affiliate links with disclosure.
+Live on `lijstjesenlootjes.nl` and `wishanddraw.com`: wishlists with reservations, draws with exclusions, redraws and personal links, the name wheel, Dutch and English interfaces (German via the language switcher) with per-domain paths, seasonal themes with a protected admin, durable rate limiting, retention cleanup, security headers with a nonce CSP, anonymous usage counters, optional one-off email with delivery counters, opt-in link recovery, and bol and Amazon affiliate links with disclosure.
 
-Added in the latest sprint (not yet pushed when this was written; check `git log` for the commit):
+Added on 2026-11-19:
 
-- GitHub Actions CI (`.github/workflows/ci.yml`): typecheck, unit tests, and the full e2e suite.
-- Opt-in recovery of a lost management link, without storing the address.
-- Email sent after the response with retries and a visible status; the organizer can mail a fresh link.
-- Clear explanation of expired, replaced, or unknown links; the organizer can move a draw's date and every link follows.
-- Progress and reminder messages per participant; a participant can link an existing wishlist.
-- Footer and privacy text no longer describe a closed preview.
+- Functions run in Frankfurt (`fra1`), next to the database.
+- Resend delivery webhook (`/api/webhooks/resend`, Svix signature) feeding delivered/bounced/complained/delayed counters in `/admin/usage`; SPF, DKIM and DMARC are in place for both domains.
+- Fix: the office, Christmas and birthday landing pages were rejected by a fixed page list in the database (error 23514); the check now only guards the shape of the key.
+- Localized error pages, per-domain contact address, and a complete privacy statement (controller, grounds, processors, rights, complaint route).
+- The repository is public; the `Protect main` ruleset requires a pull request and the two CI checks.
+- Phone homepage: the actions are on the first screen. The organizer claim is worded as "the management screen shows no overview of the pairings".
+
+Still open before wide public use: external uptime monitoring and deploy-failure notifications, a decided backup policy, the legal name or company details of the controller in the privacy statement, and the storage migration below.
 
 ## Phase 1 — Public-pilot readiness
 
@@ -58,7 +60,7 @@ Required implementation after approval of these periods:
 
 ### 3. End-to-end quality gate
 
-**Status (2026-11-17): implemented** in `e2e/` (`npm run test:e2e`, 45 tests across the `nl` and `en` projects, against an in-memory Supabase stand-in so no real data is touched). Runs in CI on every pull request and push to `main`. Still manual: a GitHub branch-protection rule that makes the checks mandatory before merging, since Vercel deploys `main` on its own.
+**Status (2026-11-17): implemented** in `e2e/` (`npm run test:e2e`, 98 passing tests (4 intentionally language-specific skips) across the `nl` and `en` projects, plus 113 unit tests, against an in-memory Supabase stand-in so no real data is touched). Runs in CI on every pull request and push to `main`. Since 2026-11-19 the `Protect main` ruleset makes a pull request and both checks mandatory before anything reaches `main`, and with it production.
 
 Automate these browser flows in both Dutch and English:
 
