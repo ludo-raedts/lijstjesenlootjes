@@ -26,3 +26,19 @@ test("a German visitor sees the recovery page in German", async ({ page }, testI
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Verwaltungslink verloren?");
   await expectNoAxeViolations(page, "German recovery page");
 });
+
+// German strings run longer than Dutch and English (LOCALIZATION.md asks for 35% expansion), so the German pages are
+// checked on a 320 px phone: nothing may force a horizontal scroll.
+test("German pages do not overflow a 320 px screen", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.context().addCookies([{ name: "ll_locale", value: "de", url: testInfo.project.use.baseURL! }]);
+  const targets = [pagePath(testInfo, "home"), pagePath(testInfo, "drawCreate"), pagePath(testInfo, "wishlistCreate"),
+    pagePath(testInfo, "wheel"), pagePath(testInfo, "recover"), "/privacy", "/help"];
+  for (const target of targets) {
+    await page.goto(target);
+    await expect(page.locator("html")).toHaveAttribute("lang", "de");
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, `${target} scrolls sideways by ${overflow}px`).toBeLessThanOrEqual(0);
+  }
+});
+

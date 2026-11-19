@@ -63,3 +63,18 @@ test("German formats dates and API errors in German", async () => {
   assert.match(translateApiError("rate_limited", {}, "de"), /Minute/);
   assert.equal(translateApiError("field_required", { field: "groupName" }, "de"), "Gruppenname fehlt.");
 });
+
+test("German covers every key except the owner-only admin and usage screens, with intact placeholders", async () => {
+  const { enMessages } = await import("../src/i18n/messages/en");
+  const { deMessages } = await import("../src/i18n/messages/de");
+  const ownerOnly = /^(admin|usage|meta\.admin|meta\.usage)/;
+  const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).sort();
+  const german = deMessages as Record<string, string | undefined>;
+  const missing = Object.keys(enMessages).filter((key) => !ownerOnly.test(key) && !german[key]);
+  assert.deepEqual(missing, [], "German keys missing; add them or they fall back to English");
+  for (const [key, value] of Object.entries(enMessages)) {
+    const text = german[key];
+    if (text) assert.deepEqual(placeholders(text), placeholders(value), key);
+  }
+});
+

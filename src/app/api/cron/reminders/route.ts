@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { mintDrawAdminLink } from "@/lib/access-links";
 import { HttpError } from "@/lib/api-error";
 import { isCronAuthorized } from "@/lib/cron-auth";
+import { recordCronRun } from "@/lib/cron-health";
 import { originForHost } from "@/lib/domains";
 import { emailConfigured, sendEmailWithRetry } from "@/lib/email";
 import { renderReminderEmail } from "@/lib/email-templates";
@@ -37,13 +38,17 @@ export async function GET(request: NextRequest) {
   try {
     if (!isCronAuthorized(request)) throw new HttpError(401, "cron_unauthorized");
     const key = parseSealKey(process.env.REMINDER_ENCRYPTION_KEY);
-    if (!key || !emailConfigured()) return noStoreJson({ sent: 0, cleared: 0, skipped: true });
+    if (!key || !emailConfigured()) {
+      await transaction((database) => recordCronRun(database, "reminders"));
+      return noStoreJson({ sent: 0, cleared: 0, skipped: true });
+    }
 
     const today = amsterdamDay(new Date());
     const origin = new URL(request.url).origin;
     const cleared = new Set<string>();
 
     const jobs = await transaction((database) => {
+      recordCronRun(database, "reminders");
       const due: Job[] = [];
       for (const draw of database.draws) {
         if (!draw.reminder) continue;

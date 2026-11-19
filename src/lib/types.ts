@@ -119,6 +119,8 @@ export type Database = {
   sessions: Session[];
   siteSettings?: {
     theme?: ThemeSettings;
+    /** When each scheduled job last ran (ISO timestamps only), read by the cron health check. */
+    cronRuns?: Partial<Record<"cleanup" | "reminders", string>>;
   };
 };
 

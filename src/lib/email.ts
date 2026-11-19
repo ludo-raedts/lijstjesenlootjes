@@ -39,6 +39,15 @@ export function senderForHost(host: string | null | undefined) {
   return specific || process.env.EMAIL_FROM?.trim() || undefined;
 }
 
+/**
+ * Where a reply to a mail goes: the contact address of the domain the request arrived on (so mail from
+ * wishanddraw.com is answered at wishanddraw.com). `EMAIL_REPLY_TO` is only the fallback for unknown hosts such as
+ * previews. Each address needs a real mailbox.
+ */
+export function replyToForHost(host: string | null | undefined) {
+  return findSiteDomain(host)?.contactEmail || process.env.EMAIL_REPLY_TO?.trim() || undefined;
+}
+
 export function emailConfigured() {
   return Boolean(process.env.EMAIL_PROVIDER_API_KEY?.trim() && process.env.EMAIL_FROM?.trim());
 }
@@ -59,7 +68,7 @@ async function attempt(message: EmailMessage): Promise<Attempt> {
   const apiKey = process.env.EMAIL_PROVIDER_API_KEY?.trim();
   const from = senderForHost(message.host);
   if (!apiKey || !from) return { result: "skipped", retryable: false };
-  const replyTo = process.env.EMAIL_REPLY_TO?.trim();
+  const replyTo = replyToForHost(message.host);
   try {
     const response = await fetch(endpoint(), {
       method: "POST",

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test, { afterEach } from "node:test";
 import { createTranslator } from "../src/i18n/messages";
-import { emailConfigured, senderForHost, sendEmail, sendEmailWithRetry } from "../src/lib/email";
+import { emailConfigured, replyToForHost, senderForHost, sendEmail, sendEmailWithRetry } from "../src/lib/email";
 import { escapeHtml, renderDrawEmail, renderRecoveryEmail, renderWishlistEmail } from "../src/lib/email-templates";
 import { optionalEmail } from "../src/lib/validation";
 
@@ -160,4 +160,14 @@ test("wishlist and draw emails invite the reader to make their own list on the s
   assert.ok(wishlist.text.includes("https://wishanddraw.com/wishlist-maker") && wishlist.html.includes("https://wishanddraw.com/wishlist-maker"));
   const draw = renderDrawEmail(createTranslator("nl"), { group: "Team", adminUrl: "https://lijstjesenlootjes.nl/x#token=1", participants: [{ name: "Sam", url: "https://lijstjesenlootjes.nl/y#token=2" }], site: "lijstjesenlootjes.nl" });
   assert.ok(draw.text.includes("https://lijstjesenlootjes.nl/verlanglijstje-maken"));
+});
+
+test("replies go to the contact address of the sending domain, with the env value as fallback", () => {
+  process.env.EMAIL_REPLY_TO = "fallback@example.nl";
+  assert.equal(replyToForHost("lijstjesenlootjes.nl"), "info@lijstjesenlootjes.nl");
+  assert.equal(replyToForHost("www.wishanddraw.com:443"), "info@wishanddraw.com");
+  assert.equal(replyToForHost("localhost:3000"), "fallback@example.nl");
+  assert.equal(replyToForHost(null), "fallback@example.nl");
+  delete process.env.EMAIL_REPLY_TO;
+  assert.equal(replyToForHost("localhost:3000"), undefined);
 });

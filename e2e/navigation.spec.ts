@@ -80,6 +80,14 @@ test("health endpoint reports ok without leaking details", async ({ request }) =
   expect(response.headers()["cache-control"]).toContain("no-store");
 });
 
+test("the cron health endpoint answers ok on a fresh deployment and leaks nothing", async ({ request }) => {
+  const response = await request.get(`${API}/api/health/cron`);
+  expect(response.status()).toBe(200);
+  const body = await response.json();
+  expect(Object.keys(body).sort()).toEqual(["jobs", "status", "timestamp"]);
+  expect(body.status).toBe("ok");
+});
+
 test("the cleanup endpoint refuses unauthenticated and wrong callers", async ({ request }) => {
   expect((await request.get(`${API}/api/cron/cleanup`)).status()).toBe(401);
   expect((await request.get(`${API}/api/cron/cleanup`, { headers: { authorization: "Bearer wrong" } })).status()).toBe(401);
