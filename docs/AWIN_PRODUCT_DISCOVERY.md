@@ -122,7 +122,7 @@ A config like `BOL_PROGRAMS`: `{ siteHost, locales, programmeId, awinMerchantId,
 
 ## Gate findings (2026-11-18, read-only look in the Awin account and public terms)
 
-- **Update 2026-11-19:** the owner reports that Awin approval has been granted. Which programmes, countries and feed terms apply has not been re-read into this document yet: confirm it through the Awin account or MCP and update gate 1 below before building anything on it.
+- **Correction 2026-11-19 (read in the Awin account, see the gate answers below):** the publisher account is approved, but 0 advertiser programmes are joined; ANWB Webwinkel NL, ICI PARIS XL NL and Proshop NL are all `APPLICATION_PENDING`. An earlier note in this repository that "Awin is approved" was too broad.
 - **Programmes (gate 1), as last read:** 0 joined, 3 pending (ANWB Webwinkel NL, ICI PARIS XL NL, Proshop NL), all NL and all with a product feed.
   Nothing is approved yet, so no licence to use any advertiser material exists today.
 - **Feeds (gate 2):** Awin Create-a-Feed (feed list + per-feed download URL with a personal key; keep it server-side,
@@ -183,3 +183,25 @@ click reference, product data feed FAQ). Not checked in the signed terms; confir
   directory search by region (Awin directory, region filter) once a target country is chosen.
 - **Price freshness (5):** no rule found in Awin's help pages; the FAQ is silent on stale prices. Treat prices as
   informational ("price on {date}") until an advertiser says otherwise.
+
+## Gate answers (read 2026-11-19, Awin account via the Awin MCP plus public Awin help pages)
+
+No answer below is a written permission from an advertiser. Where the terms are silent, ask each advertiser in writing after its partnership is active. Never put feed URLs, feed keys or API keys in the repository, commits, pull requests or documents.
+
+| # | Answer | Status |
+|---|---|---|
+| 1 | 0 joined. ANWB Webwinkel NL (updated 2026-11-17), ICI PARIS XL NL (2026-11-17) and Proshop NL (2026-11-18) are `APPLICATION_PENDING`, all Netherlands. `Active` on a programme page means the programme runs, not that our application is approved. Nothing is approved for `wishanddraw.com`; ICI PARIS XL is only for Dutch-language channels aimed at the Netherlands. | Open: wait for approval |
+| 2 | Awin publishes no expiry for a feed URL or key, so do not assume it is permanent. The key is part of the download URL: keep it server-side only. Update frequency is set by each advertiser; check `last update` and download only when it changed. Limits: at most 5 concurrent downloads, at most 5 identical downloads per hour, avoid starting exactly on the hour or minute. The earlier note that Proshop updates hourly could not be re-verified on 2026-11-19. | Partly answered |
+| 3 | No written permission found to store titles and prices in our database or for how long. The three programme terms (ANWB 2020-04-14, Proshop 2023-01-13, ICI PARIS XL 2026-10-05) do not answer it. | Open: ask in writing |
+| 4 | No written permission to cache, resize or proxy images through our domain. Awin's own resize/cache service is not permission for our own proxy. ICI PARIS XL refers to a separate document under its Documents tab that was not available through the connector. | Open: ask in writing |
+| 5 | Feeds contain prices and price comparison is a normal use, but no term sets how old a shown price may be or prescribes "price on {date}". That wording is a design proposal only. | Open: ask in writing |
+| 6 | Generic deep link: `https://www.awin1.com/cread.php?awinmid={advertiserId}&awinaffid={publisherId}&clickref={fixedLabel}&ued={encodedDestination}`. Prefer the feed's `aw_deep_link` column. Up to six ClickRefs, the first 50 characters appear in reports, only `clickref1` is visible to the advertiser. Use only fixed, non-personal labels (for example `wishlist-guest`, `draw-reveal`); never a token, session, visitor, participant or list ID in any of the six. | Answered |
+| 7 | Terms allow community/UGC, shopping directory and content publishers, which makes the use plausible, but nothing says we may turn a link a user typed into an affiliate link without being asked. Keep the current explicit choice; ask for written permission before affiliate links in user wishlists and draw views. | Open: ask in writing |
+| 8 | No programme-specific wording found; Awin requires a clear commercial disclosure under local law. Starting point next to the link or card: "Advertisement/partner link: we may receive a commission; you pay no more." Our existing disclosure is a good basis; per-programme approval is missing. | Open |
+| 9 | No active Awin programme with international delivery for `wishanddraw.com`. Amazon remains the only configured affiliate for the English domain. | Answered |
+
+Email: recovery, list and draw mails must stay free of advertiser links. ANWB and ICI PARIS XL require every commercial mailing to go through the Email Approval Tool; Proshop's allowed publisher types are not an approval of our mails.
+
+Amazon (not verifiable from the repository or the Awin account): only `amazon.com` for `wishanddraw.com` is configured, and nothing is configured for `.nl`, `.de` or `.co.uk`. Each target marketplace needs its own Associates enrolment and Partner Tag. The Creators API additionally needs at least 10 qualifying sales in the previous 30 days; there is no evidence that threshold is met, so plain tagged links only and no catalog integration. bol: only a site code for `lijstjesenlootjes.nl` is configured; treat `wishanddraw.com` as not approved at bol.
+
+Recommended scope for the first version once a programme is approved: explicit text links only, no prices and no product images, until each advertiser has agreed in writing to storage, price display, image use and links inside user-created lists.
