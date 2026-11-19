@@ -86,3 +86,96 @@ Follow-ups:
 - [ ] Pitch the roundups listed above.
 - [ ] Decide on a Dutch comparison or tips page.
 - [ ] Review the Search Console Links report in a few weeks.
+
+## Pitch drafts for step 2 (not yet sent)
+
+Prepared on 2026-11-19. Nothing has been sent; each pitch needs the owner's confirmation of text and destination first. Sender address: `info@wishanddraw.com`. Sign-off name is left to the owner.
+
+### Claims that are safe to make
+
+Verified against the live English page and the project documents on 2026-11-19:
+
+- No account is needed; the organizer gets one management link and every participant a personal link.
+- Optional exclusions ("who must not draw each other"), one direction per setting; drawing yourself is always excluded. The site says so when exclusions make a draw impossible.
+- Optional date and budget; participants can create a wishlist through their own link.
+- The management screen shows no overview of who drew whom. Do **not** claim more than that: the organizer issues the links and could in principle open one (`PROJECT_CONTEXT.md`).
+- Do **not** say "free" or "gratis": that word is reserved until the revenue-model decision (`SEO_PLAN.md`).
+
+### Targets
+
+| Priority | Target | Why | Route | Notes |
+|----------|--------|-----|-------|-------|
+| 1 | [Educators Technology](https://www.educatorstechnology.com/2022/12/the-7-best-secret-santa-generators.html) | Independent list of 6 generators, last updated 2026-10-21 by Med Kharbach; none offers the combination of exclusions and no account that Wish & Draw does. | Contact page `educatorstechnology.com/contact/` | Best fit and freshest. |
+| 2 | [The Gift Hacker](https://thegifthacker.com/secret-santa-generator/) | Roundup of 5 sites and 3 apps by Peter Geerts, page dated 2025-11-12. | `info@thegifthacker.com` or `thegifthacker.com/contact/` | Affiliate-style "Buy Now" links, so expect a commercial angle. |
+| 3 | [Streamer.guide](https://streamer.guide/guides/best-secret-santa-apps) | Eight tools, updated 2026-10-29 by Kenji Arai. | Footer "Contact Us" (target unclear) or `/about` | Find the contact link before sending. |
+| 4 | [PopSci](https://www.popsci.com/story/diy/secret-santa-websites-guide/) | Big brand, but last updated 2021-12-09 and the author has left. | `popsci.com/contact/` | Low odds; a short note to the DIY desk only. |
+| 5 | [Windows Report](https://windowsreport.com/secret-santa-websites/) | Roundup of 7 tools. | Unknown; the page returned 403 to the research tool | Check the live page for author and contact. |
+
+### Skipped on purpose
+
+| Target | Reason |
+|--------|--------|
+| Uplup blog | Its own marketing page ranking Uplup first; a competitor. |
+| GiftList blog | Published by GiftList; a competitor. |
+| Gitnux | Commissioned and co-funded by assessed vendors and earns commissions; "Apply for a Listing" looks like paid inclusion. |
+
+### Draft A: Educators Technology (contact form)
+
+Subject: A Secret Santa generator with exclusions and no account, for your list
+
+> Hi Med,
+>
+> I like your list of Secret Santa generators and saw it was updated in October. I'm one of the people behind Wish & Draw (https://wishanddraw.com/secret-santa-generator), and I thought it might be worth a look for teachers and school staff who run a draw.
+>
+> What it does: you add the participants and optionally a date and budget, tick who must not draw each other (for example partners), and everyone gets a personal link to see their name and add a wishlist. Nobody needs an account, and the organizer's screen shows no overview of who drew whom.
+>
+> If it fits, I'd be glad to be considered for the list. Corrections or questions are welcome, and I'm happy to answer anything about how it works.
+>
+> Thanks for your time,
+> <sender name>, Wish & Draw (info@wishanddraw.com)
+
+### Draft B: The Gift Hacker (email)
+
+Subject: Suggestion for your Secret Santa generator page
+
+> Hi Peter,
+>
+> Your Secret Santa generator page is a useful overview, so I wanted to point out a newer option: Wish & Draw (https://wishanddraw.com/secret-santa-generator). Names are drawn without anyone needing an account; the organizer can set who must not draw each other, add an optional date and budget, and each participant gets a personal link where they can also create a wishlist.
+>
+> If you think it belongs next to the sites you list, I'd appreciate it. I'm glad to answer questions or share details.
+>
+> Kind regards,
+> <sender name>, Wish & Draw
+
+### Draft C: Streamer.guide (contact form, once the route is found)
+
+Subject: Secret Santa tool for your list of apps
+
+> Hi Kenji,
+>
+> I read your Secret Santa apps guide, which you re-checked on 29 October. I'd like to suggest Wish & Draw (https://wishanddraw.com/secret-santa-generator): a browser-based draw with optional exclusions, a date and budget, personal links for every participant, and a wishlist per person. No account is needed.
+>
+> If it meets your criteria, a mention would be welcome. Feel free to test it and tell me what you find.
+>
+> Thanks,
+> <sender name>, Wish & Draw
+
+### Draft D: PopSci (contact page, short)
+
+Subject: Update to "The best Secret Santa platforms, ranked"
+
+> Hello,
+>
+> Your guide to Secret Santa platforms was last updated in 2021. If a refresh is planned, Wish & Draw (https://wishanddraw.com/secret-santa-generator) is a newer option: draw names with optional exclusions, no account needed, personal links per participant and a wishlist for each.
+>
+> Happy to provide details or a walkthrough.
+>
+> Thanks,
+> <sender name>, Wish & Draw
+
+### Follow-ups for step 2
+
+- [ ] Owner confirms the texts and destinations, then A, B and D are sent; find the Streamer.guide and Windows Report contact routes first.
+- [ ] Log each sent pitch with its date in the "Editorial pitches" table.
+- [ ] Do not follow up more than once, after about two weeks.
+- [ ] Decide on the "free" wording before any pitch mentions price.
