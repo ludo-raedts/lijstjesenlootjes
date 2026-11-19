@@ -441,7 +441,7 @@ export const nlMessages = {
   "privacy.notSentBody": "De radpagina stuurt namen, vragen en uitslagen niet naar de server, analytics of externe scripts. Er worden geen WhatsApp-berichten autonoom verstuurd.",
   "footer.contact": "Contact",
   "privacy.controllerTitle": "Wie is verantwoordelijk",
-  "privacy.controllerBody": "Lijstjes & Lootjes wordt beheerd door een particulier en is niet commercieel georganiseerd als bedrijf met personeel. Die beheerder is de verantwoordelijke voor de gegevens op deze site. Vragen, verzoeken en klachten kun je mailen naar {email}.",
+  "privacy.controllerBody": "Lijstjes & Lootjes wordt beheerd door L.D.M. Raedts, een particulier. Die is de verantwoordelijke voor de gegevens op deze site. Vragen, verzoeken en klachten kun je mailen naar {email}.",
   "privacy.groundsTitle": "Waarom we gegevens verwerken",
   "privacy.groundsBody": "De inhoud van je lijstje of trekking verwerken we om de dienst uit te voeren die je zelf start (uitvoering van de dienst die je vraagt). Je e-mailadres gebruiken we alleen als je dat bewust invult en ervoor kiest: voor die ene mail met je links, voor een herinnering of voor herstel (jouw toestemming; je kunt elke optie weglaten). Anonieme bezoektellingen en een tijdelijke, gehashte aanduiding om misbruik en overbelasting te beperken bewaren we vanuit ons gerechtvaardigd belang om de site veilig, bereikbaar en begrijpelijk te houden; die bewaren we hooguit zeven dagen (misbruikbescherming) of in totalen per dag (tellingen). Er zijn geen accounts, geen profielen, geen advertentietrackers en geen geautomatiseerde besluiten over jou.",
   "privacy.processorsTitle": "Met wie we gegevens delen",

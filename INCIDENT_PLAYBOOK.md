@@ -6,8 +6,9 @@ Short, practical steps for the first hour. Keep this free of real names, links, 
 
 - `GET /api/health` returns `200 {"status":"ok"}` when the app reaches the database and
   `503 {"status":"degraded"}` otherwise. It never returns data or error details.
-- Still to do by the owner: point an uptime monitor at `https://lijstjesenlootjes.nl/api/health` and
-  `https://wishanddraw.com/api/health` (check every minute, alert after 2 failures).
+- `GET /api/health/cron` answers `503` when the daily cleanup or reminder job has not run for 36 hours (`200` with `waiting` on a fresh deployment). Monitor it as well, on both domains. If it fails, check Vercel → Settings → Cron Jobs and `CRON_SECRET` (a missing or short secret makes both jobs answer 401).
+- Still to do by the owner: point an uptime monitor at `https://lijstjesenlootjes.nl/api/health`, `https://lijstjesenlootjes.nl/api/health/cron` and
+  the same two paths on `https://wishanddraw.com` (check every minute, alert after 2 failures).
 - Vercel alert rules (Observability → Alerts, or `vercel alerts rules ls`):
   - `ar_default` (built-in): usage and error anomalies at severity high or above, sent to
     team owners.

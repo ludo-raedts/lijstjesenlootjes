@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { isCronAuthorized } from "@/lib/cron-auth";
+import { recordCronRun } from "@/lib/cron-health";
 import { purgeExpired } from "@/lib/data-lifecycle";
 import { errorResponse, noStoreJson } from "@/lib/http";
 import { HttpError } from "@/lib/api-error";
@@ -11,7 +12,11 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   try {
     if (!isCronAuthorized(request)) throw new HttpError(401, "cron_unauthorized");
-    const report = await transaction((database) => purgeExpired(database));
+    const report = await transaction((database) => {
+      const purged = purgeExpired(database);
+      recordCronRun(database, "cleanup");
+      return purged;
+    });
     await cleanupMeasurementRetention();
     // Counts only: never log names, wishes, tokens, links or identifiers.
     console.info("retention_cleanup_completed", JSON.stringify(report));

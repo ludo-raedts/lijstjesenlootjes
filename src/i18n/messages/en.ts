@@ -443,7 +443,7 @@ export const enMessages: Record<MessageKey, string> = {
   "privacy.notSentBody": "The wheel page does not send names, questions, or results to the server, analytics, or external scripts. WhatsApp messages are never sent automatically.",
   "footer.contact": "Contact",
   "privacy.controllerTitle": "Who is responsible",
-  "privacy.controllerBody": "Wishlists & Draws is run by an individual and is not organised as a company with staff. That person is the controller of the data on this site. Questions, requests and complaints can be emailed to {email}.",
+  "privacy.controllerBody": "Wishlists & Draws is run by L.D.M. Raedts, an individual. That person is the controller of the data on this site. Questions, requests and complaints can be emailed to {email}.",
   "privacy.groundsTitle": "Why we process data",
   "privacy.groundsBody": "We process the content of your list or draw to carry out the service you start yourself (performance of the service you ask for). We only use your email address if you enter it and choose an option on purpose: for the single email with your links, a reminder or recovery (your consent; you can leave every option out). We keep anonymous visit counts and a short-lived, hashed identifier to limit abuse and overload on the basis of our legitimate interest in keeping the site safe, available and understandable; the identifier is kept for at most seven days and the counts only as daily totals. There are no accounts, no profiles, no advertising trackers and no automated decisions about you.",
   "privacy.processorsTitle": "Who we share data with",

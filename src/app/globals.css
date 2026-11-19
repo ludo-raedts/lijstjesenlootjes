@@ -1009,3 +1009,9 @@ body {
   .hero-aside { margin-top: 1.5rem; }
   .hero-intro { max-width: none; }
 }
+
+/* Long German compound words ("Wunschzettel") made the single-column tool header wider than a 320 px screen. */
+@media (max-width: 560px) {
+  .tool-hero { grid-template-columns: minmax(0, 1fr); }
+  .tool-hero h1 { font-size: clamp(2.2rem, 11.5vw, 3.1rem); overflow-wrap: break-word; hyphens: auto; }
+}

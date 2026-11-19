@@ -16,6 +16,7 @@ Added on 2026-11-19:
 - Fix: the office, Christmas and birthday landing pages were rejected by a fixed page list in the database (error 23514); the check now only guards the shape of the key.
 - Localized error pages, per-domain contact address, and a complete privacy statement (controller, grounds, processors, rights, complaint route).
 - The repository is public; the `Protect main` ruleset requires a pull request and the two CI checks.
+- Cron heartbeat (`/api/health/cron`), replies to mail go to the sending domain's contact address, the German catalog is complete except owner-only screens (with a test that keeps it so), and the controller is named in the privacy statement.
 - Phone homepage: the actions are on the first screen. The organizer claim is worded as "the management screen shows no overview of the pairings".
 
 Still open before wide public use: external uptime monitoring and deploy-failure notifications, a decided backup policy, the legal name or company details of the controller in the privacy statement, and the storage migration below.

@@ -44,7 +44,7 @@ Keep user-created content unchanged:
 - Current default locale: `nl`.
 - Initial supported catalog set: `nl`, `en`.
 - German (`de`) is available as an interface language chosen with the language switcher (cookie `ll_locale`). It has no domain of its own: paths, sitemap and hreflang stay with the two domains, so German is not indexed. `src/lib/paths.ts` and `domains.ts` use `SiteLocale` (`nl`, `en`) for anything tied to a domain; `siteLocaleFor` maps German onto the English paths.
-- `messages/de.ts` is a partial catalog. A key it lacks falls back to English (`translate`), so strings added to the other catalogs never break German. The tools, the personal pages, the emails, help, privacy, errors and the name wheel are translated; admin, usage, the Sinterklaas page, the office/Christmas/birthday landing pages and the long SEO explanations are not yet. A test keeps German keys real and their placeholders intact.
+- `messages/de.ts` covers every key except the owner-only screens (`admin.*`, `usage.*`, `meta.admin*`, `meta.usage*`), which fall back to English (`translate`). A unit test fails when a non-owner key is missing in German or a placeholder differs, so a string added to the other catalogs must be added in German too. An e2e test loads the main German pages at 320 px and fails on horizontal overflow, which guards the 35% text expansion German needs.
 - Use short BCP 47 language tags in routes and application state; use full regional locales such as `nl-NL` and `en-GB` only for formatting.
 - Locale choice belongs to the browser/interface session, not the draw or wishlist database record.
 
