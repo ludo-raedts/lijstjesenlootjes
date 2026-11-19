@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { getServerI18n } from "@/i18n/server";
 import { hasPath } from "@/lib/paths";
-import { getPagePath } from "@/lib/request-site";
+import { getContactEmail, getPagePath } from "@/lib/request-site";
 
 export async function SiteFooter() {
   const { locale, t } = await getServerI18n();
+  const contactEmail = await getContactEmail();
   return (
     <footer className="site-footer">
       <span className="footer-flowers" aria-hidden="true" />
@@ -21,6 +22,7 @@ export async function SiteFooter() {
           <Link href="/help">{t("footer.help")}</Link>
           <Link href={await getPagePath("recover")}>{t("footer.recover")}</Link>
           <Link href="/privacy">{t("footer.privacy")}</Link>
+          <a href={`mailto:${contactEmail}`}>{t("footer.contact")}</a>
         </nav>
       </div>
     </footer>

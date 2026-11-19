@@ -1,7 +1,7 @@
 import "server-only";
 
 import { headers } from "next/headers";
-import { originForHost } from "@/lib/domains";
+import { contactEmailForHost, originForHost } from "@/lib/domains";
 import { pathForHost, type PageKey } from "@/lib/paths";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -18,4 +18,9 @@ export async function getRequestSiteUrl(): Promise<string> {
 /** Resolves the canonical path of a page on the domain the visitor is on (the path follows the domain, not the cookie). */
 export async function getPagePath(key: PageKey): Promise<string> {
   return pathForHost(key, await getRequestHost());
+}
+
+/** Public contact address of the domain the visitor is on. */
+export async function getContactEmail(): Promise<string> {
+  return contactEmailForHost(await getRequestHost());
 }

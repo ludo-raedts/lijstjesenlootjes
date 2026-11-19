@@ -3,12 +3,14 @@ import type { SiteLocale } from "../i18n/config";
 export interface SiteDomain {
   host: string;
   locale: SiteLocale;
+  /** Public contact address of this site (shown in the footer and the privacy statement). */
+  contactEmail: string;
 }
 
 /** Public domains served by this app. The first entry is the primary (x-default) domain. */
 export const SITE_DOMAINS: readonly SiteDomain[] = [
-  { host: "lijstjesenlootjes.nl", locale: "nl" },
-  { host: "wishanddraw.com", locale: "en" },
+  { host: "lijstjesenlootjes.nl", locale: "nl", contactEmail: "info@lijstjesenlootjes.nl" },
+  { host: "wishanddraw.com", locale: "en", contactEmail: "info@wishanddraw.com" },
 ];
 
 function stripHost(rawHost: string | null | undefined): string | null {
@@ -28,4 +30,9 @@ export function localeForHost(rawHost: string | null | undefined): SiteLocale | 
 export function originForHost(rawHost: string | null | undefined): string | null {
   const domain = findSiteDomain(rawHost);
   return domain ? `https://${domain.host}` : null;
+}
+
+/** Contact address for the domain a request arrived on; unknown hosts (previews, localhost) get the primary one. */
+export function contactEmailForHost(rawHost: string | null | undefined): string {
+  return (findSiteDomain(rawHost) ?? SITE_DOMAINS[0]).contactEmail;
 }
