@@ -68,3 +68,21 @@ Sent after owner confirmation; no placement is guaranteed.
 - [ ] Finish the assessment of the owner's other sites and decide what, if anything, to link.
 - [ ] Look for further international Christmas and gift guides that accept visible, natural mentions.
 - [ ] Register Search Console and Bing Webmaster Tools ownership in the repository notes once confirmed (see `SEO_PLAN.md`, phase 0).
+
+## Next steps researched on 2026-11-19
+
+Web research, not verified against each site. Roundups are partly dated or self-promotional, so treat them as leads.
+
+1. **Bing Webmaster Tools via Search Console import.** Bing can import verified Search Console sites and sitemaps without re-verifying, using the Google account that owns the property ([Bing blog](https://blogs.bing.com/webmaster/september-2019/Import-sites-from-Search-Console-to-Bing-Webmaster-Tools)). This is still open in `SEO_PLAN.md` phase 0. IndexNow can notify Bing and reportedly Yandex, Seznam and Naver of changes; Google does not support it. It needs a key file in the repository, so it would be a small code change through a pull request; verify details with Bing first ([overview](https://x-cmd.com/seo/bing-indexnow)).
+2. **Editorial pitches for `wishanddraw.com`** to current Secret Santa roundups, with one concrete difference per pitch (exclusion rules, no account needed, free): [Uplup](https://uplup.com/blog/best-secret-santa-generator-tools), [GiftList](https://giftlist.com/blog/best-secret-santa-apps-2026) (a competitor), [PopSci](https://www.popsci.com/story/diy/secret-santa-websites-guide/), [Windows Report](https://windowsreport.com/secret-santa-websites/), [Gitnux](https://gitnux.org/best/secret-santa-software/), [Streamer.guide](https://streamer.guide/guides/best-secret-santa-apps). Expect little response.
+3. **Dutch market.** `lootjestrekken.nl` (DrawNames, since 2001) dominates and publishes yearly holiday-survey press releases ([2025](https://static-cdn.drawnames.com/Content/Press/20251113-NL-Persbericht-Feestdagenonderzoek.pdf)). No current Dutch comparison article was found. That is a gap for an own comparison or tips page (`SEO_PLAN.md` section 5). Sinterklaas is on 5 December, so outreach to Dutch blogs has little time.
+4. **Own sites:** only visible, relevant links; low topical fit.
+5. **Measure:** after a few weeks, check the Search Console Links report to see which listings actually link to the sites. Whether the directory submissions have SEO value is unknown until then.
+
+Follow-ups:
+
+- [ ] Import the sites into Bing Webmaster Tools and submit the sitemaps.
+- [ ] Decide whether to add IndexNow (key file, pull request).
+- [ ] Pitch the roundups listed above.
+- [ ] Decide on a Dutch comparison or tips page.
+- [ ] Review the Search Console Links report in a few weeks.
