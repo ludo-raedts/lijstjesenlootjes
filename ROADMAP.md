@@ -126,7 +126,7 @@ Cutover plan:
 
 ## Phase 3 — Affiliate validation
 
-Update 2026-11-19: the Awin programme is approved and Amazon Associates is approved. Whether the Awin product feed may be shown in the product (content-use terms, freshness, attribution) and how it is connected (Awin MCP or feed import) is still to be confirmed before building; Amazon catalog search through the Creators API still needs the sales threshold below, while plain tagged links do not.
+Update 2026-11-19 (corrected the same day): the Awin publisher account is approved, but none of the three advertiser programmes applied for (ANWB Webwinkel NL, ICI PARIS XL NL, Proshop NL; all Dutch) is approved yet; all are `APPLICATION_PENDING`, so no advertiser material may be used and nothing is approved for `wishanddraw.com`. Amazon Associates approval per marketplace could not be verified from the repository: only `amazon.com` for `wishanddraw.com` is configured. The bol programme is configured for `lijstjesenlootjes.nl` only. First version after approval: explicit text links only, no prices and no product images, until each advertiser has agreed in writing. Details and the gate answers are in `docs/AWIN_PRODUCT_DISCOVERY.md`.
 
 The affiliate feature should make adding a useful gift easier. It must not turn a personal
 wishlist into an advertising feed or silently alter user-entered content.
