@@ -34,6 +34,9 @@ Sent after owner confirmation; no placement is guaranteed.
 | The News Minute (outdated Secret Santa comparison of 15 sites) | Update pitch via contact form | Sent |
 | English Rose from Manchester (Secret Santa generator comparison) | Public comment on the existing post | Posted |
 | WhistleOut (Secret Santa apps roundup, mobile-app oriented) | Pitch via form | Sent after the owner solved the captcha |
+| Educators Technology (Secret Santa generators list) | Email, draft A | Sent by the owner on 2026-11-19 |
+| The Gift Hacker (Secret Santa generator roundup) | Email, draft B | Sent by the owner on 2026-11-19 |
+| PopSci ("The best Secret Santa platforms, ranked") | Contact form, draft D | Sent by the owner on 2026-11-19 |
 
 ## Blocked or open
 
@@ -87,9 +90,9 @@ Follow-ups:
 - [ ] Decide on a Dutch comparison or tips page.
 - [ ] Review the Search Console Links report in a few weeks.
 
-## Pitch drafts for step 2 (not yet sent)
+## Pitch drafts for step 2
 
-Prepared on 2026-11-19. Nothing has been sent; each pitch needs the owner's confirmation of text and destination first. Sender address: `info@wishanddraw.com`. Sign-off name is left to the owner.
+Prepared on 2026-11-19. Drafts A, B and D were sent by the owner the same day from the shared address; C (Streamer.guide) and Windows Report are still open because their contact routes were not found. Sender address: `info@wishanddraw.com`. Sign-off name is left to the owner.
 
 ### Claims that are safe to make
 
@@ -175,7 +178,7 @@ Subject: Update to "The best Secret Santa platforms, ranked"
 
 ### Follow-ups for step 2
 
-- [ ] Owner confirms the texts and destinations, then A, B and D are sent; find the Streamer.guide and Windows Report contact routes first.
-- [ ] Log each sent pitch with its date in the "Editorial pitches" table.
-- [ ] Do not follow up more than once, after about two weeks.
+- [x] A, B and D sent on 2026-11-19 and logged in the "Editorial pitches" table.
+- [ ] Find the Streamer.guide and Windows Report contact routes, then send C.
+- [ ] Follow up at most once, after about two weeks (around 2026-12-03).
 - [ ] Decide on the "free" wording before any pitch mentions price.
