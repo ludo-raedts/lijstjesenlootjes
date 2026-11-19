@@ -31,7 +31,7 @@ npm run test:e2e
 
 `.github/workflows/ci.yml` draait bij elke pull request en elke push naar `main`: typecheck en unit tests (job `checks`) en de volledige Playwright-suite in `nl` en `en` (job `e2e`, tegen de in-memory Supabase- en e-mailnabootsing, met wegwerpgeheimen; er zijn geen repository-secrets nodig). Bij een mislukte e2e-run worden de traces 7 dagen bewaard als artifact.
 
-Vercel deployt een push naar `main` zelf, los van deze workflow. Om CI een echte releasepoort te maken moet er één keer, in GitHub, een branch-protectionregel voor `main` worden gezet die de checks `Typecheck, unit tests and build` en `End-to-end (Playwright, nl + en)` verplicht stelt en werken via pull requests afdwingt (Settings → Branches). Dat is een repository-instelling en staat dus niet in de code.
+De repository is openbaar. Een ruleset (`Protect main`) op `main` verplicht werken via pull requests en laat die pas mergen als de checks `Lint, typecheck and unit tests` en `End-to-end (Playwright, nl + en)` zijn geslaagd; verwijderen en force-pushen zijn geblokkeerd. Werkwijze: branch maken, pushen, pull request openen, wachten op groene CI, mergen. Vercel deployt `main` na de merge en maakt een preview per pull request.
 
 ## Beheer van een trekking en lijstje
 
@@ -120,4 +120,4 @@ Gedekt: homepage, mobiel menu, taalwissel en Engelse paden; verlanglijstje maken
 - Een gekoppeld los verlanglijstje wordt live getoond aan de gever. Wordt dat lijstje verwijderd, dan verdwijnen de wensen daaruit stilzwijgend bij de gever.
 - De opslag is één versioned JSON-document met optimistic concurrency (jittered retries, `src/lib/backoff.ts`). Dat volstaat voor een pilot; het plan voor echte tabellen staat in [ROADMAP.md](ROADMAP.md).
 
-Nog open vóór grootschalig gebruik: externe uptimemonitoring en deploy-alerts (zie [INCIDENT_PLAYBOOK.md](INCIDENT_PLAYBOOK.md)), een afgedwongen CI-poort vóór productie (branch protection is op het huidige GitHub-plan voor deze private repository niet beschikbaar), een vastgesteld back-upbeleid en de opslagmigratie naar tabellen.
+Nog open vóór grootschalig gebruik: externe uptimemonitoring en deploy-alerts (zie [INCIDENT_PLAYBOOK.md](INCIDENT_PLAYBOOK.md)), een vastgesteld back-upbeleid en de opslagmigratie naar tabellen.
