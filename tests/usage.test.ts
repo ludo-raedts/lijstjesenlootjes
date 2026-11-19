@@ -27,6 +27,10 @@ test("the usage series fills missing days with zeros, oldest first", () => {
     participant_links_issued: 0,
     personal_link_opened: 0,
     admin_login: 0,
+    email_delivered: 0,
+    email_bounced: 0,
+    email_complained: 0,
+    email_delayed: 0,
   });
 });
 

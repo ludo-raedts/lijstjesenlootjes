@@ -39,6 +39,8 @@ export const apiErrorCodes = [
   "invalid_draw_wish_count",
   "access_token_missing",
   "cron_unauthorized",
+  "webhook_not_configured",
+  "webhook_signature_invalid",
   "invalid_json",
   "invalid_traffic_measurement",
   "payload_too_large",

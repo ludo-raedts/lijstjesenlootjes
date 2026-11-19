@@ -1,6 +1,6 @@
 # SEO-plan — Lijstjes & Lootjes / Wishlists & Draws
 
-**Status (17 november 2026, na de laatste sprint):** fase 0 en 1 en het grootste deel van fase 2 zijn uitgevoerd (robots-fix, per-pagina OG-metadata, deelafbeelding `/og`, keywordtitels en -koppen, Engelse padhernoeming met 308's, taalschakelaar met domeinlinks, JSON-LD, contentblokken met FAQ, de Sinterklaas-landingspagina). Open: Search Console en Bing Webmaster Tools instellen, analytics kiezen, linkbuilding. De vinkjes hieronder zijn bijgewerkt; de bevindingen en tabellen laten de situatie van vóór de uitvoering zien.
+**Status (17 november 2026, na de laatste sprint):** fase 0 en 1 en het grootste deel van fase 2 zijn uitgevoerd (robots-fix, per-pagina OG-metadata, deelafbeelding `/og`, keywordtitels en -koppen, Engelse padhernoeming met 308's, taalschakelaar met domeinlinks, JSON-LD, contentblokken met FAQ, de Sinterklaas-landingspagina). Search Console en Bing Webmaster Tools zijn ingesteld (19 november 2026). Open: Core Web Vitals en maandelijkse SEO-metingen, linkbuilding. De vinkjes hieronder zijn bijgewerkt; de bevindingen en tabellen laten de situatie van vóór de uitvoering zien.
 
 Opgesteld op 17 november 2026 op basis van de code en de live sites `lijstjesenlootjes.nl` en `wishanddraw.com`. Alle bevindingen over titels, headings, robots en sitemap zijn live gecontroleerd. Zoekvolumes zijn **niet** gemeten: valideer de keywordkeuzes in Search Console en een keywordtool voordat je er grote beslissingen op neemt.
 

@@ -93,8 +93,7 @@ Also done (second sprint): an opt-in one-off reminder to the organizer (address 
 
 Still open:
 
-- Bounce and complaint handling (Resend webhook) and an email counter in the usage dashboard.
-- SPF, DKIM and DMARC for both sending domains (DNS, outside the code).
+- Done 2026-11-19: SPF, DKIM and DMARC are in place for both domains; the Resend webhook (`/api/webhooks/resend`) feeds delivered/bounced/complained/delayed counters in the usage dashboard. Still manual: create the webhook in Resend, set `RESEND_WEBHOOK_SECRET`, apply migration `20261119100000`, and send test mail to Gmail and Outlook.
 - Reminders to participants (not only the organizer) need participant addresses and are deliberately not built.
 - Export/share options that never put access tokens in analytics or referrer headers.
 - Consider accounts only if link-based ownership proves to be a support problem.
@@ -124,6 +123,8 @@ Cutover plan:
 5. Freeze writes briefly (Vercel Firewall rule from the incident playbook), copy, verify, flip the flag, unfreeze; keep the JSON document for one retention period as a fallback, then drop it.
 
 ## Phase 3 — Affiliate validation
+
+Update 2026-11-19: the Awin programme is approved and Amazon Associates is approved. Whether the Awin product feed may be shown in the product (content-use terms, freshness, attribution) and how it is connected (Awin MCP or feed import) is still to be confirmed before building; Amazon catalog search through the Creators API still needs the sales threshold below, while plain tagged links do not.
 
 The affiliate feature should make adding a useful gift easier. It must not turn a personal
 wishlist into an advertising feed or silently alter user-entered content.

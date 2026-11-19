@@ -43,6 +43,16 @@ export function emailConfigured() {
   return Boolean(process.env.EMAIL_PROVIDER_API_KEY?.trim() && process.env.EMAIL_FROM?.trim());
 }
 
+/** Resend answers errors as `{ "name": "...", "message": "..." }`; only the short, fixed name is safe to log. */
+async function providerErrorName(response: Response) {
+  try {
+    const name = ((await response.json()) as { name?: unknown }).name;
+    return typeof name === "string" && /^[a-z_]{1,40}$/.test(name) ? name : "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
 type Attempt = { result: EmailResult; retryable: boolean };
 
 async function attempt(message: EmailMessage): Promise<Attempt> {
@@ -69,7 +79,10 @@ async function attempt(message: EmailMessage): Promise<Attempt> {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     if (!response.ok) {
-      console.error("Email send failed", response.status);
+      // The provider's error name (for example "validation_error") and the sender domain make a 403 diagnosable
+      // (an unverified sending domain looks different from a restricted key); recipients and message text are never logged.
+      const name = await providerErrorName(response);
+      console.error("Email send failed", response.status, name, from.split("@").pop()?.replace(/[>\s]/g, "") ?? "");
       // Rate limits and provider errors are worth another try; a rejected request (4xx) is not.
       return { result: "failed", retryable: response.status === 429 || response.status >= 500 };
     }

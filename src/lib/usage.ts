@@ -9,6 +9,10 @@ export const usageEvents = [
   "participant_links_issued",
   "personal_link_opened",
   "admin_login",
+  "email_delivered",
+  "email_bounced",
+  "email_complained",
+  "email_delayed",
 ] as const;
 
 export type UsageEvent = (typeof usageEvents)[number];
