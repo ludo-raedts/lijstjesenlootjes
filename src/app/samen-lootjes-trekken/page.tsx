@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { DrawTogether } from "@/components/DrawTogether";
 import { JsonLd } from "@/components/JsonLd";
 import { SeoContent } from "@/components/SeoContent";
@@ -22,6 +23,7 @@ export default async function DrawTogetherPage() {
       </header>
       <div className="shell narrow page-section" style={{ paddingTop: 0 }}>
         <DrawTogether wishlistHref={await getPagePath("wishlistCreate")} />
+        <p className="together-online"><Link href={await getPagePath("drawCreate")}>{t("together.page.onlineLink")}</Link></p>
       </div>
       <SeoContent prefix="together.seo" stepCount={3} tipCount={4} faqCount={4} />
     </>

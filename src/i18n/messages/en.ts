@@ -888,4 +888,6 @@ export const enMessages: Record<MessageKey, string> = {
   "together.seo.faq3Answer": "Not yet when drawing together on one screen. If you need exclusions, use the online draw, where everyone gets a personal link.",
   "together.seo.faq4Question": "Do I need an account or an app?",
   "together.seo.faq4Answer": "No. Open the page and start. Keep the page open until everyone has had their turn: closing or refreshing erases everything.",
+  "draw.page.togetherLink": "Sitting together? Draw on one screen, no links needed",
+  "together.page.onlineLink": "A big or scattered group? Draw online, everyone gets a personal link.",
 };

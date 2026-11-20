@@ -886,6 +886,8 @@ export const nlMessages = {
   "together.seo.faq3Answer": "Nog niet bij samen trekken op één scherm. Heb je uitsluitingen nodig, gebruik dan online lootjes trekken, waar iedereen een persoonlijke link krijgt.",
   "together.seo.faq4Question": "Moet ik een account maken of een app installeren?",
   "together.seo.faq4Answer": "Nee. Open de pagina en begin. Laat de pagina open staan tot iedereen aan de beurt is geweest: sluiten of verversen wist alles.",
+  "draw.page.togetherLink": "Zit je samen aan tafel? Trek op één scherm, zonder links",
+  "together.page.onlineLink": "Met een grote of verspreide groep? Trek online, iedereen krijgt een persoonlijke link.",
 } as const;
 
 export type MessageKey = keyof typeof nlMessages;

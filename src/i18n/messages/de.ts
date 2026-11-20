@@ -777,4 +777,6 @@ export const deMessages: Partial<Record<MessageKey, string>> = {
   "together.seo.faq3Answer": "Beim gemeinsamen Auslosen an einem Bildschirm noch nicht. Brauchst du Ausschlüsse, nutze die Online-Auslosung, bei der alle einen persönlichen Link bekommen.",
   "together.seo.faq4Question": "Brauche ich ein Konto oder eine App?",
   "together.seo.faq4Answer": "Nein. Öffne die Seite und leg los. Lass die Seite offen, bis alle an der Reihe waren: Schließen oder Neuladen löscht alles.",
+  "draw.page.togetherLink": "Ihr sitzt zusammen? Lost an einem Bildschirm, ganz ohne Links",
+  "together.page.onlineLink": "Große oder verstreute Gruppe? Lost online, alle bekommen einen persönlichen Link.",
 };
