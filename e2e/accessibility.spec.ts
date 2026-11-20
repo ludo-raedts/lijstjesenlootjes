@@ -12,7 +12,7 @@ import type { PageKey } from "../src/lib/paths";
 
 test.beforeEach(resetBackend);
 
-const publicPages: PageKey[] = ["home", "wishlistCreate", "drawCreate", "wheel", "help", "privacy", "officeDraw", "christmasDraw", "birthdayWishlist"];
+const publicPages: PageKey[] = ["home", "wishlistCreate", "drawCreate", "wheel", "drawTogether", "help", "privacy", "officeDraw", "christmasDraw", "birthdayWishlist"];
 const viewports = [
   { name: "desktop", width: 1280, height: 900 },
   { name: "200% zoom equivalent", width: 640, height: 800 },

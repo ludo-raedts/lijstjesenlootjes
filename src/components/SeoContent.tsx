@@ -3,7 +3,7 @@ import type { MessageKey } from "@/i18n/messages";
 
 interface SeoContentProps {
   /** Catalog prefix, e.g. "draw.seo" or "wishlist.seo". */
-  prefix: "draw.seo" | "wishlist.seo";
+  prefix: "draw.seo" | "wishlist.seo" | "together.seo";
   stepCount: number;
   tipCount: number;
   faqCount: number;

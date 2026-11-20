@@ -27,6 +27,7 @@ export type PageKey =
   | "wishlistCreate"
   | "drawCreate"
   | "wheel"
+  | "drawTogether"
   | "sinterklaasDraw"
   | "officeDraw"
   | "christmasDraw"
@@ -44,6 +45,7 @@ export const PAGES: readonly PageDefinition[] = [
   { key: "wishlistCreate", visibility: "public", paths: { nl: "/verlanglijstje-maken", en: "/wishlist-maker" }, legacyPaths: { en: ["/create-wishlist"] } },
   { key: "drawCreate", visibility: "public", paths: { nl: "/lootjes-trekken", en: "/secret-santa-generator" }, legacyPaths: { en: ["/draw-names"] } },
   { key: "wheel", visibility: "public", paths: { nl: "/rad-draaien", en: "/name-wheel" }, legacyPaths: { en: ["/spin-the-wheel"] } },
+  { key: "drawTogether", visibility: "public", paths: { nl: "/samen-lootjes-trekken", en: "/draw-names-together" } },
   { key: "sinterklaasDraw", visibility: "public", paths: { nl: "/sinterklaas-lootjes-trekken" }, fallback: "drawCreate" },
   { key: "officeDraw", visibility: "public", paths: { nl: "/lootjes-trekken-op-kantoor", en: "/office-secret-santa" } },
   { key: "christmasDraw", visibility: "public", paths: { nl: "/kerst-lootjes-trekken" }, fallback: "drawCreate" },

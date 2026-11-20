@@ -3,6 +3,8 @@ import { DrawCreate } from "@/components/DrawCreate";
 import { SeoContent } from "@/components/SeoContent";
 import { getServerI18n } from "@/i18n/server";
 import { JsonLd } from "@/components/JsonLd";
+import Link from "next/link";
+import { getPagePath } from "@/lib/request-site";
 import { publicPageMetadata, webApplicationStructuredData } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -20,6 +22,7 @@ export default async function DrawPage() {
         <aside className="side-note">
           <h2>{t("draw.page.asideTitle")}</h2>
           <ul><li>{t("draw.page.aside1")}</li><li>{t("draw.page.aside2")}</li><li>{t("draw.page.aside3")}</li><li>{t("draw.page.aside4")}</li></ul>
+          <p><Link href={await getPagePath("drawTogether")}>{t("draw.page.togetherLink")}</Link></p>
         </aside>
       </div>
       <SeoContent prefix="draw.seo" stepCount={4} tipCount={4} faqCount={8} extraSection />
