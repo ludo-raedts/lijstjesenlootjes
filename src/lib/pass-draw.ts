@@ -1,4 +1,4 @@
-import { secureIndex } from "./wheel";
+import { createAssignments } from "./draw";
 
 /** Limits of the "draw together on one device" flow. Everything runs in the browser; nothing is stored or sent. */
 export const PASS_DRAW_MIN_PARTICIPANTS = 3;
@@ -11,12 +11,17 @@ export type PassDrawNamesResult =
   | { ok: true; names: string[] }
   | { ok: false; error: PassDrawNamesError; params: Record<string, string | number> };
 
-/** Splits the textarea input into one name per line, trims whitespace and validates the group. */
-export function parsePassDrawNames(raw: string): PassDrawNamesResult {
-  const names = raw
+/** Splits the textarea input into one name per line and trims whitespace, without validating the group. */
+export function listPassDrawNames(raw: string): string[] {
+  return raw
     .split(/\r?\n/)
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
+
+/** Validates the group: size, name length and duplicates. */
+export function parsePassDrawNames(raw: string): PassDrawNamesResult {
+  const names = listPassDrawNames(raw);
 
   const tooLong = names.find((name) => [...name].length > PASS_DRAW_MAX_NAME_LENGTH);
   if (tooLong) return { ok: false, error: "name_too_long", params: { name: tooLong, max: PASS_DRAW_MAX_NAME_LENGTH } };
@@ -32,33 +37,26 @@ export function parsePassDrawNames(raw: string): PassDrawNamesResult {
   return { ok: true, names };
 }
 
-type RandomIndex = (maxExclusive: number) => number;
-
-function shuffled<T>(items: T[], random: RandomIndex) {
-  const result = [...items];
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const swap = random(index + 1);
-    [result[index], result[swap]] = [result[swap], result[index]];
-  }
-  return result;
-}
+/** A pair of participant indexes who must not draw each other (in either direction). */
+export type PassDrawExclusion = readonly [number, number];
 
 /**
- * Returns, for every participant index, the index of the person they draw. Nobody draws themselves and everybody
- * is drawn exactly once. Plain shuffles are repeated until no one maps to themselves (about one in e of them is
- * fine); a single-cycle fallback (Sattolo) guarantees an answer so the loop can never run away.
+ * Returns, for every participant index, the index of the person they draw, or null when the exclusions leave no
+ * valid draw. Nobody draws themselves, nobody draws an excluded partner and everybody is drawn exactly once.
+ * Reuses the server's matching-based algorithm, so a solvable set of exclusions always yields an answer.
  */
-export function drawAssignments(count: number, random: RandomIndex = secureIndex): number[] {
+export function drawAssignments(
+  count: number,
+  options: { exclusions?: readonly PassDrawExclusion[]; random?: (maxExclusive: number) => number } = {},
+): number[] | null {
   if (!Number.isInteger(count) || count < 2) throw new Error("A draw needs at least two participants.");
-  const identity = Array.from({ length: count }, (_, index) => index);
-  for (let attempt = 0; attempt < 500; attempt += 1) {
-    const candidate = shuffled(identity, random);
-    if (candidate.every((recipient, giver) => recipient !== giver)) return candidate;
-  }
-  const cycle = [...identity];
-  for (let index = cycle.length - 1; index > 0; index -= 1) {
-    const swap = random(index);
-    [cycle[index], cycle[swap]] = [cycle[swap], cycle[index]];
-  }
-  return cycle;
+  const participants = Array.from({ length: count }, (_, index) => ({ id: String(index), name: String(index) }));
+  const exclusions = (options.exclusions ?? []).flatMap(([a, b]) => [
+    { from: String(a), to: String(b) },
+    { from: String(b), to: String(a) },
+  ]);
+  const result = createAssignments(participants, exclusions, { random: options.random });
+  if (result.kind !== "success") return null;
+  const recipientOf = new Map(result.assignments.map(({ giverId, recipientId }) => [giverId, Number(recipientId)]));
+  return participants.map(({ id }) => recipientOf.get(id)!);
 }

@@ -39,3 +39,40 @@ test("the setup explains what is wrong with the names", async ({ page }, testInf
   await page.getByRole("button", { name: t("together.setup.start") }).click();
   await expect(page.locator("#together-names-error")).toContainText(t("together.error.too_few", { min: 3 }));
 });
+
+test("partners can be excluded and an impossible set is explained", async ({ page }, testInfo) => {
+  const { t } = i18n(testInfo);
+  await page.goto(pagePath(testInfo, "drawTogether"));
+  const names = page.getByLabel(t("together.setup.namesLabel"));
+  const addPair = async (a: string, b: string) => {
+    await page.getByLabel(t("together.exclusions.first")).selectOption(a);
+    await page.getByLabel(t("together.exclusions.second")).selectOption(b);
+    await page.getByRole("button", { name: t("together.exclusions.add") }).click();
+  };
+
+  // Three people with one excluded pair has no valid draw.
+  await names.fill("Simon\nFatima\nNoor");
+  await addPair("Simon", "Fatima");
+  await expect(page.getByText(t("together.exclusions.pair", { a: "Simon", b: "Fatima" }))).toBeVisible();
+  await page.getByRole("button", { name: t("together.setup.start") }).click();
+  await expect(page.locator("#together-names-error")).toContainText(t("together.error.impossible"));
+
+  // Two couples among four people: everyone draws from the other couple.
+  await names.fill("Simon\nFatima\nNoor\nLudo");
+  await addPair("Noor", "Ludo");
+  await page.getByRole("button", { name: t("together.setup.start") }).click();
+  const couples: Record<string, string[]> = { Simon: ["Noor", "Ludo"], Fatima: ["Noor", "Ludo"], Noor: ["Simon", "Fatima"], Ludo: ["Simon", "Fatima"] };
+  for (const name of ["Simon", "Fatima", "Noor", "Ludo"]) {
+    const ready = page.getByRole("button", { name: t("together.handoff.ready", { name }) });
+    await expect(ready).toBeEnabled();
+    await ready.click();
+    const yes = page.getByRole("button", { name: t("together.confirm.yes", { name }) });
+    await expect(yes).toBeEnabled();
+    await yes.click();
+    expect(couples[name]).toContain((await page.locator(".together-recipient").innerText()).trim());
+    const hide = page.getByRole("button", { name: t("together.reveal.hide") });
+    await expect(hide).toBeEnabled();
+    await hide.click();
+  }
+  await expect(page.getByRole("heading", { name: t("together.done.title") })).toBeVisible();
+});
