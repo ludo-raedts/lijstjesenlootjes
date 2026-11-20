@@ -33,7 +33,7 @@ test("German pages do not overflow a 320 px screen", async ({ page }, testInfo) 
   await page.setViewportSize({ width: 320, height: 800 });
   await page.context().addCookies([{ name: "ll_locale", value: "de", url: testInfo.project.use.baseURL! }]);
   const targets = [pagePath(testInfo, "home"), pagePath(testInfo, "drawCreate"), pagePath(testInfo, "wishlistCreate"),
-    pagePath(testInfo, "wheel"), pagePath(testInfo, "recover"), "/privacy", "/help"];
+    pagePath(testInfo, "wheel"), pagePath(testInfo, "drawTogether"), pagePath(testInfo, "recover"), "/privacy", "/help"];
   for (const target of targets) {
     await page.goto(target);
     await expect(page.locator("html")).toHaveAttribute("lang", "de");
@@ -42,3 +42,26 @@ test("German pages do not overflow a 320 px screen", async ({ page }, testInfo) 
   }
 });
 
+
+test("German draw-together steps do not overflow a 320 px screen, even with long names", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.context().addCookies([{ name: "ll_locale", value: "de", url: testInfo.project.use.baseURL! }]);
+  const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  await page.goto(pagePath(testInfo, "drawTogether"));
+  const longName = "Wolfgang-Maximilian-Alexander";
+  await page.getByLabel("Namen *").fill(`${longName}\nFatima\nNoor`);
+  await page.getByRole("button", { name: "Auslosung starten" }).click();
+  for (const name of [longName, "Fatima", "Noor"]) {
+    await page.getByRole("button", { name: `Ich bin ${name}` }).click();
+    expect(await overflow()).toBeLessThanOrEqual(0);
+    const yes = page.getByRole("button", { name: `Ja, ich bin ${name}` });
+    await expect(yes).toBeEnabled();
+    await yes.click();
+    expect(await overflow()).toBeLessThanOrEqual(0);
+    const hide = page.getByRole("button", { name: "Ich habe es mir gemerkt, verbergen" });
+    await expect(hide).toBeEnabled();
+    await hide.click();
+  }
+  await expect(page.getByRole("heading", { name: "Alle haben gelost" })).toBeVisible();
+  expect(await overflow()).toBeLessThanOrEqual(0);
+});
