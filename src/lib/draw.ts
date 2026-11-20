@@ -1,4 +1,6 @@
-import { randomInt } from "node:crypto";
+// Web Crypto based (works in Node and the browser), so the same algorithm serves the server draw and the
+// draw-together flow that runs entirely in the browser.
+import { secureIndex } from "./wheel";
 
 export type DrawParticipantInput = { id: string; name: string };
 export type DrawExclusion = { from: string; to: string };
@@ -34,7 +36,7 @@ export function hasPerfectMatching(
   return participants.every((participant) => visit(participant.id, new Set()));
 }
 
-export function fisherYates<T>(items: T[], random = (maxExclusive: number) => randomInt(0, maxExclusive)) {
+export function fisherYates<T>(items: T[], random = (maxExclusive: number) => secureIndex(maxExclusive)) {
   const result = [...items];
   for (let index = result.length - 1; index > 0; index -= 1) {
     const swapIndex = random(index + 1);
@@ -92,7 +94,7 @@ export function createAssignments(
     return { kind: "impossible" as const };
   }
   const attempts = options?.attempts ?? Math.max(20_000, participants.length * 4_000);
-  const random = options?.random ?? ((maxExclusive: number) => randomInt(0, maxExclusive));
+  const random = options?.random ?? ((maxExclusive: number) => secureIndex(maxExclusive));
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const recipients = fisherYates(participants, random);
     const valid = participants.every((giver, index) =>

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/i18n/I18nProvider";
 import type { MessageKey } from "@/i18n/messages";
-import { drawAssignments, parsePassDrawNames, PASS_DRAW_MAX_PARTICIPANTS, PASS_DRAW_MIN_PARTICIPANTS } from "@/lib/pass-draw";
+import { drawAssignments, listPassDrawNames, parsePassDrawNames, PASS_DRAW_MAX_PARTICIPANTS, PASS_DRAW_MIN_PARTICIPANTS } from "@/lib/pass-draw";
 
 /** Milliseconds a step ignores clicks, so a double click cannot skip through the privacy screens. */
 const STEP_GUARD_MS = 900;
@@ -23,6 +23,22 @@ export function DrawTogether({ wishlistHref }: { wishlistHref: string }) {
   const [rawNames, setRawNames] = useState("");
   const [error, setError] = useState<{ key: MessageKey; params: Record<string, string | number> } | null>(null);
   const [session, setSession] = useState<Session>({ phase: "setup" });
+  // People who must not draw each other (partners, housemates), stored by name as typed.
+  const [pairs, setPairs] = useState<Array<[string, string]>>([]);
+  const [first, setFirst] = useState("");
+  const [second, setSecond] = useState("");
+  const candidates = useMemo(() => {
+    const seen = new Set<string>();
+    return listPassDrawNames(rawNames).filter((name) => {
+      const key = name.toLocaleLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [rawNames]);
+  const key = (name: string) => name.toLocaleLowerCase();
+  // A pair only counts while both names are still in the list; the choices reset when a name disappears.
+  const activePairs = pairs.filter(([a, b]) => candidates.some((n) => key(n) === key(a)) && candidates.some((n) => key(n) === key(b)));
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
@@ -48,8 +64,12 @@ export function DrawTogether({ wishlistHref }: { wishlistHref: string }) {
       setError({ key: `together.error.${parsed.error}` as MessageKey, params: parsed.params });
       return;
     }
+    const indexOf = (name: string) => parsed.names.findIndex((candidate) => key(candidate) === key(name));
+    const assignment = drawAssignments(parsed.names.length, {
+      exclusions: activePairs.map(([a, b]) => [indexOf(a), indexOf(b)] as const),
+    });
+    if (!assignment) { setError({ key: "together.error.impossible", params: {} }); return; }
     setError(null);
-    const assignment = drawAssignments(parsed.names.length);
     setSession({
       phase: "handoff",
       names: parsed.names,
@@ -57,6 +77,18 @@ export function DrawTogether({ wishlistHref }: { wishlistHref: string }) {
       index: 0,
     });
   };
+
+  const addPair = () => {
+    const a = candidates.find((name) => key(name) === key(first));
+    const b = candidates.find((name) => key(name) === key(second));
+    if (!a || !b || key(a) === key(b)) { setError({ key: "together.error.pairIncomplete", params: {} }); return; }
+    setError(null);
+    if (!activePairs.some(([x, y]) => (key(x) === key(a) && key(y) === key(b)) || (key(x) === key(b) && key(y) === key(a)))) {
+      setPairs([...activePairs, [a, b]]);
+    }
+    setFirst(""); setSecond("");
+  };
+  const removePair = (position: number) => setPairs(activePairs.filter((_, index) => index !== position));
 
   const restart = () => { setSession({ phase: "setup" }); setError(null); };
 
@@ -79,6 +111,41 @@ export function DrawTogether({ wishlistHref }: { wishlistHref: string }) {
           />
           <small id="together-names-hint" className="muted">{t("together.setup.namesHint", { min: PASS_DRAW_MIN_PARTICIPANTS, max: PASS_DRAW_MAX_PARTICIPANTS })}</small>
         </div>
+        {candidates.length >= PASS_DRAW_MIN_PARTICIPANTS ? (
+          <fieldset className="together-exclusions">
+            <legend>{t("together.exclusions.title")}</legend>
+            <p className="muted">{t("together.exclusions.hint")}</p>
+            <div className="field-row">
+              <div className="field">
+                <label className="field-label" htmlFor="together-first">{t("together.exclusions.first")}</label>
+                <select id="together-first" value={first} onChange={(event) => setFirst(event.target.value)}>
+                  <option value="">{t("together.exclusions.choose")}</option>
+                  {candidates.map((name) => <option key={name} value={name}>{name}</option>)}
+                </select>
+              </div>
+              <div className="field">
+                <label className="field-label" htmlFor="together-second">{t("together.exclusions.second")}</label>
+                <select id="together-second" value={second} onChange={(event) => setSecond(event.target.value)}>
+                  <option value="">{t("together.exclusions.choose")}</option>
+                  {candidates.map((name) => <option key={name} value={name}>{name}</option>)}
+                </select>
+              </div>
+            </div>
+            <button className="button button-secondary button-small" type="button" onClick={addPair}>{t("together.exclusions.add")}</button>
+            {activePairs.length > 0 ? (
+              <ul className="together-pairs">
+                {activePairs.map(([a, b], position) => (
+                  <li key={`${a}|${b}`}>
+                    <span>{t("together.exclusions.pair", { a, b })}</span>
+                    <button className="button button-secondary button-small" type="button" onClick={() => removePair(position)} aria-label={t("together.exclusions.removeLabel", { a, b })}>
+                      {t("together.exclusions.remove")}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </fieldset>
+        ) : null}
         <div id="together-names-error" role="alert">
           {error ? <p className="notice error"><strong>{t(error.key, error.params)}</strong></p> : null}
         </div>
