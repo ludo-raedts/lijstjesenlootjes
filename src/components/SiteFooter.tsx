@@ -18,6 +18,7 @@ export async function SiteFooter() {
           {hasPath("sinterklaasDraw", locale) ? <Link href={await getPagePath("sinterklaasDraw")}>{t("footer.sinterklaas")}</Link> : null}
           {hasPath("officeDraw", locale) ? <Link href={await getPagePath("officeDraw")}>{t("footer.office")}</Link> : null}
           {hasPath("birthdayWishlist", locale) ? <Link href={await getPagePath("birthdayWishlist")}>{t("footer.birthday")}</Link> : null}
+          <Link href={await getPagePath("drawTogether")}>{t("footer.together")}</Link>
           <Link href={await getPagePath("wheel")}>{t("footer.wheel")}</Link>
           <Link href="/help">{t("footer.help")}</Link>
           <Link href={await getPagePath("recover")}>{t("footer.recover")}</Link>

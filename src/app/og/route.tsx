@@ -14,6 +14,7 @@ const HEADLINE_KEYS: Partial<Record<PageKey, MessageKey>> = {
   wishlistCreate: "meta.wishlistCreate.title",
   drawCreate: "meta.drawCreate.title",
   wheel: "meta.wheel.title",
+  drawTogether: "meta.together.title",
   help: "meta.help.title",
   privacy: "meta.privacy.title",
   sinterklaasDraw: "meta.sinterklaasDraw.title",

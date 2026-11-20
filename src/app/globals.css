@@ -1019,3 +1019,18 @@ body {
   .tool-hero { grid-template-columns: minmax(0, 1fr); }
   .tool-hero h1 { font-size: clamp(2.2rem, 11.5vw, 3.1rem); overflow-wrap: break-word; hyphens: auto; }
 }
+
+/* Draw together on one device: one calm card per step, big type, no decoration that competes with the privacy message */
+.together-card { max-width: 640px; margin-inline: auto; text-align: center; }
+.together-card .field, .together-card textarea { text-align: left; }
+.together-heading { margin: 0 0 1rem; font-size: clamp(1.9rem, 6vw, 2.9rem); line-height: 1.05; overflow-wrap: anywhere; }
+.together-heading:focus { outline: none; }
+.together-progress { margin: 0 0 .75rem; }
+.together-recipient { margin: .5rem 0 1.25rem; overflow-wrap: anywhere; }
+.together-actions { justify-content: center; }
+.together-card .notice { text-align: left; }
+.together-done .seal { display: grid; width: 70px; height: 70px; margin: 0 auto 1.3rem; place-items: center; border: 2px solid var(--green); border-radius: 50%; color: var(--green); font-size: 2rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .together-card.reveal-card .together-recipient { animation: together-unfold .4s ease-out both; }
+}
+@keyframes together-unfold { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
