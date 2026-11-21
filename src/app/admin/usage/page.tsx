@@ -71,6 +71,37 @@ export default async function UsagePage() {
     (totals, row) => ({ pageViews: totals.pageViews + row.pageViews, visits: totals.visits + row.visits }),
     { pageViews: 0, visits: 0 },
   );
+  const currentTrafficDays = traffic ? new Set(trafficWindow(traffic, 30).map(({ day }) => day)) : undefined;
+  const previousTrafficTotals = traffic && currentTrafficDays
+    ? trafficWindow(traffic, 60)
+      .filter(({ day }) => !currentTrafficDays.has(day))
+      .reduce(
+        (totals, row) => ({ pageViews: totals.pageViews + row.pageViews, visits: totals.visits + row.visits }),
+        { pageViews: 0, visits: 0 },
+      )
+    : undefined;
+  const previousUsageTotals = usage ? totalUsage(usage.slice(-60, -30)) : undefined;
+  const kpis: { id: string; label: string; value: number; previous?: number }[] = [];
+  if (trafficTotals) {
+    kpis.push(
+      { id: "visits", label: t("usage.traffic.visits"), value: trafficTotals.visits, previous: previousTrafficTotals?.visits },
+      { id: "pageViews", label: t("usage.traffic.pageViews"), value: trafficTotals.pageViews, previous: previousTrafficTotals?.pageViews },
+    );
+  }
+  if (periods[0] && previousUsageTotals) {
+    for (const event of ["wishlist_created", "draw_created", "personal_link_opened"] as const) {
+      kpis.push({ id: event, label: t(`usage.event.${event}`), value: periods[0].totals[event], previous: previousUsageTotals[event] });
+    }
+  }
+  const trend = (value: number, previous?: number) => {
+    if (previous === undefined || previous === 0) return { kind: "none" as const, text: t("usage.kpi.noPrevious") };
+    const change = Math.round(((value - previous) / previous) * 100);
+    if (change === 0) return { kind: "flat" as const, text: `0% ${t("usage.kpi.vsPrevious")}` };
+    return {
+      kind: change > 0 ? "up" as const : "down" as const,
+      text: `${Math.abs(change)}% ${change > 0 ? t("usage.kpi.up") : t("usage.kpi.down")} ${t("usage.kpi.vsPrevious")}`,
+    };
+  };
   const trafficLabel = (row: NonNullable<typeof trafficSummary>[number]) => {
     const host = SITE_DOMAINS.find(({ locale: site }) => site === row.site)?.host ?? row.site;
     const path = pathForLocale(row.page, row.site);
@@ -92,6 +123,24 @@ export default async function UsagePage() {
           <Link href="/admin/usage" aria-current="page">{t("admin.nav.usage")}</Link>
         </nav>
       </header>
+
+      {kpis.length > 0 ? (
+        <section className="kpi-strip" aria-labelledby="usage-kpi-title">
+          <h2 id="usage-kpi-title" className="kpi-strip-title">{t("usage.kpi.title")}</h2>
+          <dl className="kpi-grid">
+            {kpis.map((kpi) => {
+              const change = trend(kpi.value, kpi.previous);
+              return (
+                <div data-kpi={kpi.id} key={kpi.id}>
+                  <dt>{kpi.label}</dt>
+                  <dd>{number.format(kpi.value)}</dd>
+                  <dd className={`kpi-trend kpi-trend-${change.kind}`}>{change.text}</dd>
+                </div>
+              );
+            })}
+          </dl>
+        </section>
+      ) : null}
 
       {trafficSummary && trafficTotals ? (
         <section className="tool-card" aria-labelledby="usage-traffic-title">

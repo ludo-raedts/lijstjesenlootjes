@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { isWithinRateLimit } from "@/lib/security";
 
 const ADMIN_COOKIE = "ll_theme_admin_session";
-const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
+const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 
 function getCredentials() {
   return {

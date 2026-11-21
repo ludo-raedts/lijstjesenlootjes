@@ -10,6 +10,13 @@ async function login(page: import("@playwright/test").Page, t: ReturnType<typeof
   await page.getByRole("button", { name: t("admin.login.submit") }).click();
 }
 
+test("logging in lands on the usage dashboard with KPIs", async ({ page }, testInfo) => {
+  const { t } = i18n(testInfo);
+  await login(page, t);
+  await expect(page).toHaveURL(/\/admin\/usage$/);
+  await expect(page.locator("#usage-kpi-title")).toBeVisible();
+});
+
 test("admin pages are not cacheable or indexable and ask for a login", async ({ page }, testInfo) => {
   const { t } = i18n(testInfo);
   const response = await page.goto("/admin");
@@ -27,7 +34,9 @@ test("a wrong password is refused", async ({ page }, testInfo) => {
 test("log in, save a manual theme and layout, reset to automatic, log out", async ({ page }, testInfo) => {
   const { t } = i18n(testInfo);
   await login(page, t);
+  await page.getByRole("link", { name: t("admin.nav.settings") }).click();
   await expect(page.locator("#admin-current-title")).toBeVisible();
+  await expect(page.locator(".layout-preview")).toBeVisible();
   await expect(page.getByText(t("admin.source.automatic"))).toBeVisible();
 
   await page.locator("#theme-mode").selectOption("manual");

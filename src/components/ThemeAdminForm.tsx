@@ -7,6 +7,7 @@ import {
   saveThemeSettingsAction,
   type AdminActionState,
 } from "@/app/admin/actions";
+import { LayoutPreview } from "@/components/LayoutPreview";
 import { useI18n } from "@/i18n/I18nProvider";
 import {
   layoutIds,
@@ -32,6 +33,12 @@ const layoutLabelKeys: Record<LayoutId, Parameters<ReturnType<typeof useI18n>["t
   editorial: "admin.layout.editorial",
   split: "admin.layout.split",
   showcase: "admin.layout.showcase",
+};
+
+const layoutCaptionKeys: Record<LayoutId, Parameters<ReturnType<typeof useI18n>["t"]>[0]> = {
+  editorial: "admin.preview.layout.editorial",
+  split: "admin.preview.layout.split",
+  showcase: "admin.preview.layout.showcase",
 };
 
 export function ThemeAdminForm({
@@ -65,6 +72,11 @@ export function ThemeAdminForm({
           <h2 id="admin-current-title">{t(themeLabelKeys[appearance.theme])}</h2>
           <p>{t(layoutLabelKeys[appearance.layout])}</p>
         </div>
+        <LayoutPreview
+          layout={appearance.layout}
+          theme={appearance.theme}
+          caption={t(layoutCaptionKeys[appearance.layout])}
+        />
         <div className="admin-current-meta">
           <span>{appearance.themeSource === "automatic" ? t("admin.source.automatic") : t("admin.source.manual")}</span>
           <span>{appearance.layoutSource === "automatic" ? t("admin.layoutSource.automatic") : t("admin.layoutSource.manual")}</span>
