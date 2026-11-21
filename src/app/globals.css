@@ -870,9 +870,8 @@ body {
 .admin-login-card { max-width: 600px; }
 .admin-current {
   display: grid;
-  grid-template-columns: 1fr minmax(180px, 240px) auto auto;
-  gap: 1.5rem;
-  align-items: center;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
   margin-bottom: clamp(2rem, 5vw, 4rem);
   padding: clamp(1.4rem, 3vw, 2rem);
   border: 1px solid var(--ink);
@@ -1068,3 +1067,9 @@ body {
 .layout-preview-showcase .layout-preview-copy { flex-direction: row; align-items: center; flex-wrap: wrap; }
 .layout-preview-showcase .layout-preview-line { width: 28%; }
 .layout-preview-showcase .layout-preview-line.short { width: 18%; }
+.admin-current-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+.admin-current-sites { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.admin-current-site { display: grid; grid-template-columns: 1fr minmax(150px, 210px); gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--line); background: var(--paper); }
+.admin-current-host { display: block; margin-bottom: .25rem; color: var(--muted); font-size: .85rem; font-weight: 700; }
+.admin-current-site .admin-current-meta { margin-top: .75rem; }
+@media (max-width: 520px) { .admin-current-site { grid-template-columns: 1fr; } }
