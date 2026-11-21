@@ -161,16 +161,17 @@ test("the usage dashboard needs a login and shows anonymous counts only", async 
   await page.getByRole("link", { name: t("admin.nav.usage") }).click();
   await expect(page).toHaveURL(/\/admin\/usage$/);
 
-  const last30Days = page.locator('[data-period="30"]');
-  await expect(last30Days.locator('[data-event="wishlist_created"]')).toHaveText("1");
-  await expect(last30Days.locator('[data-event="shared_wishlist_opened"]')).toHaveText("1");
-  await expect(last30Days.locator('[data-event="draw_created"]')).toHaveText("1");
-  await expect(last30Days.locator('[data-event="participant_links_issued"]')).toHaveText("4");
-  await expect(last30Days.locator('[data-event="admin_login"]')).toHaveText("1");
+  const last30Days = (event: string) => page.locator(`td[data-period="30"][data-event="${event}"]`);
+  await expect(last30Days("wishlist_created")).toHaveText("1");
+  await expect(last30Days("shared_wishlist_opened")).toHaveText("1");
+  await expect(last30Days("draw_created")).toHaveText("1");
+  await expect(last30Days("participant_links_issued")).toHaveText("4");
+  await expect(last30Days("admin_login")).toHaveText("1");
   await expect(page.locator('[data-traffic-total="visits"]')).toHaveText("1");
   await expect(page.locator('[data-traffic-total="pageViews"]')).toHaveText("2");
   await expect(page.locator(`[data-traffic-page="home"]`)).toBeVisible();
   await expect(page.locator(`[data-traffic-page="wishlistCreate"]`)).toBeVisible();
+  await page.locator("summary", { hasText: t("usage.traffic.countries") }).click();
   await expect(page.locator(`[data-country="OTHER"][data-country-site="${locale}"]`)).toBeVisible();
   await expect(page.locator(`[data-country="${expectedCountry}"]`)).toHaveCount(0);
   await expect(page.locator('[data-stock="wishlists"]')).toHaveText("1");
