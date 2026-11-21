@@ -13,7 +13,26 @@ export const usageEvents = [
   "email_bounced",
   "email_complained",
   "email_delayed",
+  "cta_reveal_to_draw",
+  "cta_reveal_to_wishlist",
+  "cta_guest_to_draw",
+  "cta_guest_to_wishlist",
+  "share_link_copied",
 ] as const;
+
+/** Counters the browser may report itself: plain interface actions, never content or identifiers. */
+export const clientUsageEvents = [
+  "cta_reveal_to_draw",
+  "cta_reveal_to_wishlist",
+  "cta_guest_to_draw",
+  "cta_guest_to_wishlist",
+  "share_link_copied",
+] as const satisfies readonly (typeof usageEvents)[number][];
+
+export type ClientUsageEvent = (typeof clientUsageEvents)[number];
+
+export const isClientUsageEvent = (value: unknown): value is ClientUsageEvent =>
+  typeof value === "string" && (clientUsageEvents as readonly string[]).includes(value);
 
 export type UsageEvent = (typeof usageEvents)[number];
 

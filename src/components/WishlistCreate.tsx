@@ -56,7 +56,7 @@ export function WishlistCreate() {
         </div>
         <div className="link-result">
           <span className="field-label">{t("wishlist.create.guestLink")}</span>
-          <div className="link-box"><code>{result.guestUrl}</code><CopyButton value={result.guestUrl} label={t("wishlist.create.copyGuest")} /></div>
+          <div className="link-box"><code>{result.guestUrl}</code><CopyButton track value={result.guestUrl} label={t("wishlist.create.copyGuest")} /></div>
         </div>
         <div className="button-row">
           <a className="button" href={result.manageUrl}>{t("wishlist.create.openManage")}</a>

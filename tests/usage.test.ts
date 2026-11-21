@@ -31,6 +31,11 @@ test("the usage series fills missing days with zeros, oldest first", () => {
     email_bounced: 0,
     email_complained: 0,
     email_delayed: 0,
+    cta_reveal_to_draw: 0,
+    cta_reveal_to_wishlist: 0,
+    cta_guest_to_draw: 0,
+    cta_guest_to_wishlist: 0,
+    share_link_copied: 0,
   });
 });
 
@@ -91,4 +96,13 @@ test("the stock summary contains counts and dates only", () => {
   });
   const serialized = JSON.stringify(summary);
   for (const secret of ["Private", "Secret", "Ann", "Bo"]) assert.ok(!serialized.includes(secret));
+});
+
+test("the browser may only report allowlisted interface counters", async () => {
+  const { clientUsageEvents, isClientUsageEvent, usageEvents } = await import("../src/lib/usage");
+  assert.equal(isClientUsageEvent("share_link_copied"), true);
+  assert.equal(isClientUsageEvent("draw_created"), false);
+  assert.equal(isClientUsageEvent("admin_login"), false);
+  assert.equal(isClientUsageEvent(undefined), false);
+  for (const event of clientUsageEvents) assert.ok(usageEvents.includes(event));
 });

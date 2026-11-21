@@ -87,7 +87,7 @@ function RecipientWishlist({
       <button className="button button-secondary button-small" disabled={refreshing} type="button" onClick={onRefresh}>
         {refreshing ? t("draw.reveal.refreshing") : t("draw.reveal.refresh")}
       </button>
-      <MakeOwnList />
+      <MakeOwnList source="reveal" />
     </section>
   );
 }
