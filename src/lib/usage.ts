@@ -19,6 +19,8 @@ export const usageEvents = [
   "cta_guest_to_wishlist",
   "share_link_copied",
   "manage_link_saved",
+  "state_commit_conflict",
+  "state_commit_failed",
 ] as const;
 
 /** Counters the browser may report itself: plain interface actions, never content or identifiers. */
@@ -77,6 +79,13 @@ export function totalUsage(series: UsageDay[]): Record<UsageEvent, number> {
     for (const event of usageEvents) totals[event] += counts[event];
   }
   return totals;
+}
+
+/** Any failed write, or many retried collisions in a week, means the single-document store needs attention. */
+export const CONTENTION_CONFLICT_THRESHOLD = 50;
+
+export function isStoreContended(week: Record<UsageEvent, number>) {
+  return week.state_commit_failed > 0 || week.state_commit_conflict >= CONTENTION_CONFLICT_THRESHOLD;
 }
 
 /** A calendar-day window from the prior year, used for a like-for-like seasonal comparison. */
