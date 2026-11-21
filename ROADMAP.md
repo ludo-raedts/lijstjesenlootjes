@@ -83,6 +83,8 @@ Implemented (2026-11-17): `/admin/usage` with anonymous daily counters and a sto
 
 Update 2026-11-21: the funnel now also counts, anonymously, clicks on the "organize your own draw / make your own list" call to action under a draw reveal and a shared wishlist, and copies of shared links (`POST /api/usage`, allowlisted events in `src/lib/usage.ts`). Migration `20261121100000_funnel_events.sql` relaxes the event check to a shape check so new counters need no further migration; apply it before deploying.
 
+Update 2026-11-21 (performance notes): Core Web Vitals are counted anonymously (LCP, INP, CLS per rating) via `useReportWebVitals`, shown under "Speed" in `/admin/usage`; no values, URLs or identifiers are sent. Public pages stay server-rendered per request because the CSP nonce is per request and the language follows cookie and host, so the HTML itself is not cached at the CDN. The saving is elsewhere: the theme settings used by every page and the share image are read from the database once per server instance per minute (`THEME_SETTINGS_CACHE_TTL_MS`, default 60000, `0` switches it off). Revisit HTML caching only together with the storage migration.
+
 ## Phase 2 — Product completeness
 
 Done:

@@ -228,3 +228,11 @@ export function resolveAppearance(
     layoutSource: settings.layoutMode,
   };
 }
+
+const DEFAULT_THEME_SETTINGS_TTL_MS = 60_000;
+
+/** How long a server instance keeps the theme settings. `THEME_SETTINGS_CACHE_TTL_MS=0` switches the cache off. */
+export function themeSettingsTtlMs(value = process.env.THEME_SETTINGS_CACHE_TTL_MS) {
+  const parsed = value === undefined || value.trim() === "" ? Number.NaN : Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : DEFAULT_THEME_SETTINGS_TTL_MS;
+}

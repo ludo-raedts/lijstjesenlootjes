@@ -42,3 +42,13 @@ test("manual theme and layout overrides win independently", () => {
   assert.equal(appearance.themeSource, "manual");
   assert.equal(appearance.layoutSource, "manual");
 });
+
+test("the theme settings cache lifetime is configurable and falls back to a minute", async () => {
+  const { themeSettingsTtlMs } = await import("../src/lib/theme");
+  assert.equal(themeSettingsTtlMs(undefined), 60_000);
+  assert.equal(themeSettingsTtlMs(""), 60_000);
+  assert.equal(themeSettingsTtlMs("nonsense"), 60_000);
+  assert.equal(themeSettingsTtlMs("-5"), 60_000);
+  assert.equal(themeSettingsTtlMs("0"), 0);
+  assert.equal(themeSettingsTtlMs("15000"), 15_000);
+});

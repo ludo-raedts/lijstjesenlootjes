@@ -39,6 +39,15 @@ test("the usage series fills missing days with zeros, oldest first", () => {
     manage_link_saved: 0,
     state_commit_conflict: 0,
     state_commit_failed: 0,
+    vitals_lcp_good: 0,
+    vitals_lcp_needs_work: 0,
+    vitals_lcp_poor: 0,
+    vitals_inp_good: 0,
+    vitals_inp_needs_work: 0,
+    vitals_inp_poor: 0,
+    vitals_cls_good: 0,
+    vitals_cls_needs_work: 0,
+    vitals_cls_poor: 0,
   });
 });
 
@@ -118,4 +127,17 @@ test("the store counts as contended after any failed write or many collisions", 
   assert.equal(isStoreContended(week([["state_commit_conflict", 49]])), false);
   assert.equal(isStoreContended(week([["state_commit_conflict", 50]])), true);
   assert.equal(isStoreContended(week([["state_commit_failed", 1]])), true);
+});
+
+test("web vitals counters are allowlisted for the browser and fit the database event shape", async () => {
+  const { clientUsageEvents, isClientUsageEvent, webVitalMetrics, webVitalRatings } = await import("../src/lib/usage");
+  for (const metric of webVitalMetrics) {
+    for (const rating of webVitalRatings) {
+      const event = `vitals_${metric}_${rating}`;
+      assert.ok(isClientUsageEvent(event), event);
+      assert.match(event, /^[a-z][a-z_]{0,39}$/);
+    }
+  }
+  assert.equal(isClientUsageEvent("vitals_ttfb_good"), false);
+  assert.ok(clientUsageEvents.length >= 15);
 });

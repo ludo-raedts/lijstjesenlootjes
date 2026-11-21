@@ -153,14 +153,14 @@ Interne links: verwijs vanuit de tools naar de hulppagina, vanuit de lijst naar 
 ### Fase 2 — vóór volgend seizoen (Q1–Q3 2027)
 
 - [x] Seizoens- en doelgroeplandingspagina’s uit 5; `paths.ts` per-locale optioneel.
-- [ ] Uitgebreide helpvragen, interne linkstructuur.
+- [x] Uitgebreide helpvragen (6 zoekintentievragen toegevoegd op 21 november 2026), [ ] interne linkstructuur.
 - [ ] Eerste externe vermeldingen: lijsten met Sinterklaas-/kerstgidsen, familie- en teamblogs, Product Hunt/vergelijkingssites voor tools; persberichten rond de lancering. Spreek geen “gratis”-claim uit zonder besluit. *Gestart op 18–19 november 2026: directory-aanmeldingen en redactionele pitches staan, met status en open punten, in `docs/EXTERNAL_LISTINGS.md`.*
 
 ### Fase 3 — doorlopend
 
-- [ ] Core Web Vitals meten (PageSpeed/CrUX) en caching van de publieke pagina’s heroverwegen (2.2 #6).
-- [ ] Maandelijks Search Console: queries, CTR per titel (A/B via herschrijven), indexatiedekking, hreflang-rapport (Google heeft het rapport verwijderd; controleer via een crawler zoals Screaming Frog).
-- [ ] Seizoensgebonden ververs: titels/H1 en OG-afbeeldingen vooraf aanpassen vóór het piekseizoen (okt–dec).
+- [x] Core Web Vitals meten: anonieme tellers in `/admin/usage` (21 november 2026). Caching van de publieke pagina’s heroverwogen: de HTML blijft dynamisch (CSP-nonce per verzoek), de themainstellingen worden per serverinstantie 60 seconden onthouden. Open: PageSpeed/CrUX-nulmeting.
+- [ ] Maandelijks Search Console (draaiboek: `docs/SEARCH_CONSOLE_ROUTINE.md`): queries, CTR per titel (A/B via herschrijven), indexatiedekking, hreflang-rapport (Google heeft het rapport verwijderd; controleer via een crawler zoals Screaming Frog).
+- [x] Seizoensgebonden ververs: beschrijvingen van home en loting-pagina volgen het actieve thema (Sinterklaas/kerst); titels blijven het hele jaar gelijk; OG-afbeelding volgt het thema. Controleer elk jaar eind september of de planning in het beheer klopt.
 
 ## 8. KPI’s
 
