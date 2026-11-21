@@ -71,9 +71,10 @@ test("the policy does not break any page, interaction or form", async ({ page },
   await page.goto("/admin");
   await page.getByLabel(t("admin.login.password")).fill(E2E_ADMIN_PASSWORD);
   await page.getByRole("button", { name: t("admin.login.submit") }).click();
-  await expect(page.locator("#admin-current-title")).toBeVisible();
-  await page.goto("/admin/usage");
+  await expect(page).toHaveURL(/\/admin\/usage$/);
   await expect(page.getByRole("table").first()).toBeVisible();
+  await page.goto("/admin");
+  await expect(page.locator("#admin-current-title")).toBeVisible();
 
   expect(violations, "CSP violations").toEqual([]);
 });
