@@ -15,7 +15,7 @@ import {
   type CountryTrafficRow,
   type TrafficRow,
 } from "@/lib/analytics";
-import { buildUsageSeries, isStoreContended, previousYearWindow, summarizeStock, totalUsage, usageEvents } from "@/lib/usage";
+import { buildUsageSeries, isStoreContended, type UsageEvent, previousYearWindow, summarizeStock, totalUsage } from "@/lib/usage";
 
 export const dynamic = "force-dynamic";
 
@@ -114,6 +114,39 @@ export default async function UsagePage() {
   const countryLabel = (country: string) =>
     country === OTHER_COUNTRIES ? t("usage.traffic.otherCountries") : (regions.of(country) ?? country);
 
+  const groups = [
+    { id: "lists", events: ["wishlist_created", "shared_wishlist_opened", "reservation_made"] },
+    { id: "draws", events: ["draw_created", "participant_links_issued", "personal_link_opened"] },
+    { id: "growth", events: ["cta_reveal_to_draw", "cta_reveal_to_wishlist", "cta_guest_to_draw", "cta_guest_to_wishlist", "share_link_copied", "manage_link_saved"] },
+    { id: "mail", events: ["email_delivered", "email_bounced", "email_complained", "email_delayed"] },
+    { id: "system", events: ["admin_login", "state_commit_conflict", "state_commit_failed"] },
+  ] as const satisfies readonly { id: string; events: readonly UsageEvent[] }[];
+  const percent = (part: number, whole: number) => (whole > 0 ? `${Math.round((part / whole) * 100)}%` : "–");
+  const month = periods[0]?.totals;
+  const ratios = month
+    ? [
+        {
+          id: "openedShare",
+          label: t("usage.ratio.opened"),
+          value: percent(month.personal_link_opened, month.participant_links_issued),
+          note: t("usage.ratio.openedNote", { opened: number.format(month.personal_link_opened), issued: number.format(month.participant_links_issued) }),
+        },
+        {
+          id: "ctaShare",
+          label: t("usage.ratio.cta"),
+          value: percent(month.cta_reveal_to_draw + month.cta_reveal_to_wishlist, month.personal_link_opened),
+          note: t("usage.ratio.ctaNote", { clicks: number.format(month.cta_reveal_to_draw + month.cta_reveal_to_wishlist), opened: number.format(month.personal_link_opened) }),
+        },
+        {
+          id: "savedShare",
+          label: t("usage.ratio.saved"),
+          value: percent(month.manage_link_saved, month.wishlist_created + month.draw_created),
+          note: t("usage.ratio.savedNote", { saved: number.format(month.manage_link_saved), created: number.format(month.wishlist_created + month.draw_created) }),
+        },
+      ]
+    : [];
+  const funnelEvents = ["wishlist_created", "shared_wishlist_opened", "reservation_made", "draw_created", "personal_link_opened"] as const;
+
   return (
     <div className="shell page-section admin-page">
       <header className="admin-page-header">
@@ -132,7 +165,14 @@ export default async function UsagePage() {
         </p>
       ) : null}
 
-      {kpis.length > 0 ? (
+      <nav className="usage-jump" aria-label={t("usage.jump.label")}>
+        <a href="#usage-kpi-title">{t("usage.jump.overview")}</a>
+        <a href="#usage-traffic-title">{t("usage.jump.visitors")}</a>
+        <a href="#usage-period-title">{t("usage.jump.usage")}</a>
+        <a href="#usage-stock-title">{t("usage.jump.stock")}</a>
+      </nav>
+
+      {kpis.length > 0 || ratios.length > 0 ? (
         <section className="kpi-strip" aria-labelledby="usage-kpi-title">
           <h2 id="usage-kpi-title" className="kpi-strip-title">{t("usage.kpi.title")}</h2>
           <dl className="kpi-grid">
@@ -146,6 +186,13 @@ export default async function UsagePage() {
                 </div>
               );
             })}
+            {ratios.map((ratio) => (
+              <div data-kpi={ratio.id} key={ratio.id}>
+                <dt>{ratio.label}</dt>
+                <dd>{ratio.value}</dd>
+                <dd className="kpi-trend kpi-trend-none">{ratio.note}</dd>
+              </div>
+            ))}
           </dl>
         </section>
       ) : null}
@@ -154,7 +201,7 @@ export default async function UsagePage() {
         <section className="tool-card" aria-labelledby="usage-traffic-title">
           <h2 id="usage-traffic-title">{t("usage.traffic.title")}</h2>
           <p className="muted">{t("usage.traffic.body")}</p>
-          <dl className="usage-grid">
+          <dl className="usage-grid usage-grid-compact">
             <div>
               <dt>{t("usage.traffic.visits")}</dt>
               <dd data-traffic-total="visits">{number.format(trafficTotals.visits)}</dd>
@@ -164,10 +211,10 @@ export default async function UsagePage() {
               <dd data-traffic-total="pageViews">{number.format(trafficTotals.pageViews)}</dd>
             </div>
           </dl>
-          {trafficSummary.length > 0 ? (
-            <>
-              <h3 id="usage-traffic-details-title">{t("usage.traffic.details")}</h3>
-              <div className="usage-table-wrap" role="region" aria-labelledby="usage-traffic-details-title" tabIndex={0}>
+          <details className="usage-details" open>
+            <summary>{t("usage.traffic.details")} ({number.format(trafficSummary.length)})</summary>
+            {trafficSummary.length > 0 ? (
+              <div className="usage-table-wrap" role="region" aria-label={t("usage.traffic.details")} tabIndex={0}>
                 <table className="usage-table">
                   <thead>
                     <tr>
@@ -177,7 +224,7 @@ export default async function UsagePage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {trafficSummary.map((row) => (
+                    {[...trafficSummary].sort((left, right) => right.pageViews - left.pageViews).map((row) => (
                       <tr data-traffic-page={row.page} data-traffic-site={row.site} key={`${row.site}-${row.page}`}>
                         <th scope="row">{trafficLabel(row)}</th>
                         <td>{number.format(row.visits)}</td>
@@ -187,37 +234,38 @@ export default async function UsagePage() {
                   </tbody>
                 </table>
               </div>
-            </>
-          ) : <p className="muted">{t("usage.traffic.empty")}</p>}
-
-          <h3 id="usage-traffic-countries-title">{t("usage.traffic.countries")}</h3>
-          <p className="muted">{t("usage.traffic.countryNote")}</p>
-          {countryTrafficSummary ? (
-            countryTrafficSummary.length > 0 ? (
-              <div className="usage-table-wrap" role="region" aria-labelledby="usage-traffic-countries-title" tabIndex={0}>
-                <table className="usage-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">{t("usage.traffic.site")}</th>
-                      <th scope="col">{t("usage.traffic.country")}</th>
-                      <th scope="col">{t("usage.traffic.visits")}</th>
-                      <th scope="col">{t("usage.traffic.pageViews")}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {countryTrafficSummary.map((row) => (
-                      <tr data-country={row.country} data-country-site={row.site} key={`${row.site}-${row.country}`}>
-                        <th scope="row">{siteLabel(row.site)}</th>
-                        <td>{countryLabel(row.country)}</td>
-                        <td>{number.format(row.visits)}</td>
-                        <td>{number.format(row.pageViews)}</td>
+            ) : <p className="muted">{t("usage.traffic.empty")}</p>}
+          </details>
+          <details className="usage-details">
+            <summary>{t("usage.traffic.countries")}</summary>
+            <p className="muted">{t("usage.traffic.countryNote")}</p>
+            {countryTrafficSummary ? (
+              countryTrafficSummary.length > 0 ? (
+                <div className="usage-table-wrap" role="region" aria-label={t("usage.traffic.countries")} tabIndex={0}>
+                  <table className="usage-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">{t("usage.traffic.site")}</th>
+                        <th scope="col">{t("usage.traffic.country")}</th>
+                        <th scope="col">{t("usage.traffic.visits")}</th>
+                        <th scope="col">{t("usage.traffic.pageViews")}</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : <p className="muted">{t("usage.traffic.countryEmpty")}</p>
-          ) : <p className="notice error" role="alert">{t("usage.traffic.countryError")}</p>}
+                    </thead>
+                    <tbody>
+                      {countryTrafficSummary.map((row) => (
+                        <tr data-country={row.country} data-country-site={row.site} key={`${row.site}-${row.country}`}>
+                          <th scope="row">{siteLabel(row.site)}</th>
+                          <td>{countryLabel(row.country)}</td>
+                          <td>{number.format(row.visits)}</td>
+                          <td>{number.format(row.pageViews)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : <p className="muted">{t("usage.traffic.countryEmpty")}</p>
+            ) : <p className="notice error" role="alert">{t("usage.traffic.countryError")}</p>}
+          </details>
         </section>
       ) : (
         <p className="notice error" role="alert">{t("usage.traffic.error")}</p>
@@ -225,41 +273,56 @@ export default async function UsagePage() {
 
       {usage ? (
         <>
-          {periods.map((period) => (
-            <section className="tool-card" aria-labelledby={`usage-totals-${period.id}`} data-period={period.id} key={period.id}>
-              <h2 id={`usage-totals-${period.id}`}>{period.title}</h2>
-              <dl className="usage-grid">
-                {usageEvents.map((event) => (
-                  <div key={event}>
-                    <dt>{t(`usage.event.${event}`)}</dt>
-                    <dd data-event={event}>{number.format(period.totals[event])}</dd>
-                  </div>
+          <section className="tool-card" aria-labelledby="usage-period-title">
+            <h2 id="usage-period-title">{t("usage.period.title")}</h2>
+            <div className="usage-table-wrap" role="region" aria-labelledby="usage-period-title" tabIndex={0}>
+              <table className="usage-table usage-table-periods">
+                <thead>
+                  <tr>
+                    <th scope="col"><span className="sr-only">{t("usage.period.event")}</span></th>
+                    {periods.map((period) => <th scope="col" key={period.id}>{period.title}</th>)}
+                  </tr>
+                </thead>
+                {groups.map((group) => (
+                  <tbody key={group.id}>
+                    <tr className="usage-group-row"><th scope="colgroup" colSpan={periods.length + 1}>{t(`usage.group.${group.id}`)}</th></tr>
+                    {group.events.map((event) => (
+                      <tr key={event}>
+                        <th scope="row">{t(`usage.event.${event}`)}</th>
+                        {periods.map((period) => (
+                          <td data-event={event} data-period={period.id} key={period.id}>{number.format(period.totals[event])}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
                 ))}
-              </dl>
-            </section>
-          ))}
+              </table>
+            </div>
+          </section>
 
           <section className="tool-card" aria-labelledby="usage-daily-title">
             <h2 id="usage-daily-title">{t("usage.daily.title")}</h2>
-            <div className="usage-table-wrap" role="region" aria-labelledby="usage-daily-title" tabIndex={0}>
-              <table className="usage-table">
-                <caption>{t("usage.daily.caption")}</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">{t("usage.daily.day")}</th>
-                    {usageEvents.map((event) => <th scope="col" key={event}>{t(`usage.event.${event}`)}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentDays.map(({ day, counts }) => (
-                    <tr key={day}>
-                      <th scope="row">{date(day)}</th>
-                      {usageEvents.map((event) => <td key={event}>{number.format(counts[event])}</td>)}
+            <details className="usage-details">
+              <summary>{t("usage.daily.caption")}</summary>
+              <div className="usage-table-wrap" role="region" aria-labelledby="usage-daily-title" tabIndex={0}>
+                <table className="usage-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">{t("usage.daily.day")}</th>
+                      {funnelEvents.map((event) => <th scope="col" key={event}>{t(`usage.event.${event}`)}</th>)}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {recentDays.map(({ day, counts }) => (
+                      <tr key={day}>
+                        <th scope="row">{date(day)}</th>
+                        {funnelEvents.map((event) => <td key={event}>{number.format(counts[event])}</td>)}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
           </section>
         </>
       ) : (
