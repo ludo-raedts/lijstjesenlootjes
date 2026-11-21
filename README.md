@@ -60,7 +60,7 @@ THEME_ADMIN_PASSWORD=
 THEME_ADMIN_SESSION_SECRET=
 ```
 
-The password must contain at least 12 characters and the signing secret at least 32 characters. Authentication uses a signed, HttpOnly, SameSite-strict session cookie with a 12-hour lifetime. Login attempts share the same durable Supabase rate limiter as the public write APIs: eight attempts per hashed identifier in 15 minutes. Theme settings are stored as an optional `siteSettings.theme` object in the existing private versioned Supabase application-state document. `/admin` responses are `no-store` and `noindex`.
+The password must contain at least 12 characters and the signing secret at least 32 characters. Authentication uses a signed, HttpOnly, SameSite-strict session cookie with a 30-day lifetime. Login attempts share the same durable Supabase rate limiter as the public write APIs: eight attempts per hashed identifier in 15 minutes. Theme settings are stored as an optional `siteSettings.theme` object in the existing private versioned Supabase application-state document. `/admin` responses are `no-store` and `noindex`.
 
 ## Vercel-setup
 

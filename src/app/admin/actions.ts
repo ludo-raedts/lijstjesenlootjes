@@ -51,7 +51,7 @@ export async function loginAdminAction(
   }
   await createAdminSession();
   await recordUsage("admin_login");
-  redirect("/admin");
+  redirect("/admin/usage");
 }
 
 function oneOf<T extends string>(value: FormDataEntryValue | null, values: readonly T[]): T | undefined {
