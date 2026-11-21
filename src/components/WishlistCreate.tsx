@@ -5,6 +5,7 @@ import { api, copyText } from "@/lib/client";
 import { AmazonDisclosure } from "@/components/AmazonAffiliate";
 import { blankWish, WishDraft, WishFields } from "@/components/WishFields";
 import { CopyButton } from "@/components/CopyButton";
+import { SaveManageLink } from "@/components/SaveManageLink";
 import { useI18n } from "@/i18n/I18nProvider";
 
 type Result = { manageUrl: string; guestUrl: string; emailStatus: "not_requested" | "queued" | "failed" };
@@ -50,16 +51,12 @@ export function WishlistCreate() {
         {result.emailStatus === "queued" && <div className="notice" role="status"><strong>{t("email.result.queuedTitle")}</strong><span>{t("email.result.queuedBody", { email: sentTo })}</span></div>}
         {result.emailStatus === "failed" && <div className="notice error" role="alert"><strong>{t("email.result.failedTitle")}</strong><span>{t("email.result.failedBody")}</span></div>}
         <div className="notice warning"><strong>{t("wishlist.create.manageWarningTitle")}</strong><span>{t("wishlist.create.manageWarningBody")}</span></div>
-        <div className="link-result">
-          <span className="field-label">{t("wishlist.create.manageLink")}</span>
-          <div className="link-box"><code>{result.manageUrl}</code><CopyButton value={result.manageUrl} label={t("wishlist.create.copyManage")} /></div>
-        </div>
+        <SaveManageLink url={result.manageUrl} kind="wishlist" mailQueued={result.emailStatus === "queued"} copyLabel={t("wishlist.create.copyManage")} openLabel={t("wishlist.create.openManage")} />
         <div className="link-result">
           <span className="field-label">{t("wishlist.create.guestLink")}</span>
           <div className="link-box"><code>{result.guestUrl}</code><CopyButton track value={result.guestUrl} label={t("wishlist.create.copyGuest")} /></div>
         </div>
         <div className="button-row">
-          <a className="button" href={result.manageUrl}>{t("wishlist.create.openManage")}</a>
           <button className="button button-secondary" type="button" onClick={async () => {
             if (navigator.share) await navigator.share({ title: t("wishlist.create.shareTitle"), text: shareText });
             else await copyText(shareText);

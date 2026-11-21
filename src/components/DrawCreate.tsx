@@ -1,8 +1,9 @@
 "use client";
 
 import { type FormEvent, useMemo, useRef, useState } from "react";
-import { api, copyText } from "@/lib/client";
+import { api } from "@/lib/client";
 import { CopyButton } from "@/components/CopyButton";
+import { SaveManageLink } from "@/components/SaveManageLink";
 import { useI18n } from "@/i18n/I18nProvider";
 
 type Person = { id: string; name: string };
@@ -68,7 +69,7 @@ export function DrawCreate() {
         {result.emailStatus === "queued" && <div className="notice" role="status"><strong>{t("email.result.queuedTitle")}</strong><span>{t("email.result.queuedBody", { email: sentTo })}</span></div>}
         {result.emailStatus === "failed" && <div className="notice error" role="alert"><strong>{t("email.result.failedTitle")}</strong><span>{t("email.result.failedBody")}</span></div>}
         <div className="notice warning"><strong>{t("draw.create.keepPageTitle")}</strong><span>{t("draw.create.keepPageBody")}</span></div>
-        <div className="link-result"><span className="field-label">{t("draw.create.adminLink")}</span><div className="link-box"><code>{result.adminUrl}</code><CopyButton value={result.adminUrl} label={t("draw.create.copyAdminLink")} /></div></div>
+        <SaveManageLink url={result.adminUrl} kind="draw" mailQueued={result.emailStatus === "queued"} copyLabel={t("draw.create.copyAdminLink")} openLabel={t("draw.create.openAdmin")} />
         <h3>{t("draw.create.shareHeading")}</h3>
         <ul className="result-list">
           {result.participantLinks.map((link) => {
@@ -76,7 +77,6 @@ export function DrawCreate() {
             return <li className="result-row" key={link.participantId}><div className="participant-name"><strong>{link.name}</strong><small>{t("draw.create.linkAvailable")}</small></div><div className="button-row"><CopyButton track value={link.url} label={t("draw.create.copyLink")} /><CopyButton track value={message} label={t("draw.create.copyMessage")} /><a className="button button-small button-whatsapp" href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d={WHATSAPP_PATH} /></svg>{t("draw.create.openWhatsapp")}</a></div></li>;
           })}
         </ul>
-        <div className="button-row"><a className="button" href={result.adminUrl}>{t("draw.create.openAdmin")}</a><button className="button button-secondary" type="button" onClick={() => copyText(result.adminUrl)}>{t("draw.create.saveAdmin")}</button></div>
       </section>
     );
   }

@@ -36,6 +36,7 @@ test("the usage series fills missing days with zeros, oldest first", () => {
     cta_guest_to_draw: 0,
     cta_guest_to_wishlist: 0,
     share_link_copied: 0,
+    manage_link_saved: 0,
   });
 });
 
