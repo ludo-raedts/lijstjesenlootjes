@@ -119,6 +119,7 @@ export default async function UsagePage() {
     { id: "draws", events: ["draw_created", "participant_links_issued", "personal_link_opened"] },
     { id: "growth", events: ["cta_reveal_to_draw", "cta_reveal_to_wishlist", "cta_guest_to_draw", "cta_guest_to_wishlist", "share_link_copied", "manage_link_saved"] },
     { id: "mail", events: ["email_delivered", "email_bounced", "email_complained", "email_delayed"] },
+    { id: "vitals", events: ["vitals_lcp_good", "vitals_lcp_needs_work", "vitals_lcp_poor", "vitals_inp_good", "vitals_inp_needs_work", "vitals_inp_poor", "vitals_cls_good", "vitals_cls_needs_work", "vitals_cls_poor"] },
     { id: "system", events: ["admin_login", "state_commit_conflict", "state_commit_failed"] },
   ] as const satisfies readonly { id: string; events: readonly UsageEvent[] }[];
   const percent = (part: number, whole: number) => (whole > 0 ? `${Math.round((part / whole) * 100)}%` : "–");

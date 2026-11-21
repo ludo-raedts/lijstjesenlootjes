@@ -11,6 +11,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HelpPage() {
   const { t } = await getServerI18n();
   const items = [
+    ["help.noPeekingQuestion", "help.noPeekingAnswer"],
+    ["help.selfDrawQuestion", "help.selfDrawAnswer"],
+    ["help.groupSizeQuestion", "help.groupSizeAnswer"],
+    ["help.exclusionsQuestion", "help.exclusionsAnswer"],
+    ["help.accountQuestion", "help.accountAnswer"],
     ["help.manageQuestion", "help.manageAnswer"],
     ["help.lostQuestion", "help.lostAnswer"],
     ["help.expiredQuestion", "help.expiredAnswer"],
@@ -22,6 +27,7 @@ export default async function HelpPage() {
     ["help.releaseQuestion", "help.releaseAnswer"],
     ["help.whatsappQuestion", "help.whatsappAnswer"],
     ["help.emailQuestion", "help.emailAnswer"],
+    ["help.retentionQuestion", "help.retentionAnswer"],
   ] as const;
   return (
     <div className="shell narrow page-section prose-page">

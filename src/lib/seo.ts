@@ -6,6 +6,9 @@ import { getPagePath, getRequestHost, getRequestSiteUrl } from "@/lib/request-si
 import { SITE_DOMAINS, findSiteDomain } from "@/lib/domains";
 import { alternatesFor, hasPath, pathForLocale, publicPages, type PageKey } from "@/lib/paths";
 import type { Locale } from "@/i18n/config";
+import { nlMessages } from "@/i18n/messages/nl";
+import { getActiveAppearance } from "@/lib/theme-store";
+import type { ThemeId } from "@/lib/theme";
 
 const openGraphLocales = { nl: "nl_NL", en: "en_GB", de: "de_DE" } as const;
 
@@ -51,6 +54,15 @@ export function socialImages(key: PageKey, alt: string): NonNullable<NonNullable
   return [{ url: `/og?p=${key}`, width: 1200, height: 630, alt }];
 }
 
+/**
+ * The description of a page for the active season. Titles stay the same all year (they build ranking and recognition);
+ * the description may name Sinterklaas or Christmas while those themes are active, when a variant `<key>.<theme>` exists.
+ */
+export function seasonalMessageKey<Key extends string>(key: Key, theme: ThemeId): Key {
+  const seasonal = `${key}.${theme}`;
+  return (theme === "sinterklaas" || theme === "christmas") && seasonal in nlMessages ? (seasonal as Key) : key;
+}
+
 export async function publicPageMetadata(
   key: PageKey,
   titleKey: Parameters<Awaited<ReturnType<typeof getServerI18n>>["t"]>[0],
@@ -59,8 +71,9 @@ export async function publicPageMetadata(
   const { locale, t } = await getServerI18n();
   const path = await getPagePath(key);
   const base = await getRequestSiteUrl();
+  const { theme } = await getActiveAppearance(locale);
   const title = t(titleKey);
-  const description = t(descriptionKey);
+  const description = t(seasonalMessageKey(descriptionKey, theme));
   return {
     title,
     description,

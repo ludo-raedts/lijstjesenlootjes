@@ -21,7 +21,20 @@ export const usageEvents = [
   "manage_link_saved",
   "state_commit_conflict",
   "state_commit_failed",
+  "vitals_lcp_good",
+  "vitals_lcp_needs_work",
+  "vitals_lcp_poor",
+  "vitals_inp_good",
+  "vitals_inp_needs_work",
+  "vitals_inp_poor",
+  "vitals_cls_good",
+  "vitals_cls_needs_work",
+  "vitals_cls_poor",
 ] as const;
+
+/** Core Web Vitals ratings, counted anonymously per metric (never a value, URL or identifier). */
+export const webVitalMetrics = ["lcp", "inp", "cls"] as const;
+export const webVitalRatings = ["good", "needs_work", "poor"] as const;
 
 /** Counters the browser may report itself: plain interface actions, never content or identifiers. */
 export const clientUsageEvents = [
@@ -31,6 +44,15 @@ export const clientUsageEvents = [
   "cta_guest_to_wishlist",
   "share_link_copied",
   "manage_link_saved",
+  "vitals_lcp_good",
+  "vitals_lcp_needs_work",
+  "vitals_lcp_poor",
+  "vitals_inp_good",
+  "vitals_inp_needs_work",
+  "vitals_inp_poor",
+  "vitals_cls_good",
+  "vitals_cls_needs_work",
+  "vitals_cls_poor",
 ] as const satisfies readonly (typeof usageEvents)[number][];
 
 export type ClientUsageEvent = (typeof clientUsageEvents)[number];

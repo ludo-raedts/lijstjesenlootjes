@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { AmazonAffiliateProvider } from "@/components/AmazonAffiliate";
 import { PublicTrafficMeasurement } from "@/components/PublicTrafficMeasurement";
+import { WebVitalsMeasurement } from "@/components/WebVitalsMeasurement";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getServerI18n } from "@/i18n/server";
 import { getAmazonLinkConfig, getBolLinkConfig } from "@/lib/affiliate/server";
 import { getRequestSiteUrl } from "@/lib/request-site";
-import { socialImages } from "@/lib/seo";
+import { seasonalMessageKey, socialImages } from "@/lib/seo";
 import { isVercelPreview, isVercelProduction } from "@/lib/site-url";
 import { getActiveAppearance } from "@/lib/theme-store";
 import "@fontsource-variable/fraunces/wght.css";
@@ -22,6 +23,8 @@ const openGraphLocales = { nl: "nl_NL", en: "en_GB", de: "de_DE" } as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { locale, t } = await getServerI18n();
+  const { theme } = await getActiveAppearance(locale);
+  const description = t(seasonalMessageKey("meta.home.description", theme));
   return {
     metadataBase: new URL(await getRequestSiteUrl()),
     alternates: { canonical: "./" },
@@ -29,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: t("meta.home.title"),
       template: `%s | ${t("app.name")}`,
     },
-    description: t("meta.home.description"),
+    description,
     applicationName: t("app.name"),
     robots: isVercelPreview() ? { index: false, follow: false } : undefined,
     twitter: { card: "summary_large_image" },
@@ -38,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: openGraphLocales[locale],
       siteName: t("app.name"),
       title: t("meta.home.openGraphTitle"),
-      description: t("meta.home.description"),
+      description,
       images: socialImages("home", t("meta.home.openGraphTitle")),
     },
   };
@@ -66,7 +69,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <SiteFooter />
           </AmazonAffiliateProvider>
         </I18nProvider>
-        {isVercelProduction() ? <PublicTrafficMeasurement /> : null}
+        {isVercelProduction() ? <><PublicTrafficMeasurement /><WebVitalsMeasurement /></> : null}
       </body>
     </html>
   );

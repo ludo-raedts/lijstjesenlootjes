@@ -4,7 +4,11 @@ import { i18n, pagePath } from "./helpers";
 test("pass the device: each person sees only their own draw, once", async ({ page }, testInfo) => {
   const { t } = i18n(testInfo);
   const requests: string[] = [];
-  page.on("request", (request) => { if (request.method() !== "GET" && !request.url().endsWith("/api/traffic")) requests.push(request.url()); });
+  // Anonymous page-view and speed counters (a page key or a rating, never names) are allowed; nothing else may be sent.
+  const isAnonymousCounter = (request: import("@playwright/test").Request) =>
+    request.url().endsWith("/api/traffic") ||
+    (request.url().endsWith("/api/usage") && /^\{"event":"vitals_[a-z_]+"\}$/.test(request.postData() ?? ""));
+  page.on("request", (request) => { if (request.method() !== "GET" && !isAnonymousCounter(request)) requests.push(request.url()); });
   await page.goto(pagePath(testInfo, "drawTogether"));
   await page.getByLabel(t("together.setup.namesLabel")).fill("Simon\nFatima\nNoor");
   await page.getByRole("button", { name: t("together.setup.start") }).click();

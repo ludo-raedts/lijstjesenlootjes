@@ -22,6 +22,8 @@ const serverEnv = {
   // Simulate the real production deployment so first-party traffic measurement is exercised.
   VERCEL: "1",
   VERCEL_ENV: "production",
+  // The stand-in database is reset between tests, so the theme settings must not be cached across them.
+  THEME_SETTINGS_CACHE_TTL_MS: "0",
   // Mail goes to the stand-in, which records it; nothing is ever sent to a real provider.
   EMAIL_PROVIDER_API_KEY: "re_e2e_not_real",
   EMAIL_FROM: "E2E <noreply@example.test>",
