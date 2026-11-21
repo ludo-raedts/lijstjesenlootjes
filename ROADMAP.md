@@ -81,6 +81,8 @@ against production records.
 
 Implemented (2026-11-17): `/admin/usage` with anonymous daily counters and a stock summary. Amazon clicks and conversions are not measured here; use Amazon Associates reports.
 
+Update 2026-11-21: the funnel now also counts, anonymously, clicks on the "organize your own draw / make your own list" call to action under a draw reveal and a shared wishlist, and copies of shared links (`POST /api/usage`, allowlisted events in `src/lib/usage.ts`). Migration `20261121100000_funnel_events.sql` relaxes the event check to a shape check so new counters need no further migration; apply it before deploying.
+
 ## Phase 2 — Product completeness
 
 Done:

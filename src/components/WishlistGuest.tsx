@@ -47,7 +47,7 @@ export function WishlistGuest() {
       </ul>
       <AmazonDisclosure />
       <p className="hint">{t("wishlist.guest.sessionHint")}</p>
-      <MakeOwnList />
+      <MakeOwnList source="guest" />
     </section>
   );
 }

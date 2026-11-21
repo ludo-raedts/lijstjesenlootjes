@@ -43,6 +43,7 @@ export const apiErrorCodes = [
   "webhook_signature_invalid",
   "invalid_json",
   "invalid_traffic_measurement",
+  "invalid_usage_event",
   "payload_too_large",
   "too_many_exclusions",
   "wishlist_link_invalid",

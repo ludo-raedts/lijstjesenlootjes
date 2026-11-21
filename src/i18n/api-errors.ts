@@ -72,6 +72,7 @@ const messages: Record<Locale, Record<ApiErrorCode, Formatter>> = {
     webhook_signature_invalid: () => "Dit verzoek is niet toegestaan.",
     invalid_json: () => "Dit verzoek kon niet worden gelezen. Ververs de pagina en probeer het opnieuw.",
     invalid_traffic_measurement: () => "Deze anonieme meting kon niet worden verwerkt.",
+    invalid_usage_event: () => "Deze anonieme meting kon niet worden verwerkt.",
     payload_too_large: () => "Dit verzoek is te groot.",
     too_many_exclusions: () => "Er zijn te veel uitsluitingen opgegeven.",
     field_required: (params) => `${field("nl", params)} ontbreekt.`,
@@ -125,6 +126,7 @@ const messages: Record<Locale, Record<ApiErrorCode, Formatter>> = {
     webhook_signature_invalid: () => "This request is not allowed.",
     invalid_json: () => "This request could not be read. Refresh the page and try again.",
     invalid_traffic_measurement: () => "This anonymous measurement could not be processed.",
+    invalid_usage_event: () => "This anonymous measurement could not be processed.",
     payload_too_large: () => "This request is too large.",
     too_many_exclusions: () => "Too many exclusions were provided.",
     field_required: (params) => `${field("en", params)} is required.`,
@@ -214,6 +216,7 @@ const messages: Record<Locale, Record<ApiErrorCode, Formatter>> = {
     too_many_managers: (params) => `Eine Liste kann höchstens ${params.max} zusätzliche Verwaltungslinks haben. Widerrufe zuerst einen.`,
     manager_not_found: () => "Dieser Verwaltungslink existiert nicht mehr.",
     invalid_traffic_measurement: () => "Diese Messung ist ungültig.",
+    invalid_usage_event: () => "Diese Messung ist ungültig.",
     reminder_needs_future_date: () => "Eine Erinnerung ist nur möglich, wenn die Auslosung ein Datum nach heute hat. Lege zuerst das Datum fest.",
   },
 };

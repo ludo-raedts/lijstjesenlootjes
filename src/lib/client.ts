@@ -2,6 +2,7 @@
 
 import { getActiveLocale } from "@/i18n/config";
 import { translateApiError } from "@/i18n/api-errors";
+import type { ClientUsageEvent } from "@/lib/usage";
 import { isApiErrorCode, type ApiErrorCode, type ApiErrorParams } from "@/lib/api-error";
 
 /** An API failure with its stable code, so screens can react to the cause and not just show the text. */
@@ -63,4 +64,15 @@ export async function ensureSession() {
 
 export async function copyText(value: string) {
   await navigator.clipboard.writeText(value);
+}
+
+/** Reports one anonymous interface action (a call-to-action click or a link copy). Never blocks or throws. */
+export function reportUsage(event: ClientUsageEvent) {
+  void fetch("/api/usage", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ event }),
+    keepalive: true,
+    referrerPolicy: "no-referrer",
+  }).catch(() => undefined);
 }
