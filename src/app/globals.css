@@ -1073,3 +1073,7 @@ body {
 .admin-current-host { display: block; margin-bottom: .25rem; color: var(--muted); font-size: .85rem; font-weight: 700; }
 .admin-current-site .admin-current-meta { margin-top: .75rem; }
 @media (max-width: 520px) { .admin-current-site { grid-template-columns: 1fr; } }
+.save-link { display: grid; gap: .5rem; margin: .85rem 0 1.35rem; padding: 1rem 1.1rem; border: 2px solid var(--line); border-radius: 2px; background: var(--paper-deep, #f8f0e3); }
+.save-link h3, .save-link p { margin: 0; }
+.save-link .link-box { margin: 0; }
+.save-link .button-row { margin-top: .25rem; }

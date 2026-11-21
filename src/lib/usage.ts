@@ -18,6 +18,7 @@ export const usageEvents = [
   "cta_guest_to_draw",
   "cta_guest_to_wishlist",
   "share_link_copied",
+  "manage_link_saved",
 ] as const;
 
 /** Counters the browser may report itself: plain interface actions, never content or identifiers. */
@@ -27,6 +28,7 @@ export const clientUsageEvents = [
   "cta_guest_to_draw",
   "cta_guest_to_wishlist",
   "share_link_copied",
+  "manage_link_saved",
 ] as const satisfies readonly (typeof usageEvents)[number][];
 
 export type ClientUsageEvent = (typeof clientUsageEvents)[number];
