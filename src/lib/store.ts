@@ -72,9 +72,11 @@ export async function transaction<T>(
     if (committed === true) return result;
     // Someone else committed first. Count the collision (no data) and retry after a random pause.
     console.warn("Supabase state commit conflict", attempt + 1);
+    void recordUsage("state_commit_conflict");
     await new Promise((resolve) => setTimeout(resolve, commitBackoffMs(attempt)));
   }
 
+  await recordUsage("state_commit_failed");
   throw new Error("The database was too busy to commit the change.");
 }
 

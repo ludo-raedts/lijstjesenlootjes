@@ -37,6 +37,8 @@ test("the usage series fills missing days with zeros, oldest first", () => {
     cta_guest_to_wishlist: 0,
     share_link_copied: 0,
     manage_link_saved: 0,
+    state_commit_conflict: 0,
+    state_commit_failed: 0,
   });
 });
 
@@ -106,4 +108,14 @@ test("the browser may only report allowlisted interface counters", async () => {
   assert.equal(isClientUsageEvent("admin_login"), false);
   assert.equal(isClientUsageEvent(undefined), false);
   for (const event of clientUsageEvents) assert.ok(usageEvents.includes(event));
+});
+
+test("the store counts as contended after any failed write or many collisions", async () => {
+  const { isStoreContended, totalUsage, buildUsageSeries } = await import("../src/lib/usage");
+  const week = (rows: Array<[string, number]>) =>
+    totalUsage(buildUsageSeries(rows.map(([event, eventCount]) => ({ day: "2026-11-17", event, eventCount })), 1, now));
+  assert.equal(isStoreContended(week([])), false);
+  assert.equal(isStoreContended(week([["state_commit_conflict", 49]])), false);
+  assert.equal(isStoreContended(week([["state_commit_conflict", 50]])), true);
+  assert.equal(isStoreContended(week([["state_commit_failed", 1]])), true);
 });

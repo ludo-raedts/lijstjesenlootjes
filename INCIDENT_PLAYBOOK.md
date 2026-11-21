@@ -19,6 +19,7 @@ Short, practical steps for the first hour. Keep this free of real names, links, 
     proven by a real incident yet; verify it the first time something breaks.
   - Failed deployments are not an alert rule. Enable them under Vercel → Settings →
     Notifications (deployment failed) so a broken build is reported by email.
+- Contention signal without log access: `/admin/usage` counts retried write collisions (`state_commit_conflict`) and writes that gave up (`state_commit_failed`), and shows a warning when a week has any failed write or 50+ collisions. The thresholds are a starting guess (`CONTENTION_CONFLICT_THRESHOLD` in `src/lib/usage.ts`); adjust them once real seasonal traffic shows what normal looks like. A failed write answers 500, so the 5xx alert rule above also catches it.
 - Structured log events to search for in Runtime Logs: `health_check_failed`,
   `retention_cleanup_completed`, `Supabase read_app_state failed`,
   `Supabase commit_app_state failed`, `Supabase state commit conflict` (a write retried after a collision; a steady stream means the single-document store is under contention), `Supabase consume_app_rate_limit failed`,

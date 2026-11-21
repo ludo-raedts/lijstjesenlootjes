@@ -15,7 +15,7 @@ import {
   type CountryTrafficRow,
   type TrafficRow,
 } from "@/lib/analytics";
-import { buildUsageSeries, previousYearWindow, summarizeStock, totalUsage, usageEvents } from "@/lib/usage";
+import { buildUsageSeries, isStoreContended, previousYearWindow, summarizeStock, totalUsage, usageEvents } from "@/lib/usage";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +62,8 @@ export default async function UsagePage() {
     { id: "90", title: t("usage.totals.90Days"), totals: totalUsage(usage.slice(-90)) },
     { id: "previous-year", title: t("usage.totals.previousYear"), totals: totalUsage(previousYearWindow(usage, 30)) },
   ] : [];
+  const week = usage ? totalUsage(usage.slice(-7)) : undefined;
+  const contended = week ? isStoreContended(week) : false;
   const recentDays = usage ? usage.slice(-14).reverse() : [];
   const trafficSummary = traffic ? summarizeTraffic(trafficWindow(traffic, 30)) : undefined;
   const countryTrafficSummary = countryTraffic
@@ -123,6 +125,12 @@ export default async function UsagePage() {
           <Link href="/admin/usage" aria-current="page">{t("admin.nav.usage")}</Link>
         </nav>
       </header>
+
+      {contended && week ? (
+        <p className="notice warning" role="status">
+          {t("usage.contention.warning", { conflicts: number.format(week.state_commit_conflict), failed: number.format(week.state_commit_failed) })}
+        </p>
+      ) : null}
 
       {kpis.length > 0 ? (
         <section className="kpi-strip" aria-labelledby="usage-kpi-title">
