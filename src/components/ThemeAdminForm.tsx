@@ -43,15 +43,16 @@ const layoutCaptionKeys: Record<LayoutId, Parameters<ReturnType<typeof useI18n>[
 
 export function ThemeAdminForm({
   settings,
-  appearance,
+  appearances,
 }: {
   settings: ThemeSettings;
-  appearance: ResolvedAppearance;
+  appearances: { host: string; appearance: ResolvedAppearance }[];
 }) {
   const { t } = useI18n();
   const router = useRouter();
   const initialState: AdminActionState = { code: "idle" };
   const [state, action, pending] = useActionState(saveThemeSettingsAction, initialState);
+  const activeThemes = new Set(appearances.map(({ appearance }) => appearance.theme));
   const formSettings = state.code === "saved" && state.settings ? state.settings : settings;
 
   useEffect(() => {
@@ -67,23 +68,32 @@ export function ThemeAdminForm({
   return (
     <>
       <section className="admin-current" aria-labelledby="admin-current-title">
-        <div>
+        <div className="admin-current-heading">
           <span className="eyebrow">{t("admin.current.eyebrow")}</span>
-          <h2 id="admin-current-title">{t(themeLabelKeys[appearance.theme])}</h2>
-          <p>{t(layoutLabelKeys[appearance.layout])}</p>
+          <form action={logoutAdminAction}>
+            <button className="button button-secondary button-small" type="submit">{t("admin.logout")}</button>
+          </form>
         </div>
-        <LayoutPreview
-          layout={appearance.layout}
-          theme={appearance.theme}
-          caption={t(layoutCaptionKeys[appearance.layout])}
-        />
-        <div className="admin-current-meta">
-          <span>{appearance.themeSource === "automatic" ? t("admin.source.automatic") : t("admin.source.manual")}</span>
-          <span>{appearance.layoutSource === "automatic" ? t("admin.layoutSource.automatic") : t("admin.layoutSource.manual")}</span>
+        <div className="admin-current-sites">
+          {appearances.map(({ host, appearance }, index) => (
+            <article className="admin-current-site" data-site={host} key={host}>
+              <div>
+                <span className="admin-current-host">{host}</span>
+                <h2 id={index === 0 ? "admin-current-title" : undefined}>{t(themeLabelKeys[appearance.theme])}</h2>
+                <p>{t(layoutLabelKeys[appearance.layout])}</p>
+                <div className="admin-current-meta">
+                  <span>{appearance.themeSource === "automatic" ? t("admin.source.automatic") : t("admin.source.manual")}</span>
+                  <span>{appearance.layoutSource === "automatic" ? t("admin.layoutSource.automatic") : t("admin.layoutSource.manual")}</span>
+                </div>
+              </div>
+              <LayoutPreview
+                layout={appearance.layout}
+                theme={appearance.theme}
+                caption={t(layoutCaptionKeys[appearance.layout])}
+              />
+            </article>
+          ))}
         </div>
-        <form action={logoutAdminAction}>
-          <button className="button button-secondary button-small" type="submit">{t("admin.logout")}</button>
-        </form>
       </section>
 
       <form action={action} className="admin-settings-form" key={formSettings.updatedAt ?? "default"}>
@@ -161,7 +171,7 @@ export function ThemeAdminForm({
           {themeIds.map((theme) => {
             const definition = themeDefinitions[theme];
             return (
-              <article className={appearance.theme === theme ? "is-active" : undefined} key={theme}>
+              <article className={activeThemes.has(theme) ? "is-active" : undefined} key={theme}>
                 <img
                   src={definition.desktopImage}
                   alt=""
@@ -174,7 +184,7 @@ export function ThemeAdminForm({
                   <h3>{t(themeLabelKeys[theme])}</h3>
                   <p>{t(layoutLabelKeys[definition.defaultLayout])}</p>
                 </div>
-                {appearance.theme === theme ? <span>{t("admin.gallery.active")}</span> : null}
+                {activeThemes.has(theme) ? <span>{t("admin.gallery.active")}</span> : null}
               </article>
             );
           })}

@@ -36,8 +36,8 @@ test("log in, save a manual theme and layout, reset to automatic, log out", asyn
   await login(page, t);
   await page.getByRole("link", { name: t("admin.nav.settings") }).click();
   await expect(page.locator("#admin-current-title")).toBeVisible();
-  await expect(page.locator(".layout-preview")).toBeVisible();
-  await expect(page.getByText(t("admin.source.automatic"))).toBeVisible();
+  await expect(page.locator(".layout-preview")).toHaveCount(2);
+  await expect(page.getByText(t("admin.source.automatic"))).toHaveCount(2);
 
   await page.locator("#theme-mode").selectOption("manual");
   await page.locator("#manual-theme").selectOption("winter");

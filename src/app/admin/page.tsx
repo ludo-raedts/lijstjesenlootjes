@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { ThemeAdminForm } from "@/components/ThemeAdminForm";
 import { getServerI18n } from "@/i18n/server";
+import { SITE_DOMAINS } from "@/lib/domains";
 import { hasAdminSession, isAdminConfigured } from "@/lib/admin-auth";
 import { getActiveAppearance, getThemeSettings } from "@/lib/theme-store";
 
@@ -16,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AdminPage() {
-  const { locale, t } = await getServerI18n();
+  const { t } = await getServerI18n();
   const configured = isAdminConfigured();
   const authenticated = configured && await hasAdminSession();
 
@@ -44,7 +45,10 @@ export default async function AdminPage() {
         </nav>
         <ThemeAdminForm
           settings={await getThemeSettings()}
-          appearance={await getActiveAppearance(locale)}
+          appearances={await Promise.all(SITE_DOMAINS.map(async ({ host, locale: siteLocale }) => ({
+            host,
+            appearance: await getActiveAppearance(siteLocale),
+          })))}
         />
         </>
       )}
