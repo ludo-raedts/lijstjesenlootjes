@@ -142,6 +142,17 @@ export default async function HomePage() {
         </div>
         <img className="trust-sprig" src={appearance.definition.accentMotif} alt="" aria-hidden="true" />
       </section>
+
+      <section className="shell narrow page-section prose-page seo-content" aria-labelledby="home-about-title">
+        <h2 id="home-about-title">{t("home.about.title")}</h2>
+        <p>{t("home.about.body")}</p>
+        {([1, 2, 3] as const).map((n) => (
+          <details key={n}>
+            <summary>{t(`home.about.faq${n}Question` as const)}</summary>
+            <p>{t(`home.about.faq${n}Answer` as const)}</p>
+          </details>
+        ))}
+      </section>
     </>
   );
 }
