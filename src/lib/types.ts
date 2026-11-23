@@ -56,6 +56,8 @@ export type Wishlist = {
   updatedAt?: string;
   deletedAt?: string;
   wishes: Wish[];
+  /** Whether guests can reserve gifts. Only `false` switches it off, so lists created before this option keep reservations. */
+  reservations?: boolean;
   /** Keyed hash of the organizer's address, stored only when they opted in to link recovery. */
   recoveryHash?: string;
   emailStatus?: EmailStatus;

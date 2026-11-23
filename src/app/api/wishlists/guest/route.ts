@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
       if (!wishlist) throw new HttpError(410, "wishlist_not_found");
       return {
         wishlist: {
+          reservationsEnabled: wishlist.reservations !== false,
           title: wishlist.title,
           occasion: wishlist.occasion,
           date: wishlist.date,
@@ -41,6 +42,7 @@ export async function POST(request: NextRequest) {
     const result = await transaction((database) => {
       const wishlist = database.wishlists.find((item) => item.id === session.scopeId && !item.deletedAt);
       if (!wishlist) throw new HttpError(410, "wishlist_not_found");
+      if (wishlist.reservations === false) throw new HttpError(403, "reservations_disabled");
       const wish = wishlist.wishes.find((item) => item.id === body.wishId);
       if (!wish) throw new HttpError(404, "wish_not_found");
       const now = new Date().toISOString();

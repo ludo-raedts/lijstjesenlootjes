@@ -28,6 +28,7 @@ function publicWishlist(wishlist: Wishlist) {
     expiresAt: expiresAt === undefined ? undefined : new Date(expiresAt).toISOString(),
     emailStatus: wishlist.emailStatus,
     recoverable: Boolean(wishlist.recoveryHash),
+    reservationsEnabled: wishlist.reservations !== false,
     managers: (wishlist.comanagers ?? []).map(({ id: managerId, label, createdAt }) => ({ id: managerId, label, createdAt })),
     wishes: wishlist.wishes.map(({ reservation: _reservation, ...wish }) => wish),
   };

@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
       createdAt,
       updatedAt: createdAt,
       wishes: body.wishes.map(parseWish),
+      reservations: body.reservations === false ? false : undefined,
       recoveryHash: email && body.recoverable === true ? recoveryHash(email, recoverySecret()) : undefined,
       emailStatus: email && emailConfigured() ? queuedStatus() : undefined,
     };

@@ -22,6 +22,7 @@ export const apiErrorCodes = [
   "wish_not_found",
   "wish_already_reserved",
   "reservation_not_owned",
+  "reservations_disabled",
   "unknown_action",
   "invalid_participant_count",
   "participant_incomplete",

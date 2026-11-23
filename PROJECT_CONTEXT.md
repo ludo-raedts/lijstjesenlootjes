@@ -6,7 +6,7 @@ This document gives contributors and coding agents the minimum durable context n
 
 Lijstjes & Lootjes is a privacy-conscious web application for two closely related tasks:
 
-1. Create and share a wishlist. Guests can reserve gifts to prevent duplicates.
+1. Create and share a wishlist. The organizer can optionally let guests reserve gifts to prevent duplicates (meant for lists several people use; switched on by default, chosen when creating the list).
 2. Create a private name draw. Every participant receives a personal capability link, sees one assigned recipient, and can create a personal wishlist inside the draw. Draw wishlists do not use reservations because each recipient has one assigned giver.
 
 A third, fully client-side flow lets a group draw on one device by passing it around (`/samen-lootjes-trekken`, `/draw-names-together`). The pairing lives only in browser memory, each person's recipient is erased after one view, and nothing is stored or sent. Pairs of people (partners, housemates) can be excluded from drawing each other.

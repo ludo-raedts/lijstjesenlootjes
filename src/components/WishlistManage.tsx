@@ -19,6 +19,7 @@ type Wishlist = {
   expiresAt?: string;
   emailStatus?: MailStatus;
   recoverable?: boolean;
+  reservationsEnabled?: boolean;
   managers?: Array<{ id: string; label?: string; createdAt: string }>;
   wishes: Array<WishDraft & { id: string }>;
 };
@@ -101,7 +102,9 @@ export function WishlistManage() {
     <div className="manage-stack">
     <form className="tool-card" onSubmit={save}>
       <span className="eyebrow">{t("wishlist.manage.eyebrow")}</span><h2>{t("wishlist.manage.title")}</h2>
-      <div className="notice"><strong>{t("wishlist.manage.reservationTitle")}</strong><span>{t("wishlist.manage.reservationBody")}</span></div>
+      {wishlist.reservationsEnabled === false
+        ? <div className="notice"><strong>{t("wishlist.manage.reservationOffTitle")}</strong><span>{t("wishlist.manage.reservationOffBody")}</span></div>
+        : <div className="notice"><strong>{t("wishlist.manage.reservationTitle")}</strong><span>{t("wishlist.manage.reservationBody")}</span></div>}
       <div className="field"><label htmlFor="manage-title">{t("wishlist.manage.titleLabel")}</label><input id="manage-title" value={wishlist.title} required onChange={(event) => setWishlist({ ...wishlist, title: event.target.value })} /></div>
       <div className="field-row">
         <div className="field"><label htmlFor="manage-occasion">{t("wishlist.manage.occasionLabel")}</label><input id="manage-occasion" value={wishlist.occasion ?? ""} onChange={(event) => setWishlist({ ...wishlist, occasion: event.target.value })} /></div>
