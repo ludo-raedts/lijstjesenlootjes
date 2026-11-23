@@ -427,6 +427,7 @@ export const nlMessages = {
   "sinterklaas.faq6Question": "Is Sinterklaas lootjes trekken gratis?",
   "sinterklaas.faq6Answer": "Ja. Op dit moment kost het gebruik niets en hoef je nergens voor te betalen.",
   "footer.sinterklaas": "Sinterklaas lootjes",
+  "footer.christmas": "Kerst lootjes",
 
   "help.eyebrow": "Hulp",
   "help.title": "Veelgestelde vragen over lootjes en verlanglijstjes",
