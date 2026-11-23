@@ -3,6 +3,7 @@ import { getImageProps } from "next/image";
 import Link from "next/link";
 import { BowlArt, ClipboardArt, CobaltDashes, GroupIcon, GiftMark, LinkIcon, PencilIcon } from "@/components/Art";
 import { getServerI18n } from "@/i18n/server";
+import { hasPath } from "@/lib/paths";
 import { getPagePath } from "@/lib/request-site";
 import { JsonLd } from "@/components/JsonLd";
 import { pageAlternates, websiteStructuredData } from "@/lib/seo";
@@ -37,6 +38,11 @@ export default async function HomePage() {
       art: <BowlArt className="product-art" />,
     },
   ];
+  // Plain links in the page content (not only the footer) to the seasonal landing pages, the active season first.
+  const seasonalPages = (appearance.theme === "christmas" ? (["christmasDraw", "sinterklaasDraw"] as const) : (["sinterklaasDraw", "christmasDraw"] as const)).filter((key) => hasPath(key, locale));
+  const seasonalLinks = await Promise.all(
+    seasonalPages.map(async (key) => ({ key, href: await getPagePath(key), label: t(key === "christmasDraw" ? "home.seasonal.christmas" : "home.seasonal.sinterklaas") })),
+  );
   const steps = [
     { title: t("home.how.step1.title"), body: t("home.how.step1.body"), icon: <PencilIcon /> },
     { title: t("home.how.step2.title"), body: t("home.how.step2.body"), icon: <LinkIcon /> },
@@ -99,6 +105,13 @@ export default async function HomePage() {
             </article>
           ))}
         </div>
+        {seasonalLinks.length > 0 ? (
+          <nav className="season-links" aria-label={t("home.seasonal.label")}>
+            {seasonalLinks.map((link) => (
+              <Link className="text-link" href={link.href} key={link.key}>{link.label} <span aria-hidden="true">→</span></Link>
+            ))}
+          </nav>
+        ) : null}
       </section>
 
       <section className="how-section">

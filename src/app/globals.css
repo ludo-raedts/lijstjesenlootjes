@@ -212,6 +212,7 @@ p { margin: 0 0 1rem; }
 .tone-plum .eyebrow { color: var(--plum); }
 .tool-row p, .tool-row h2 { color: var(--ink); }
 .text-link { display: inline-flex; width: fit-content; align-items: center; gap: .65rem; color: var(--green); font-weight: 750; text-decoration: none; }
+.season-links { display: flex; flex-wrap: wrap; gap: .75rem 2rem; margin-top: 1.5rem; }
 .text-link span { transition: transform .2s ease; }
 .text-link:hover span { transform: translateX(4px); }
 
