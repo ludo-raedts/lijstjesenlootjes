@@ -411,6 +411,7 @@ export const deMessages: Partial<Record<MessageKey, string>> = {
   "sinterklaas.faq6Question": "Ist die Sinterklaas-Auslosung kostenlos?",
   "sinterklaas.faq6Answer": "Ja. Die Nutzung kostet derzeit nichts und du bezahlst für nichts.",
   "footer.sinterklaas": "Sinterklaas-Auslosung",
+  "footer.christmas": "Weihnachts-Auslosung",
   "draw.reveal.noteTitle": "Notiz der Organisation",
   "draw.reveal.redrawn": "Die Organisation hat am {date} neu ausgelost. Öffne dein Los, um zu sehen, wen du jetzt hast.",
   "draw.reveal.linkedMissing": "Die Liste, die du verknüpft hattest, gibt es nicht mehr, daher sieht deine Person keine Wünsche daraus. Verknüpfe eine andere Liste oder trage oben deine Wünsche ein.",
