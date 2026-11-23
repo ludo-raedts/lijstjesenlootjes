@@ -442,6 +442,7 @@ export const enMessages: Record<MessageKey, string> = {
   "sinterklaas.faq6Question": "Is the Sinterklaas name draw free?",
   "sinterklaas.faq6Answer": "Yes. Using it currently costs nothing and you don’t pay for anything.",
   "footer.sinterklaas": "Sinterklaas name draw",
+  "footer.christmas": "Christmas name draw",
 
   "help.eyebrow": "Help",
   "help.title": "Questions about draws and wishlists",

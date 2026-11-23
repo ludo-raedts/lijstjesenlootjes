@@ -16,6 +16,7 @@ export async function SiteFooter() {
         </div>
         <nav aria-label={t("footer.navigationLabel")}>
           {hasPath("sinterklaasDraw", locale) ? <Link href={await getPagePath("sinterklaasDraw")}>{t("footer.sinterklaas")}</Link> : null}
+          {hasPath("christmasDraw", locale) ? <Link href={await getPagePath("christmasDraw")}>{t("footer.christmas")}</Link> : null}
           {hasPath("officeDraw", locale) ? <Link href={await getPagePath("officeDraw")}>{t("footer.office")}</Link> : null}
           {hasPath("birthdayWishlist", locale) ? <Link href={await getPagePath("birthdayWishlist")}>{t("footer.birthday")}</Link> : null}
           <Link href={await getPagePath("drawTogether")}>{t("footer.together")}</Link>
