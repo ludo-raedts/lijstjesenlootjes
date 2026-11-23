@@ -6,6 +6,8 @@ export const nlMessages = {
   "language.english": "English",
 
   "meta.home.title": "Lootjes trekken & verlanglijstje maken | Lijstjes & Lootjes",
+  "meta.home.title.sinterklaas": "Sinterklaas lootjes trekken & verlanglijstje maken | Lijstjes & Lootjes",
+  "meta.home.title.christmas": "Kerst lootjes trekken & verlanglijstje maken | Lijstjes & Lootjes",
   "meta.home.description": "Trek online lootjes of maak een verlanglijstje om te delen met familie, vrienden of collega’s. Zonder account of app: iedereen krijgt een persoonlijke link.",
   "meta.home.description.sinterklaas": "Trek online lootjes voor Sinterklaas of maak een verlanglijstje om te delen. Zonder account of app: iedereen krijgt een persoonlijke link, ook voor surprises.",
   "meta.home.description.christmas": "Trek online lootjes voor kerst of maak een verlanglijstje om te delen met familie, vrienden of collega’s. Zonder account of app: iedereen krijgt een persoonlijke link.",
@@ -63,6 +65,9 @@ export const nlMessages = {
   "home.hero.imageAlt": "Een diverse groep mensen schrijft wensen op en trekt samen lootjes rond een tafel.",
   "home.products.eyebrow": "Twee manieren om te geven",
   "home.products.title": "Kies wat bij jullie past.",
+  "home.seasonal.label": "Het seizoen",
+  "home.seasonal.sinterklaas": "Sinterklaas lootjes trekken",
+  "home.seasonal.christmas": "Kerst lootjes trekken",
   "home.wishlist.title": "Verlanglijstje maken",
   "home.wishlist.body": "Zet je wensen op één plek en deel je lijst. Gasten kunnen cadeaus reserveren, zodat dubbele cadeaus worden voorkomen.",
   "home.wishlist.action": "Maak een verlanglijstje",

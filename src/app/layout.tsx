@@ -29,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(await getRequestSiteUrl()),
     alternates: { canonical: "./" },
     title: {
-      default: t("meta.home.title"),
+      default: t(seasonalMessageKey("meta.home.title", theme)),
       template: `%s | ${t("app.name")}`,
     },
     description,

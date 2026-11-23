@@ -55,8 +55,9 @@ export function socialImages(key: PageKey, alt: string): NonNullable<NonNullable
 }
 
 /**
- * The description of a page for the active season. Titles stay the same all year (they build ranking and recognition);
- * the description may name Sinterklaas or Christmas while those themes are active, when a variant `<key>.<theme>` exists.
+ * The message of a page for the active season. Page titles stay the same all year (they build ranking and recognition).
+ * The exceptions are the home description and the home title, which may name Sinterklaas or Christmas while those themes
+ * are active, when a variant `<key>.<theme>` exists: the home page is what Google shows for broad seasonal queries.
  */
 export function seasonalMessageKey<Key extends string>(key: Key, theme: ThemeId): Key {
   const seasonal = `${key}.${theme}`;

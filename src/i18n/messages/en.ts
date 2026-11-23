@@ -8,6 +8,8 @@ export const enMessages: Record<MessageKey, string> = {
   "language.english": "English",
 
   "meta.home.title": "Secret Santa generator & wishlist maker | Wishlists & Draws",
+  "meta.home.title.sinterklaas": "Sinterklaas name draw & wishlist maker | Wishlists & Draws",
+  "meta.home.title.christmas": "Christmas Secret Santa generator & wishlist maker | Wishlists & Draws",
   "meta.home.description": "Draw names online for Secret Santa or create a wishlist to share with family, friends or colleagues. No account or app: everyone gets a personal link.",
   "meta.home.description.sinterklaas": "Draw names online for Sinterklaas or create a wishlist to share. No account or app: everyone gets a personal link, surprises included.",
   "meta.home.description.christmas": "Draw names online for Secret Santa this Christmas or create a wishlist to share with family, friends or colleagues. No account or app: everyone gets a personal link.",
@@ -65,6 +67,9 @@ export const enMessages: Record<MessageKey, string> = {
   "home.hero.imageAlt": "A diverse group writes wishes and draws names together around a table.",
   "home.products.eyebrow": "Two ways to give",
   "home.products.title": "Choose what suits your group.",
+  "home.seasonal.label": "The season",
+  "home.seasonal.sinterklaas": "Sinterklaas name draw",
+  "home.seasonal.christmas": "Christmas name draw",
   "home.wishlist.title": "Create a wishlist",
   "home.wishlist.body": "Keep your wishes in one place and share your list. Guests can reserve gifts to prevent duplicates.",
   "home.wishlist.action": "Create a wishlist",

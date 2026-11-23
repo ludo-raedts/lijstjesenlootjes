@@ -12,6 +12,8 @@ export const deMessages: Partial<Record<MessageKey, string>> = {
   "language.english": "English",
 
   "meta.home.title": "Wichteln & Wunschzettel online erstellen | Wishlists & Draws",
+  "meta.home.title.sinterklaas": "Sinterklaas-Auslosung & Wunschzettel online erstellen | Wishlists & Draws",
+  "meta.home.title.christmas": "Weihnachts-Wichteln & Wunschzettel online erstellen | Wishlists & Draws",
   "meta.home.description": "Lose online Wichtelpartner aus oder erstelle einen Wunschzettel zum Teilen mit Familie, Freunden oder Kolleginnen und Kollegen. Ohne Konto oder App: Alle bekommen einen persönlichen Link.",
   "meta.home.description.sinterklaas": "Lose online Wichtelpartner aus oder erstelle einen Wunschzettel zum Teilen. Ohne Konto oder App: Alle bekommen einen persönlichen Link.",
   "meta.home.description.christmas": "Lose online Wichtelpartner für Weihnachten aus oder erstelle einen Wunschzettel zum Teilen mit Familie, Freunden oder Kolleginnen und Kollegen. Ohne Konto oder App: Alle bekommen einen persönlichen Link.",
@@ -72,6 +74,9 @@ export const deMessages: Partial<Record<MessageKey, string>> = {
   "home.hero.imageAlt": "Eine vielfältige Gruppe schreibt gemeinsam Wünsche auf und lost Namen aus.",
   "home.products.eyebrow": "Zwei Arten zu schenken",
   "home.products.title": "Wähle, was zu deiner Gruppe passt.",
+  "home.seasonal.label": "Die Saison",
+  "home.seasonal.sinterklaas": "Sinterklaas-Auslosung",
+  "home.seasonal.christmas": "Weihnachts-Auslosung",
   "home.wishlist.title": "Wunschzettel erstellen",
   "home.wishlist.body": "Sammle deine Wünsche an einem Ort und teile deine Liste. Gäste können Geschenke reservieren, damit nichts doppelt gekauft wird.",
   "home.wishlist.action": "Wunschzettel erstellen",
