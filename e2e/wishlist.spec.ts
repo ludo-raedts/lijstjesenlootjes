@@ -39,7 +39,9 @@ test("create, edit, share, reserve, release and delete a wishlist", async ({ pag
   // The owner never sees who reserved what.
   const managed = await browserFetch(managePage, "/api/wishlists/manage");
   expect(managed.status).toBe(200);
-  expect(managed.text).not.toContain("reserv");
+  // The owner never sees who reserved what (the on/off flag is fine).
+  expect(managed.text).not.toContain("reservedAt");
+  expect(managed.text).not.toContain("ownerSessionHash");
 
   // Guest reserves; the reservation survives a reload and is visible to another guest.
   const guestA = await browser.newContext();
@@ -106,4 +108,28 @@ test("a wishlist needs at least a title and one wish", async ({ page }, testInfo
   await expect(page.locator("#list-title")).toBeFocused();
   expect((await mockState()).data.wishlists).toHaveLength(0);
   expect(label(t, "wishes.titleLabel")).toBeTruthy();
+});
+
+test("a wishlist without reservations shows no reserve controls and refuses reservations", async ({ page, browser, baseURL }, testInfo) => {
+  const { t } = i18n(testInfo);
+  await page.goto(pagePath(testInfo, "wishlistCreate"));
+  await page.locator("#list-title").fill("Synthetic single-giver list");
+  await page.locator("#wish-title-0").fill("Reading lamp");
+  await page.getByLabel(t("wishlist.create.reservationsLabel")).uncheck();
+  await page.getByRole("button", { name: t("wishlist.create.submit") }).click();
+  await expect(page.getByRole("heading", { name: t("wishlist.create.successTitle") })).toBeVisible();
+
+  const [, rawGuestUrl] = await page.locator(".link-box code").allTextContents();
+  const guest = await browser.newContext();
+  const guestPage = await guest.newPage();
+  await guestPage.goto(rebase(rawGuestUrl, baseURL));
+  await expect(guestPage.getByRole("heading", { name: "Synthetic single-giver list" })).toBeVisible();
+  await expect(guestPage.locator(".gift-card", { hasText: "Reading lamp" })).toBeVisible();
+  await expect(guestPage.getByRole("button", { name: t("wishlist.guest.reserve") })).toHaveCount(0);
+  await expect(guestPage.getByText(t("wishlist.guest.available"), { exact: true })).toHaveCount(0);
+
+  const wishId = JSON.parse((await browserFetch(guestPage, "/api/wishlists/guest")).text).wishlist.wishes[0].id;
+  const attempt = await browserFetch(guestPage, "/api/wishlists/guest", { method: "POST", body: { action: "reserve", wishId } });
+  expect(attempt.status).toBe(403);
+  await guest.close();
 });
